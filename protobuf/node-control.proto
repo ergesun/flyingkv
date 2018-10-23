@@ -1,0 +1,4 @@
+syntax="proto3";
+//option cc_generic_services = true;
+
+package minikv.protocol;

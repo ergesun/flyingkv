@@ -1,6 +1,3 @@
-# Prerequisites
-*.d
-
 # Compiled Object files
 *.slo
 *.lo
@@ -30,3 +27,15 @@
 *.exe
 *.out
 *.app
+
+# Clion
+.idea
+cmake-build-debug
+
+# My build
+cmake-objs
+third_party
+build
+
+# gen
+codegen

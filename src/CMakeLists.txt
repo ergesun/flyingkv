@@ -1,0 +1,7 @@
+add_subdirectory(${SRC_ROOT}/sys)
+add_subdirectory(${SRC_ROOT}/common)
+add_subdirectory(${SRC_ROOT}/fsio)
+add_subdirectory(${SRC_ROOT}/net)
+add_subdirectory(${SRC_ROOT}/codegen)
+add_subdirectory(${SRC_ROOT}/rpc)
+add_subdirectory(${SRC_ROOT}/server)

@@ -1,0 +1,6 @@
+# 定义服务实例的端口
+## rf servers
+
+# [id] [hostname] [for_internal_port] [for_client_port]
+# [id] must large than zero.
+1 localhost 5466 6466
