@@ -16,7 +16,7 @@
 #include "../../sys/rw-mutex.h"
 #include "../../common/rf-server.h"
 
-#include "inode-internal-rpc-handler.h"
+#include "../../kv/ikv-handler.h"
 #include "iservice-rpc-callback-handler.h"
 
 #define RFLOG_DIR          "rflogs"
@@ -42,7 +42,7 @@ class IRfLogger;
 namespace server {
 class ServerRpcService;
 class ElectorManagerService;
-class RaftConsensus : public IService, public INodeInternalRpcHandler, public IServiceRpcCallbackHandler {
+class RaftConsensus : public IService, public IKVRpcRpcHandler, public IServiceRpcCallbackHandler {
 public:
     RaftConsensus();
     ~RaftConsensus() override;
@@ -50,7 +50,7 @@ public:
     bool Start() override;
     bool Stop() override;
 
-    // INodeInternalRpcHandler IF
+    // IKVRpcRpcHandler IF
     SP_PB_MSG OnAppendEntries(SP_PB_MSG sspMsg) override;
     SP_PB_MSG OnRequestVote(SP_PB_MSG sspMsg) override;
     void OnRecvRpcReturnResult(std::shared_ptr<net::NotifyMessage> sspNM) override;

@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_FSIO_FILE_UTILS_H
-#define MINIKV_FSIO_FILE_UTILS_H
+#ifndef MINIKV_UTILS_FILE_UTILS_H
+#define MINIKV_UTILS_FILE_UTILS_H
 
 #include <unistd.h>
 #include <sys/stat.h>
@@ -15,7 +15,7 @@
 using std::string;
 
 namespace minikv {
-namespace fsio {
+namespace utils {
 class FileUtils {
 public:
     /**
@@ -116,4 +116,4 @@ public:
 }
 }
 
-#endif //MINIKV_FSIO_FILE_UTILS_H
+#endif //MINIKV_UTILS_FILE_UTILS_H

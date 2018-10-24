@@ -1,0 +1,55 @@
+syntax="proto3";
+//option cc_generic_services = true;
+
+import "meta.proto";
+
+package minikv.protocol;
+
+enum Code {
+    OK             = 0;
+    ArgsErr        = 1;
+    InternalErr    = 2;
+}
+
+message PutRequest {
+    Entry     entry = 1;
+}
+
+message PutResponse {
+    Code      rc     = 1;
+    string    errmsg = 2;
+}
+
+message GetRequest {
+    bytes     key    = 1;
+}
+
+message GetResponse {
+    Code      rc     = 1;
+    Entry     entry  = 2;
+    string    errmsg = 3;
+}
+
+message DeleteRequest {
+    bytes     key    = 1;
+}
+
+// TODO:add old entry if exists
+message DeleteResponse {
+    Code      rc     = 1;
+    string    errmsg = 2;
+}
+
+// TODO:add skip、prefix filter condition
+message ScanRequest {
+    bytes     startKey        = 1;
+    bool      containStartKey = 2;
+    bool      Desc            = 3; // sort order: true is desc, false is asc
+    int32     limit           = 4;
+}
+
+message ScanResponse {
+    Code            rc        = 1;
+    repeated Entry  entries   = 2;
+    string          errmsg    = 3;
+}

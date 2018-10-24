@@ -12,7 +12,7 @@ namespace minikv {
 namespace sys {
 class MemPool;
 }
-namespace common {
+namespace utils {
 class Buffer;
 class ProtoBufUtils {
 public:

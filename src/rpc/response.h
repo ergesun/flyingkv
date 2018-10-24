@@ -9,7 +9,7 @@
 #include <sstream>
 
 #include "../net/snd-message.h"
-#include "../common/codec-utils.h"
+#include "../utils/codec-utils.h"
 #include "../common/buffer.h"
 #include "common-def.h"
 

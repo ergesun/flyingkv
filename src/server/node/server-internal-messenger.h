@@ -12,7 +12,7 @@
 #include "../../sys/thread-pool.h"
 #include "../../rpc/abstract-rpc-client.h"
 
-#include "inode-internal-rpc-handler.h"
+#include "../../kv/ikv-handler.h"
 
 namespace minikv {
 namespace rpc {
@@ -36,7 +36,7 @@ class RequestVoteResponse;
 namespace server {
 class RfSrvInternalRpcClientSync;
 class RfSrvInternalRpcClientAsync;
-class RfSrvInternalRpcServerSync;
+class KVRpcServerSync;
 
 struct CreateServerInternalMessengerParam {
     /**
@@ -51,14 +51,14 @@ struct CreateServerInternalMessengerParam {
      * @param pMp 可以为nullptr
      * @param connTimeout
      */
-    CreateServerInternalMessengerParam(INodeInternalRpcHandler *handler, uint16_t cliRpcWorkThreadsCnt, const sys::cctime &cliWaitRespTimeout,
+    CreateServerInternalMessengerParam(IKVRpcRpcHandler *handler, uint16_t cliRpcWorkThreadsCnt, const sys::cctime &cliWaitRespTimeout,
                                     uint16_t srvRpcWorkThreadsCnt, uint16_t mngerWorkThreadsCnt, uint16_t inetIOThreadsCnt,
                                     uint16_t iport, sys::MemPool *pMp, int32_t connTimeout) :
         nodeInternalRpcHandler(handler), clientRpcWorkThreadsCnt(cliRpcWorkThreadsCnt), clientWaitResponseTimeout(cliWaitRespTimeout),
         serverRpcWorkThreadsCnt(srvRpcWorkThreadsCnt), mngerDispatchWorkThreadsCnt(mngerWorkThreadsCnt), netIOThreadsCnt(inetIOThreadsCnt),
         port(iport), memPool(pMp), connectTimeout(connTimeout) {}
 
-    INodeInternalRpcHandler   *nodeInternalRpcHandler;
+    IKVRpcRpcHandler   *nodeInternalRpcHandler;
     uint16_t                   clientRpcWorkThreadsCnt;
     sys::cctime                clientWaitResponseTimeout;
     uint16_t                   serverRpcWorkThreadsCnt;
@@ -70,7 +70,7 @@ struct CreateServerInternalMessengerParam {
 };
 
 // TODO(sunchao): 把messenger抽象一下，将AbstractRpcMessenger放到rpc模块，把dispatcher部分抽象出来。否则现在的缺点是rpc message type协议头的处理在应用层了。
-class ServerInternalMessenger : public IService, public INodeInternalRpcHandler {
+class ServerInternalMessenger : public IService, public IKVRpcRpcHandler {
 public:
     /**
      *
@@ -111,11 +111,11 @@ private:
     /**
      * 关联关系，无需本类释放。
      */
-    INodeInternalRpcHandler                                                             *m_pNodeINRpcHandler  = nullptr;
+    IKVRpcRpcHandler                                                             *m_pNodeINRpcHandler  = nullptr;
     net::ISocketService                                                                 *m_pSocketService     = nullptr;
     RfSrvInternalRpcClientSync                                                          *m_pSyncClient        = nullptr;
     RfSrvInternalRpcClientAsync                                                         *m_pAsyncClient       = nullptr;
-    RfSrvInternalRpcServerSync                                                          *m_pServer            = nullptr;
+    KVRpcServerSync                                                          *m_pServer            = nullptr;
     bool                                                                                 m_bOwnMemPool        = false;
     sys::MemPool                                                                        *m_pMemPool           = nullptr;
     uint16_t                                                                             m_iDispatchTpCnt     = 0;

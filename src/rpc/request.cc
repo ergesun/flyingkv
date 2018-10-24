@@ -6,8 +6,8 @@
 #include <google/protobuf/message.h>
 
 #include "../common/buffer.h"
-#include "../common/codec-utils.h"
-#include "../common/protobuf-utils.h"
+#include "../utils/codec-utils.h"
+#include "../utils/protobuf-utils.h"
 
 #include "request.h"
 #include "common-def.h"

@@ -15,7 +15,7 @@
 #include "../../rpc/abstract-rpc-client.h"
 
 #include "iservice.h"
-#include "inode-internal-rpc-handler.h"
+#include "../../kv/ikv-handler.h"
 
 #include "common-def.h"
 
@@ -28,7 +28,7 @@ class RequestVoteResponse;
 namespace server {
 class RaftConsensus;
 class ServerInternalMessenger;
-class ServerRpcService : public IService, public INodeInternalRpcHandler {
+class ServerRpcService : public IService, public IKVRpcRpcHandler {
 public:
     struct RpcTask {
         RpcTask() {}

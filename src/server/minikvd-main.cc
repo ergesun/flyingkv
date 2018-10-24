@@ -13,7 +13,7 @@
 
 #include "../common/common-def.h"
 #include "../common/errors.h"
-#include "../fsio/file-utils.h"
+#include "../utils/file-utils.h"
 #include "../common/server-gflags-config.h"
 #include "../common/global-vars.h"
 #include "node/service-manager.h"
@@ -22,7 +22,7 @@ using std::string;
 using std::stringstream;
 using std::map;
 
-using minikv::fsio::FileUtils;
+using minikv::utils::FileUtils;
 
 void init_gflags_glog(int *argc, char ***argv) {
     gflags::ParseCommandLineFlags(argc, argv, true);

@@ -3,10 +3,3 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#include "rf-server.h"
-
-namespace minikv {
-    namespace rfcommon {
-
-    } // namespace rfcommon
-} // namespace minikv

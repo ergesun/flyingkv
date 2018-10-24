@@ -10,7 +10,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "../common/hash-algorithms.h"
+#include "../utils/hash-algorithms.h"
 
 using std::ostream;
 

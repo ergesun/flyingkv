@@ -6,8 +6,8 @@
 #ifndef MINIKV_RF_NODE_RPC_SYNC_CLIENT_H
 #define MINIKV_RF_NODE_RPC_SYNC_CLIENT_H
 
-#include "../../../rpc/abstract-rpc-sync-client.h"
-#include "../../../rpc/common-def.h"
+#include "../rpc/abstract-rpc-sync-client.h"
+#include "../rpc/common-def.h"
 
 namespace minikv {
 namespace protocol {

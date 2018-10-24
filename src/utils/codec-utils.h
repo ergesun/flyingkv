@@ -3,21 +3,21 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_COMMON_CODEC_UTILS_H
-#define MINIKV_COMMON_CODEC_UTILS_H
+#ifndef MINIKV_UTILS_CODEC_UTILS_H
+#define MINIKV_UTILS_CODEC_UTILS_H
 
 #include <cstdint>
 
-#include "common-def.h"
+#include "../common/common-def.h"
 
 #if BYTE_ORDER == BIG_ENDIAN
-#define ByteOrderUtils common::BigEndianCodecUtils
+#define ByteOrderUtils utils::BigEndianCodecUtils
 #elif BYTE_ORDER == LITTLE_ENDIAN
-#define ByteOrderUtils common::LittleEndianCodecUtils
+#define ByteOrderUtils utils::LittleEndianCodecUtils
 #endif
 
 namespace minikv {
-namespace common {
+namespace utils {
 class LittleEndianCodecUtils {
 public:
     // encode
@@ -44,7 +44,7 @@ public:
     static uint64_t ReadUInt64(uchar *buf);
 }; // class LittleEndianCodecUtils
 
-}  // namespace common
+}  // namespace utils
 }  // namespace minikv
 
-#endif //MINIKV_COMMON_CODEC_UTILS_H
+#endif //MINIKV_UTILS_CODEC_UTILS_H

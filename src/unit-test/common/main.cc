@@ -8,9 +8,9 @@
 #include <gtest/gtest.h>
 #include <mutex>
 
-#include "../../common/hash-algorithms.h"
+#include "../../utils/hash-algorithms.h"
 #include "../../common/common-def.h"
-#include "../../common/common-utils.h"
+#include "../../utils/common-utils.h"
 #include "../../common/rf-server-configuration.h"
 #include "../../common/global-vars.h"
 

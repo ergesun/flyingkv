@@ -3,13 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#include "buffer.h"
+#include "../common/buffer.h"
 
 #include "protobuf-utils.h"
 
 namespace minikv {
-namespace common {
-bool ProtoBufUtils::Deserialize(const Buffer *from, google::protobuf::Message *to) {
+namespace utils {
+bool ProtoBufUtils::Deserialize(const common::Buffer *from, google::protobuf::Message *to) {
     if (UNLIKELY(!to->ParseFromArray(from->GetPos(), from->AvailableLength()))) {
         LOGWFUN << "Missing fields in protocol buffer of " << to->GetTypeName().c_str() << ": " <<
                 to->InitializationErrorString().c_str();
@@ -19,7 +19,7 @@ bool ProtoBufUtils::Deserialize(const Buffer *from, google::protobuf::Message *t
     return true;
 }
 
-void ProtoBufUtils::Serialize(const google::protobuf::Message *from, Buffer *to, sys::MemPool *mp) {
+void ProtoBufUtils::Serialize(const google::protobuf::Message *from, common::Buffer *to, sys::MemPool *mp) {
     auto len = static_cast<uint32_t>(from->ByteSize());
 
     auto mo = mp->Get(len);
@@ -28,7 +28,7 @@ void ProtoBufUtils::Serialize(const google::protobuf::Message *from, Buffer *to,
     to->Refresh(start, start + len - 1, start, start + mo->Size() - 1, mo);
 }
 
-void ProtoBufUtils::Serialize(const google::protobuf::Message *from, Buffer *to) {
+void ProtoBufUtils::Serialize(const google::protobuf::Message *from, common::Buffer *to) {
     from->SerializeToArray(to->GetPos(), from->ByteSize());
 }
 }

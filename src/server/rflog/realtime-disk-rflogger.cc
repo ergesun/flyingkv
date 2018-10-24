@@ -7,11 +7,11 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-#include "../../fsio/file-utils.h"
-#include "../../fsio/io-utils.h"
-#include "../../common/codec-utils.h"
+#include "../../utils/file-utils.h"
+#include "../../utils/io-utils.h"
+#include "../../utils/codec-utils.h"
 #include "../../common/buffer.h"
-#include "../../common/protobuf-utils.h"
+#include "../../utils/protobuf-utils.h"
 #include "../../common/global-vars.h"
 #include "../../codegen/node-raft.pb.h"
 

@@ -10,7 +10,7 @@
 #include "io-utils.h"
 
 namespace minikv {
-namespace fsio {
+namespace utils {
 ssize_t IOUtils::WriteFully(int fd, const char *buf, size_t size) {
     if (-1 == fd || !buf) {
         return -1;
@@ -84,5 +84,5 @@ ssize_t IOUtils::ReadFully_V2(int fd, char **buf, size_t size) {
 
     return nread;
 }
-} // namespace fsio
+} // namespace utils
 } // namespace minikv

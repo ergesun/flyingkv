@@ -15,7 +15,7 @@
 
 #include "../common/blocking-queue.h"
 #include "../common/common-def.h"
-#include "../common/common-utils.h"
+#include "../utils/common-utils.h"
 
 #include "../sys/spin-lock.h"
 

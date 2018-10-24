@@ -7,7 +7,7 @@
 #define MINIKV_CONNECT_RESPONSE_MESSAGE_H
 
 #include "../../../../../../../snd-message.h"
-#include "../../../../../../../../common/codec-utils.h"
+#include "../../../../../../../../utils/codec-utils.h"
 #include "../../../../../../../../common/buffer.h"
 
 namespace minikv {

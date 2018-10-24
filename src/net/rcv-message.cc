@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include "../common/buffer.h"
-#include "../common/codec-utils.h"
+#include "../utils/codec-utils.h"
 
 #include "rcv-message.h"
 

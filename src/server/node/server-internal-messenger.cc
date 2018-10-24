@@ -36,8 +36,8 @@ ServerInternalMessenger::ServerInternalMessenger(CreateServerInternalMessengerPa
     auto nat = new net::net_addr_t("0.0.0.0", createParam.port);
     std::shared_ptr<net::net_addr_t> sspNat(nat);
     timeval connTimeout = {
-        .tv_sec = createParam.connectTimeout / 1000,
-        .tv_usec = (createParam.connectTimeout % 1000) * 1000
+        .tv_sec = createParam.connectTimeout / 1000 / 1000,
+        .tv_usec = (createParam.connectTimeout % (1000 * 1000))
     };
 
     net::NssConfig nc(net::SocketProtocol::Tcp, sspNat, createParam.port, net::NetStackWorkerMgrType::Unique,
@@ -49,7 +49,7 @@ ServerInternalMessenger::ServerInternalMessenger(CreateServerInternalMessengerPa
     m_pAsyncClient = new RfSrvInternalRpcClientAsync(m_pSocketService,
                                                      std::bind(&INodeInternalRpcHandler::OnRecvRpcReturnResult, createParam.nodeInternalRpcHandler, std::placeholders::_1),
                                                      m_pMemPool);
-    m_pServer = new RfSrvInternalRpcServerSync(this, createParam.serverRpcWorkThreadsCnt, m_pSocketService, m_pMemPool);
+    m_pServer = new KVRpcServerSync(this, createParam.serverRpcWorkThreadsCnt, m_pSocketService, m_pMemPool);
 }
 
 ServerInternalMessenger::~ServerInternalMessenger() {

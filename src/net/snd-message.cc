@@ -4,10 +4,10 @@
  */
 
 #include "../common/buffer.h"
-#include "../common/codec-utils.h"
+#include "../utils/codec-utils.h"
 
 #include "snd-message.h"
-#include "../common/common-utils.h"
+#include "../utils/common-utils.h"
 
 namespace minikv {
 namespace net {

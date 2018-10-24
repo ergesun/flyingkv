@@ -5,15 +5,15 @@
 
 #include <iostream>
 
-#include "buffer.h"
+#include "../common/buffer.h"
 #include "common-utils.h"
 
 namespace minikv {
-namespace common {
+namespace utils {
 Buffer* CommonUtils::GetNewBuffer(sys::MemPoolObject *mpo, uint32_t totalBufferSize) {
     auto bufferStart = (uchar*)(mpo->Pointer());
     auto bufferEnd = bufferStart + totalBufferSize - 1;
-    return new Buffer(nullptr, nullptr, bufferStart, bufferEnd, mpo);
+    return new common::Buffer(nullptr, nullptr, bufferStart, bufferEnd, mpo);
 }
-} // namespace common
+} // namespace utils
 } // namespace minikv

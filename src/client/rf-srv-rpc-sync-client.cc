@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#include "../../../net/notify-message.h"
-#include "../../../net/rcv-message.h"
-#include "../../../common/protobuf-utils.h"
-#include "../../../common/buffer.h"
+#include "../net/notify-message.h"
+#include "../net/rcv-message.h"
+#include "../utils/protobuf-utils.h"
+#include "../common/buffer.h"
 #include "../../../codegen/node-raft.pb.h"
-#include "../../../rpc/response.h"
+#include "../rpc/response.h"
 
 #include "common-def.h"
-#include "exceptions.h"
+#include "../server/rpc/exceptions.h"
 
 #include "rf-srv-rpc-sync-client.h"
 

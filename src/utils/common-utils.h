@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_COMMON_COMMON_UTILS_H
-#define MINIKV_COMMON_COMMON_UTILS_H
+#ifndef MINIKV_UTILS_COMMON_UTILS_H
+#define MINIKV_UTILS_COMMON_UTILS_H
 
 #include <sys/socket.h>
 #include <algorithm>
@@ -15,10 +15,10 @@
 #include "../sys/cctime.h"
 #include "../sys/mem-pool.h"
 
-#include "common-def.h"
+#include "../common/common-def.h"
 
 namespace minikv {
-namespace common {
+namespace utils {
 class Buffer;
 class CommonUtils {
 public:
@@ -75,6 +75,6 @@ public:
         return s;
     }
 }; // class CommonUtils
-}  // namespace common
+}  // namespace utils
 }  // namespace minikv
-#endif //MINIKV_COMMON_COMMON_UTILS_H
+#endif //MINIKV_UTILS_COMMON_UTILS_H

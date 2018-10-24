@@ -2,3 +2,8 @@ syntax="proto3";
 //option cc_generic_services = true;
 
 package minikv.protocol;
+
+message Entry {
+    bytes key   = 1;
+    bytes value = 2;
+}

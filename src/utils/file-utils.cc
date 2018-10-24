@@ -17,7 +17,7 @@ using std::ifstream;
 using std::stringstream;
 
 namespace minikv {
-namespace fsio {
+namespace utils {
 int FileUtils::CreateDir(const char *dir, __mode_t mode) {
     int err;
     struct stat dir_stat;
@@ -160,5 +160,5 @@ string FileUtils::ReadAllString(const string &file_path) {
     ss << fs.rdbuf();
     return ss.str();
 }
-} // namespace fsio
+} // namespace utils
 } // namespace minikv

@@ -6,7 +6,7 @@
 #include <google/protobuf/message.h>
 
 #include "response.h"
-#include "../common/protobuf-utils.h"
+#include "../utils/protobuf-utils.h"
 
 namespace minikv {
 namespace rpc {

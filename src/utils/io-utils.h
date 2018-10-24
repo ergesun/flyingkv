@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_FSIO_IO_UTILS_H
-#define MINIKV_FSIO_IO_UTILS_H
+#ifndef MINIKV_UTILS_IO_UTILS_H
+#define MINIKV_UTILS_IO_UTILS_H
 
 #include <cstdio>
 
@@ -39,7 +39,7 @@
         }
 
 namespace minikv {
-namespace fsio {
+namespace utils {
 class IOUtils {
 public:
     /**
@@ -74,4 +74,4 @@ public:
 }
 }
 
-#endif //MINIKV_FSIO_IO_UTILS_H
+#endif //MINIKV_UTILS_IO_UTILS_H
