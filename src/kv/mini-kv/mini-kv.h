@@ -6,14 +6,20 @@
 #ifndef MINIKV_MINI_KV_H
 #define MINIKV_MINI_KV_H
 
+#include "../../common/iservice.h"
+
 #include "../ikv-handler.h"
 
 namespace minikv {
 namespace kv {
-class MiniKV : public IKVHandler {
+class MiniKV : public common::IService, public IKVHandler {
 public:
     MiniKV();
     ~MiniKV();
+
+    bool Start() override;
+    bool Stop() override;
+
     rpc::SP_PB_MSG OnPut(rpc::SP_PB_MSG sspMsg)    override;
     rpc::SP_PB_MSG OnGet(rpc::SP_PB_MSG sspMsg)    override;
     rpc::SP_PB_MSG OnDelete(rpc::SP_PB_MSG sspMsg) override;

@@ -6,15 +6,19 @@
 #define MINIKV_ISERVICE_H
 
 namespace minikv {
+namespace common {
 /**
  * 所有服务的统一接口类。
  */
 class IService {
 public:
     virtual bool Start() = 0;
+
     virtual bool Stop() = 0;
+
     virtual ~IService() {};
 };
+}
 } // namespace minikv
 
 #endif //MINIKV_ISERVICE_H

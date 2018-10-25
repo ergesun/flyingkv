@@ -4,7 +4,6 @@
  */
 
 #include <exception>
-#include <sstream>
 #include <map>
 
 #include <sys/stat.h>
@@ -16,20 +15,31 @@
 #include "../utils/file-utils.h"
 #include "../common/server-gflags-config.h"
 #include "../common/global-vars.h"
-#include "node/service-manager.h"
+#include "../common/iservice.h"
+#include "../kv/ikv-handler.h"
+#include "../kv/mini-kv/mini-kv.h"
+
+#include "./rpc/kv-rpc-sync-server.h"
+
+using namespace minikv;
 
 using std::string;
 using std::stringstream;
 using std::map;
 
-using minikv::utils::FileUtils;
+using utils::FileUtils;
+
+common::IService *g_pKV  = nullptr;
+common::IService *g_pRpc = nullptr;
+
+bool              g_bStopped = true;
+std::mutex        g_m;
+std::condition_variable g_cv;
 
 void init_gflags_glog(int *argc, char ***argv) {
     gflags::ParseCommandLineFlags(argc, argv, true);
     google::InitGoogleLogging((*argv)[0]);
-    stringstream ss;
-    //ss << FLAGS_glog_dir << "/instance-" << FLAGS_thriftserver_port;
-    FLAGS_log_dir = ss.str();
+    FLAGS_log_dir = FLAGS_glog_dir;
     if (-1 == FileUtils::CreateDirPath(FLAGS_log_dir.c_str(), 0775)) {
         THROW_CREATE_DIR_ERR();
     }
@@ -49,6 +59,48 @@ void uninit_gflags_glog() {
     gflags::ShutDownCommandLineFlags();
 }
 
+void startup() {
+    std::unique_lock<std::mutex> l(g_m);
+    // TODO:configurable
+    auto pKV = new kv::MiniKV();
+    g_pKV = pKV;
+    if (!g_pKV->Start()) {
+        LOGFFUN << "start kv service is failure.";
+    }
+    auto pRpc = new server::KVRpcServerSync(pKV, uint16_t(FLAGS_rpc_server_threads_cnt),
+                                            uint16_t(FLAGS_rpc_io_threads_cnt), uint16_t(FLAGS_rpc_port));
+    g_pRpc = pRpc;
+    if (!g_pRpc->Start()) {
+        LOGFFUN << "start rpc service is failure.";
+    }
+
+    g_bStopped = false;
+}
+
+void stop() {
+    if (g_bStopped) {
+        return;
+    }
+
+    std::unique_lock<std::mutex> l(g_m);
+    if (!g_pRpc->Stop()) {
+        LOGEFUN << "rpc stop is failure.";
+    }
+
+    if (!g_pKV->Stop()) {
+        LOGFFUN << "kv stop is failure.";
+    }
+
+    g_bStopped = true;
+}
+
+void waitStop() {
+    std::unique_lock<std::mutex> l(g_m);
+    while (!g_bStopped) {
+        g_cv.wait(l);
+    }
+}
+
 void signal_handler(int sig) {
     static const map<int, string> what_sig = map<int, string>{
         {SIGHUP, "SIGHUP"},
@@ -66,12 +118,12 @@ void signal_handler(int sig) {
     }
 
     switch (sig) {
-        case SIGHUP: {
+        case SIGHUP: { // TODO:reload conf?
             break;
         }
         case SIGINT:
         case SIGTERM: {
-            minikv::server::ServiceManager::ServiceDestroyer::Run();
+            stop();
             break;
         }
         default: {
@@ -100,18 +152,14 @@ try {
         return -1;
     }
 
-    /**
-     * 不要删除这个。
-     */
     umask(0);
     init_gflags_glog(&argc, &argv);
     minikv::common::initialize();
-    minikv::server::ServiceManager::ServiceBootstrap::Run();
+    startup();
     register_signal();
-    minikv::server::ServiceManager::ServiceDestroyer::WaitAllServicesStopped();
 
+    waitStop();
     minikv::common::uninitialize();
-
     uninit_gflags_glog();
 
     return 0;

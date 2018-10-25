@@ -19,8 +19,8 @@
 
 namespace minikv {
 namespace server {
-KVRpcServerSync::KVRpcServerSync(kv::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadsCnt, uint16_t port,
-                                 uint32_t connectTimeout, sys::MemPool *memPool) : m_pHandler(handler) {
+KVRpcServerSync::KVRpcServerSync(kv::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadsCnt,
+                                 uint16_t port, sys::MemPool *memPool) : m_pHandler(handler) {
 
     CHECK(handler);
     m_pMemPool = memPool;
@@ -34,8 +34,8 @@ KVRpcServerSync::KVRpcServerSync(kv::IKVHandler *handler, uint16_t workThreadsCn
     auto nat = new net::net_addr_t("0.0.0.0", port);
     std::shared_ptr<net::net_addr_t> sspNat(nat);
     timeval connTimeout = {
-            .tv_sec = connectTimeout / 1000 / 1000,
-            .tv_usec = (connectTimeout % (1000 * 1000))
+            .tv_sec = 0,
+            .tv_usec = 0
     };
 
     net::NssConfig nc(net::SocketProtocol::Tcp, sspNat, port, net::NetStackWorkerMgrType::Unique,

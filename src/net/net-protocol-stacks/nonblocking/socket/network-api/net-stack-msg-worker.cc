@@ -24,7 +24,7 @@ ANetStackMessageWorker::ANetStackMessageWorker(AFileEventHandler *eventHandler, 
     m_bqMessages = new common::BlockingQueue<SndMessage*>(maxCacheMessageCnt);
     auto size = RcvMessage::HeaderSize();
     auto headerMemObj = m_pMemPool->Get(size);
-    m_pHeaderBuffer = common::CommonUtils::GetNewBuffer(headerMemObj, size);
+    m_pHeaderBuffer = utils::CommonUtils::GetNewBuffer(headerMemObj, size);
     m_msgCallback = std::move(msgCallbackHandler);
 }
 

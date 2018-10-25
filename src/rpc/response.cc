@@ -25,7 +25,7 @@ void RpcResponse::encodeDerive(common::Buffer *b) {
     ByteOrderUtils::WriteUInt16(b->GetPos(), m_ht);
     b->MoveHeadBack(sizeof(HandlerType));
     if (m_pMsg) {
-        common::ProtoBufUtils::Serialize(m_pMsg.get(), b);
+        utils::ProtoBufUtils::Serialize(m_pMsg.get(), b);
     }
 }
 

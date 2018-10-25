@@ -43,7 +43,8 @@ PosixTcpServerEventHandler::PosixTcpServerEventHandler(EventWorker *ew, net_addr
     m_onLogicConnect = std::move(onLogicConnect);
     m_pMemPool = memPool;
     m_msgCallbackHandler = std::move(msgCallbackHandler);
-    m_tp = new sys::ThreadPool<void*>(FLAGS_net_server_handshake_threads_cnt);
+    // TODO:参数化
+    m_tp = new sys::ThreadPool<void*>(4);
 }
 
 PosixTcpServerEventHandler::~PosixTcpServerEventHandler() {

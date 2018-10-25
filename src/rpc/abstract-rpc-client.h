@@ -15,7 +15,7 @@
 
 #include "../common/blocking-queue.h"
 #include "../net/common-def.h"
-#include "../server/node/iservice.h"
+#include "../common/iservice.h"
 
 #include "common-def.h"
 #include "imessage-handler.h"
@@ -66,7 +66,7 @@ class RpcRequest;
 /**
 * Rpc client base class.
 */
-class ARpcClient : public IService, public IMessageHandler {
+class ARpcClient : public common::IService, public IMessageHandler {
 public:
     struct SentRet {
         SentRet() = default;

@@ -18,8 +18,12 @@
 #include "../common/common-def.h"
 
 namespace minikv {
+namespace common {
+    class Buffer;
+}
+
+using common::Buffer;
 namespace utils {
-class Buffer;
 class CommonUtils {
 public:
     /**

@@ -6,6 +6,7 @@
 #ifndef MINIKV_SERVER_RF_NODE_H
 #define MINIKV_SERVER_RF_NODE_H
 
+#include "../../common/iservice.h"
 #include "../../rpc/rpc-server.h"
 #include "../../rpc/common-def.h"
 
@@ -15,10 +16,10 @@ class IKVHandler;
 }
 
 namespace server {
-class KVRpcServerSync : public IService {
+class KVRpcServerSync : public common::IService {
 public:
-    KVRpcServerSync(kv::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadCnt, uint16_t port,
-                    uint32_t connectTimeout/*usec*/, sys::MemPool *memPool = nullptr);
+    KVRpcServerSync(kv::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadCnt,
+                    uint16_t port, sys::MemPool *memPool = nullptr);
     ~KVRpcServerSync() override;
 
     bool Start() override;

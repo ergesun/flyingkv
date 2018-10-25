@@ -26,7 +26,7 @@ void RpcRequest::encodeDerive(common::Buffer *b) {
     ByteOrderUtils::WriteUInt16(b->GetPos(), (uint16_t)m_iHandlerId);
     b->MoveHeadBack(sizeof(uint16_t));
     if (m_sspMsg.get()) {
-        common::ProtoBufUtils::Serialize(m_sspMsg.get(), b);
+        utils::ProtoBufUtils::Serialize(m_sspMsg.get(), b);
     }
 }
 } // namespace rpc

@@ -10,7 +10,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "../server/node/iservice.h"
+#include "../common/iservice.h"
 
 #include "../net/notify-message.h"
 #include "../common/blocking-queue.h"
@@ -33,7 +33,7 @@ class IRpcHandler;
  *    client -> server :  |net common header(Message::HeaderSize() bytes)|[handler id(2bytes)|protobuf msg(n bytes)]|
  *    server -> client :  |net common header(Message::HeaderSize() bytes)|[rpc code(2bytes)|[handler id(2bytes)|protobuf msg(n bytes or 0 if no return value)]|
  */
-class RpcServer : public IService, public IMessageHandler {
+class RpcServer : public common::IService, public IMessageHandler {
 public:
     /**
      *
