@@ -1,5 +1,5 @@
 #!/bin/bash
-MINIKVD_CONFIG_NAME="acc.conf.base"
+MINIKVD_CONFIG_NAME="minikv.conf.base"
 MINIKVD_BINARY_FILE_NAME="minikvd"
 
 # generate VARS

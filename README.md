@@ -1,4 +1,4 @@
-# raft cpp implementation
+# minikv cpp implementation
 
 [TOC]
 

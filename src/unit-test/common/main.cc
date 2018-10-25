@@ -11,7 +11,6 @@
 #include "../../utils/hash-algorithms.h"
 #include "../../common/common-def.h"
 #include "../../utils/common-utils.h"
-#include "../../common/rf-server-configuration.h"
 #include "../../common/global-vars.h"
 
 using namespace minikv::sys;
@@ -51,15 +50,4 @@ TEST(CommonTest, ConfigurationTest) {
     std::string TestFileErr2 = "test-servers-err2";
     std::string TestFileErr3 = "test-servers-err3";
     std::string TestFileErr4 = "test-servers-err4";
-    minikv::common::RfServerConfiguration rfc;
-    auto path = g_sConfTestFileRootPath + TestFileOK;
-    EXPECT_EQ(true, rfc.Initialize(1, path));
-    path = g_sConfTestFileRootPath + TestFileErr1;
-    EXPECT_EQ(false, rfc.Initialize(1, path));
-    path = g_sConfTestFileRootPath + TestFileErr2;
-    EXPECT_EQ(false, rfc.Initialize(1, path));
-    path = g_sConfTestFileRootPath + TestFileErr3;
-    EXPECT_EQ(false, rfc.Initialize(1, path));
-    path = g_sConfTestFileRootPath + TestFileErr4;
-    EXPECT_EQ(false, rfc.Initialize(1, path));
 }

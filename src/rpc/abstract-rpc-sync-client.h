@@ -12,6 +12,8 @@
 #include "../sys/spin-lock.h"
 #include "../common/common-def.h"
 #include "../common/resource-pool.h"
+#include "../utils/protobuf-utils.h"
+#include "exceptions.h"
 
 #include "abstract-rpc-client.h"
 
@@ -23,7 +25,7 @@ std::shared_ptr<protocol::RpcName##Response>                                    
     ClassName::RpcName(rpc::SP_PB_MSG req, net::net_peer_info_t &&peer) {                                          \
         auto sspNM = sendMessage(#RpcName, std::move(req), std::move(peer));                                       \
         if (!sspNM) {                                                                                              \
-            throw RpcClientIsBusyException();                                                                      \
+            throw rpc::RpcClientIsBusyException();                                                                      \
         }                                                                                                          \
                                                                                                                    \
         auto *mnm = dynamic_cast<net::MessageNotifyMessage*>(sspNM.get());                                         \
@@ -31,7 +33,7 @@ std::shared_ptr<protocol::RpcName##Response>                                    
         auto RpcName##Resp__Impl_DEF_TMP = new protocol::RpcName##Response();                                      \
         auto buf = rm->GetDataBuffer();                                                                            \
         buf->MoveHeadBack(sizeof(rpc::HandlerType));                                                               \
-        common::ProtoBufUtils::Deserialize(buf, RpcName##Resp__Impl_DEF_TMP);                                      \
+        utils::ProtoBufUtils::Deserialize(buf, RpcName##Resp__Impl_DEF_TMP);                                      \
         return std::shared_ptr<protocol::RpcName##Response>(RpcName##Resp__Impl_DEF_TMP);                          \
     }
 
@@ -43,7 +45,7 @@ std::shared_ptr<protocol::RpcName##Response>                                    
     ClassName::RpcName(net::Message::Id id, rpc::SP_PB_MSG req, net::net_peer_info_t &&peer) {                     \
         auto sspNM = sendMessage(#RpcName, id, std::move(req), std::move(peer));                                   \
         if (!sspNM) {                                                                                              \
-            throw RpcClientIsBusyException();                                                                      \
+            throw rpc::RpcClientIsBusyException();                                                                      \
         }                                                                                                          \
                                                                                                                    \
         auto *mnm = dynamic_cast<net::MessageNotifyMessage*>(sspNM.get());                                         \
@@ -51,7 +53,7 @@ std::shared_ptr<protocol::RpcName##Response>                                    
         auto RpcName##Resp__Impl_DEF_TMP = new protocol::RpcName##Response();                                      \
         auto buf = rm->GetDataBuffer();                                                                            \
         buf->MoveHeadBack(sizeof(rpc::HandlerType));                                                               \
-        common::ProtoBufUtils::Deserialize(buf, RpcName##Resp__Impl_DEF_TMP);                                      \
+        utils::ProtoBufUtils::Deserialize(buf, RpcName##Resp__Impl_DEF_TMP);                                      \
         return std::shared_ptr<protocol::RpcName##Response>(RpcName##Resp__Impl_DEF_TMP);                          \
     }
 

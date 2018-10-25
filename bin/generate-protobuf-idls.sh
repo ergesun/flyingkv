@@ -3,7 +3,7 @@
 BIN_DIR=$(cd `dirname $0`; pwd)
 CMAKELISTS_ROOT_DIR=${BIN_DIR}/..
 
-PROTOBUF_IDL_DIR_PATH=${CMAKELISTS_ROOT_DIR}/protobuf
+PROTOBUF_IDL_DIR_PATH=${CMAKELISTS_ROOT_DIR}/proto
 THIRDPARTY_BIN_PATH=${CMAKELISTS_ROOT_DIR}/third_party/bin
 
 LANG=cpp
@@ -77,10 +77,10 @@ echo " "
 HAS_WARN=
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CMAKELISTS_ROOT_DIR}/third_party/lib
-for f in $(ls ${CMAKELISTS_ROOT_DIR}/protobuf)
+for f in $(ls ${CMAKELISTS_ROOT_DIR}/proto)
 do
-    echo ${CMAKELISTS_ROOT_DIR}/protobuf/${f}
-    ${THIRDPARTY_BIN_PATH}/protoc -I${CMAKELISTS_ROOT_DIR}/protobuf --${LANG}_out=${OUT_DIR} ${CMAKELISTS_ROOT_DIR}/protobuf/${f}
+    echo ${CMAKELISTS_ROOT_DIR}/proto/${f}
+    ${THIRDPARTY_BIN_PATH}/protoc -I${CMAKELISTS_ROOT_DIR}/proto --${LANG}_out=${OUT_DIR} ${CMAKELISTS_ROOT_DIR}/proto/${f}
     if [ "$?" -ne 0 ]; then
         echo_red "ERROR: gen error."
         exit 1
@@ -88,7 +88,7 @@ do
 done
 
 if [ "$LANG" == "cpp" ]; then
-    cp ${BIN_DIR}/resources/protobuf-gen-cmakelists.txt ${OUT_DIR}/CMakeLists.txt
+    cp ${BIN_DIR}/resources/proto-gen-cmakelists.txt ${OUT_DIR}/CMakeLists.txt
     if [ "$?" -ne 0 ]; then
         echo_yellow "WARN: cp CMakeLists.txt error."
         HAS_WARN="1"

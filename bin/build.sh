@@ -41,7 +41,7 @@ cd ${BUILD_OBJS_DIR}
 
 BUILD_FLAG="-DCMAKE_BUILD_TYPE=Release"
 BUILD_PROJECT_TYPE="Project type: minikv"
-BUILD_TYPE_INFO="BuildType: Release with \"-O3\""
+BUILD_TYPE_INFO="BuildType: Release with \"-O2\""
 BUILD_LOG_INFO="DebugLog: off"
 GEN_IDLS=
 

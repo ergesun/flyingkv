@@ -6,12 +6,13 @@
 #ifndef MINIKV_TEST_RPC_SERVER_H
 #define MINIKV_TEST_RPC_SERVER_H
 
+#include "../../../common/iservice.h"
 #include "../../../rpc/rpc-server.h"
 #include "../../../rpc/common-def.h"
 
 namespace minikv {
 namespace test {
-class TestRpcServer : public IService, public rpc::IMessageHandler {
+class TestRpcServer : public common::IService, public rpc::IMessageHandler {
 public:
     TestRpcServer(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool = nullptr);
     ~TestRpcServer() override;
@@ -23,18 +24,8 @@ public:
 
 private:
     void register_rpc_handlers();
-    rpc::SP_PB_MSG on_append_entries(rpc::SP_PB_MSG sspMsg);
-    /**
-     * for rpc lib to deserialize client request.
-     * @return
-     */
-    rpc::SP_PB_MSG create_append_entries_request();
-    rpc::SP_PB_MSG on_request_vote(rpc::SP_PB_MSG sspMsg);
-    /**
-     * for rpc lib to deserialize client request.
-     * @return
-     */
-    rpc::SP_PB_MSG create_request_vote_request();
+    rpc::SP_PB_MSG on_get(rpc::SP_PB_MSG sspMsg);
+    rpc::SP_PB_MSG create_get_request();
 
 private:
     rpc::RpcServer        *m_pRpcServer = nullptr;
