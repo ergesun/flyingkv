@@ -60,7 +60,7 @@ uint64_t SimpleWal::AppendEntry(IEntry *entry) {
     common::Buffer wb;
     wb.Refresh(bufferStart, bufferStart + walEntrySize - 1, bufferStart, bufferStart + walEntrySize - 1, mpo);
     // size
-    ByteOrderUtils::WriteUInt32(wb.GetPos(), walEntrySize);
+    ByteOrderUtils::WriteUInt32(wb.GetPos(), uint32_t(rawEntrySize));
     wb.SetPos(wb.GetPos() + 4);
 
     // content
@@ -173,8 +173,8 @@ bool SimpleWal::TruncateAhead(uint64_t id) {
     }
 
     auto endOffset = m_mpEntriesIdEndOffset[id];
-    auto reserveStartOffset = endOffset + 1;
-    if (reserveStartOffset == m_iFileSize) {
+    auto offset = endOffset + 1;
+    if (offset == m_iFileSize) {
         if (-1 == ftruncate(m_iFd, 4/*reserve header*/)) {
             LOGFFUN << "simple wal clean failed with errmsg " << strerror(errno);
         }
@@ -184,7 +184,31 @@ bool SimpleWal::TruncateAhead(uint64_t id) {
         return true;
     }
 
+    auto leftBufLen = m_iFileSize - offset;
+    auto buf = new char[leftBufLen];
+    LSeekFileWithFatalLOG(m_iFd, offset, SEEK_SET, m_sLogFilePath.c_str());
+    if (-1 == utils::IOUtils::ReadFully_V2(m_iFd, &buf, size_t(leftBufLen))) {
+        LOGFFUN << "simple wal " << m_sLogFilePath.c_str() << " read error " << strerror(errno);
+    }
 
+    LSeekFileWithFatalLOG(m_iFd, SMLOG_MAGIC_NO_LEN, SEEK_SET, m_sLogFilePath.c_str());
+    // TODO(sunchao): 以下俩文件操作不是原子的，如果过程中挂了，会导致不一致。先这样，有时间加个meta并且通过临时文件重命名的方式来做。
+    if (-1 == utils::IOUtils::WriteFully(m_iFd, buf, size_t(leftBufLen))) {
+        LOGFFUN << "simple wal " << m_sLogFilePath.c_str() << " write error " << strerror(errno);
+    }
+
+    if (-1 == ftruncate(m_iFd, 0)) {
+        LOGFFUN << "simple wal truncate ahead failed with errmsg " << strerror(errno);
+    }
+
+    m_iFileSize = uint32_t(SMLOG_MAGIC_NO_LEN + leftBufLen);
+    // TODO(sunchao): 此处需要优化，有两点：1. id无限增长的话会导致溢出，可以通过多文件的方式解决。
+    //                                   2. 每次truncate都需要从0开始清理这个map不好，需要记录last清理id
+    for (uint32_t i = 0; i <= id; ++i) {
+        m_mpEntriesIdEndOffset.erase(i);
+    }
+
+    return true;
 }
 
 void SimpleWal::Reset() {

@@ -17,6 +17,9 @@ namespace minikv {
 namespace sys {
 class MemPool;
 }
+namespace wal {
+class IWal;
+}
 namespace kv {
 class EntryComparer
 {
@@ -27,7 +30,7 @@ class EntryComparer
 
 class MiniKV : public common::IService, public IKVHandler {
 public:
-    MiniKV();
+    MiniKV(std::string &walType);
     ~MiniKV() override;
 
     bool Start() override;
@@ -38,9 +41,10 @@ public:
     rpc::SP_PB_MSG OnDelete(rpc::SP_PB_MSG sspMsg) override;
     rpc::SP_PB_MSG OnScan(rpc::SP_PB_MSG sspMsg)   override;
 
+private:
     std::map<protocol::Entry*, protocol::Entry*, EntryComparer> m_kvs;
     sys::MemPool       *m_pMp = nullptr;
-private:
+    wal::IWal          *m_pWal = nullptr;
 };
 }
 }

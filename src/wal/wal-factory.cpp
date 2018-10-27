@@ -4,9 +4,25 @@
  */
 
 #include "wal-factory.h"
+#include "simple-wal/simple-wal.h"
 
 namespace minikv {
 namespace wal {
+std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<std::string, int> {
+        {"simple", 0}
+};
 
+IWal* WALFactory::CreateWalInstance(const std::string &type, std::string &rootDir, EntryCreateHandler &&handler) {
+    auto rs = g_typeMapper.find(type);
+    if (rs == g_typeMapper.end()) {
+        LOGFFUN << "cannot find wal class type " << type;
+    }
+    switch (rs->second) {
+    case 0:
+        return new SimpleWal(rootDir, std::move(handler));
+    default:
+        return nullptr;
+    }
+}
 }
 }
