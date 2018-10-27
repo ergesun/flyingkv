@@ -6,4 +6,17 @@
 #ifndef MINIKV_CHECKPOINT_FACTORY_H
 #define MINIKV_CHECKPOINT_FACTORY_H
 
+#include <string>
+
+#include "icheckpoint.h"
+
+namespace minikv {
+namespace checkpoint {
+class CheckpointFactory {
+public:
+    static ICheckpoint* CreateInstance(const std::string &type, std::string &rootDir);
+};
+}
+}
+
 #endif //MINIKV_CHECKPOINT_FACTORY_H

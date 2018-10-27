@@ -9,7 +9,7 @@
 
 #include "../../common/common-def.h"
 
-#include "../entry.h"
+#include "../../common/ientry.h"
 
 #include "simple-wal.h"
 #include "../../utils/file-utils.h"
@@ -42,7 +42,7 @@ SimpleWal::~SimpleWal() {
     }
 }
 
-uint64_t SimpleWal::AppendEntry(IEntry *entry) {
+uint64_t SimpleWal::AppendEntry(common::IEntry *entry) {
     if (UNLIKELY(!m_bLoaded)) {
         LOGFFUN << "simple wal has not been loaded.";
     }

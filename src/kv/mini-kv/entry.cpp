@@ -3,8 +3,9 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#include "entry.h"
 #include "../../utils/protobuf-utils.h"
+
+#include "entry.h"
 
 namespace minikv {
 namespace mnkv {

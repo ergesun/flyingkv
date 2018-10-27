@@ -8,13 +8,14 @@
 
 #include <functional>
 
-#include "entry.h"
-
 namespace minikv {
+namespace common {
+class IEntry;
+}
 namespace wal {
 struct WalEntry {
     WalEntry() = delete;
-    WalEntry(uint64_t id, IEntry *e) : Id(id), Entry(e) {}
+    WalEntry(uint64_t id, common::IEntry *e) : Id(id), Entry(e) {}
     WalEntry(const WalEntry &we) {
         this->Id = we.Id;
         this->Entry = we.Entry;
@@ -26,11 +27,11 @@ struct WalEntry {
         we.Entry = nullptr;
     }
 
-    uint64_t  Id;
-    IEntry   *Entry;
+    uint64_t          Id;
+    common::IEntry   *Entry;
 };
 
-typedef std::function<wal::IEntry*(void)> EntryCreateHandler;
+typedef std::function<common::IEntry*(void)> EntryCreateHandler;
 
 class IWal {
 public:
@@ -40,7 +41,7 @@ public:
      *
      * @return entry id
      */
-    virtual uint64_t AppendEntry(IEntry*) = 0;
+    virtual uint64_t AppendEntry(common::IEntry*) = 0;
     virtual std::vector<WalEntry> Load() = 0;
     /**
      * truncate log entry in range [-, id]

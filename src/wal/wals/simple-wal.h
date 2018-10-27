@@ -16,6 +16,9 @@
 #define    SMLOG_PREFIX_NAME   "smlog"
 
 namespace minikv {
+namespace common {
+class IEntry;
+}
 namespace wal {
 // TODO(sunchao): 1. add batch sync feature with autoSync conf? 2. with multi files?
 /**
@@ -31,7 +34,7 @@ public:
     SimpleWal(std::string &rootDir, EntryCreateHandler &&handler);
     ~SimpleWal() override;
 
-    uint64_t AppendEntry(IEntry *entry) override;
+    uint64_t AppendEntry(common::IEntry *entry) override;
     std::vector<WalEntry> Load() override;
     bool TruncateAhead(uint64_t id) override;
     void Reset() override;

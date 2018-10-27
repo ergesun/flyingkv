@@ -3,16 +3,20 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
+#include <unordered_map>
+
+#include "../common/common-def.h"
+
 #include "wal-factory.h"
-#include "simple-wal/simple-wal.h"
+#include "wals/simple-wal.h"
 
 namespace minikv {
 namespace wal {
-std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<std::string, int> {
+static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<std::string, int> {
         {"simple", 0}
 };
 
-IWal* WALFactory::CreateWalInstance(const std::string &type, std::string &rootDir, EntryCreateHandler &&handler) {
+IWal* WALFactory::CreateInstance(const std::string &type, std::string &rootDir, EntryCreateHandler &&handler) {
     auto rs = g_typeMapper.find(type);
     if (rs == g_typeMapper.end()) {
         LOGFFUN << "cannot find wal class type " << type;

@@ -3,21 +3,21 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_KV_WAL_ENTRY_H
-#define MINIKV_KV_WAL_ENTRY_H
+#ifndef MINIKV_COMMON_KV_ENTRY_H
+#define MINIKV_COMMON_KV_ENTRY_H
 
-#include "../common/buffer.h"
+#include "buffer.h"
 
 namespace minikv {
-namespace wal {
+namespace common {
 class IEntry {
 public:
     virtual ~IEntry() = default;
 
-    virtual bool Encode(std::shared_ptr<common::Buffer>&) = 0;
-    virtual bool Decode(const common::Buffer&) = 0;
+    virtual bool Encode(std::shared_ptr<Buffer>&) = 0;
+    virtual bool Decode(const Buffer&) = 0;
 };
 }
 }
 
-#endif //MINIKV_KV_WAL_ENTRY_H
+#endif //MINIKV_COMMON_KV_ENTRY_H

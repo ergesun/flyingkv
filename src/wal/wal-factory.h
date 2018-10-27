@@ -12,7 +12,7 @@ namespace minikv {
 namespace wal {
 class WALFactory {
 public:
-    static IWal* CreateWalInstance(const std::string &type, std::string &rootDir, EntryCreateHandler &&handler);
+    static IWal* CreateInstance(const std::string &type, std::string &rootDir, EntryCreateHandler &&handler);
 };
 }
 }
