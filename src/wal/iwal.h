@@ -8,7 +8,7 @@
 
 #include <functional>
 
-#include "ientry.h"
+#include "entry.h"
 
 namespace minikv {
 namespace wal {
@@ -30,16 +30,25 @@ struct WalEntry {
     IEntry   *Entry;
 };
 
-typedef std::function<IEntry*(void)> EntryCreateHandler;
+typedef std::function<wal::IEntry*(void)> EntryCreateHandler;
 
 class IWal {
 public:
     virtual ~IWal() = default;
 
-    virtual void AppendEntry(IEntry*) = 0;
+    /**
+     *
+     * @return entry id
+     */
+    virtual uint64_t AppendEntry(IEntry*) = 0;
     virtual std::vector<WalEntry> Load() = 0;
-    virtual void TruncateAhead() = 0;
-    virtual void Clean() = 0;
+    /**
+     * truncate log entry in range [-, id]
+     * @param id
+     * @return
+     */
+    virtual bool TruncateAhead(uint64_t id) = 0;
+    virtual void Reset() = 0;
 };
 }
 }

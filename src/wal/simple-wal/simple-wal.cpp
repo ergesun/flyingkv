@@ -3,19 +3,26 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
+#include <memory>
+#include <unistd.h>
+#include <sys/mman.h>
+
 #include "../../common/common-def.h"
 
-#include "../ientry.h"
+#include "../entry.h"
 
 #include "simple-wal.h"
 #include "../../utils/file-utils.h"
 #include "../../utils/io-utils.h"
 #include "../../utils/codec-utils.h"
+#include "../../utils/protobuf-utils.h"
+#include "../../common/global-vars.h"
 
 namespace minikv {
 using namespace utils;
 namespace wal {
-SimpleWal::SimpleWal(std::string &rootDir) : m_sRootDir(rootDir) {
+SimpleWal::SimpleWal(std::string &rootDir, EntryCreateHandler &&entryCreateHandler) :
+        m_sRootDir(rootDir), m_entryCreator(std::move(entryCreateHandler)) {
     if (rootDir.empty()) {
         LOGFFUN << "wal root dir is empty";
     }
@@ -29,14 +36,51 @@ SimpleWal::SimpleWal(std::string &rootDir) : m_sRootDir(rootDir) {
 }
 
 SimpleWal::~SimpleWal() {
-
+    if (-1 != m_iFd) {
+        close(m_iFd);
+        m_iFd = -1;
+    }
 }
 
-void SimpleWal::AppendEntry(IEntry *entry) {
+uint64_t SimpleWal::AppendEntry(IEntry *entry) {
+    if (UNLIKELY(!m_bLoaded)) {
+        LOGFFUN << "simple wal has not been loaded.";
+    }
+    std::shared_ptr<common::Buffer> eb;
+    if (UNLIKELY(!entry->Encode(eb))) {
+        LOGFFUN << "simple wal encode entry error";
+    }
 
+    auto walEntryStartOffset = m_iFileSize;
+    auto rawEntrySize = eb->AvailableLength();
+    auto walEntrySize = walEntrySize + 8/*len 4 + start pos 4*/;
+    // mpo will be Putted in Buffer 'b'.
+    auto mpo = common::g_pMemPool->Get(walEntrySize);
+    auto bufferStart = (uchar*)(mpo->Pointer());
+    common::Buffer wb;
+    wb.Refresh(bufferStart, bufferStart + walEntrySize - 1, bufferStart, bufferStart + walEntrySize - 1, mpo);
+    // size
+    ByteOrderUtils::WriteUInt32(wb.GetPos(), walEntrySize);
+    wb.SetPos(wb.GetPos() + 4);
+
+    // content
+    memcpy(eb->GetPos(), wb.GetPos(), size_t(rawEntrySize));
+    wb.SetPos(wb.GetPos() + rawEntrySize);
+
+    // offset
+    ByteOrderUtils::WriteUInt32(wb.GetPos(), walEntryStartOffset);
+
+    WriteFileFullyWithFatalLOG(m_iFd, (char*)(wb.GetStart()), walEntrySize, m_sLogFilePath.c_str());
+    FDataSyncFileWithFatalLOG(m_iFd, m_sLogFilePath.c_str());
+    m_iFileSize += walEntrySize;
+    auto entryId = m_iCurrentLogIdx;
+    m_mpEntriesIdEndOffset[m_iCurrentLogIdx++] = m_iFileSize - 1;
+    return entryId;
 }
 
+// TODO(sunchao): 如果以后支持大量的log，就要把这个接口改成batch load
 std::vector<WalEntry> SimpleWal::Load() {
+    std::vector<WalEntry> rs;
     if (!utils::FileUtils::Exist(m_sLogFilePath)) {
         LOGDFUN2("create sm log file ", m_sLogFilePath.c_str());
         if (-1 == (m_iFd = utils::FileUtils::Open(m_sLogFilePath, O_WRONLY, O_CREAT, 0644))) {
@@ -66,45 +110,47 @@ std::vector<WalEntry> SimpleWal::Load() {
         }
 
         // 2. check if file header is corrupt.
-        if (m_iFileSize < RFLOG_MAGIC_NO_LEN) {
-            LOGFFUN << "rflog file " << m_sLogFilePath.c_str() << " header is corrupt!";
+        if (m_iFileSize < SMLOG_MAGIC_NO_LEN) {
+            LOGFFUN << "sm log file " << m_sLogFilePath.c_str() << " header is corrupt!";
         }
 
+        // TODO(sunchao): 如果以后扩展这个wal，支持大量的logs，就不要mmap了
         auto mapRet = mmap(nullptr, (size_t)m_iFileSize, PROT_READ, MAP_PRIVATE, m_iFd, 0);
         if (MAP_FAILED == mapRet) {
             auto err = errno;
-            LOGFFUN << "mmap rflog " << m_sLogFilePath.c_str() << " failed with errmsg " << strerror(err);
+            LOGFFUN << "mmap sm log " << m_sLogFilePath.c_str() << " failed with errmsg " << strerror(err);
         }
 
         auto buf = (uchar*)mapRet;
         uint32_t offset = 0;
         uint32_t magicNo = ByteOrderUtils::ReadUInt32(buf);
-        if (RFLOG_MAGIC_NO != magicNo) {
-            LOGFFUN << "rflog " << m_sLogFilePath.c_str() << " header is corrupt!";
+        if (SMLOG_MAGIC_NO != magicNo) {
+            LOGFFUN << "sm log " << m_sLogFilePath.c_str() << " header is corrupt!";
         }
 
-        offset += RFLOG_MAGIC_NO_LEN;
+        offset += SMLOG_MAGIC_NO_LEN;
         common::Buffer b;
-        // 3. load rflog content
+        // 3. load sm log content
         while (offset <= m_iFileSize - 1) {
-            // 3.1 read rflog len
+            // 3.1 read sm log len
             auto len = ByteOrderUtils::ReadUInt32(buf + offset);
             auto startPos = ByteOrderUtils::ReadUInt32(buf + offset + len);
             if (startPos != offset) {
-                LOGFFUN << "parse rflog " << m_sLogFilePath.c_str() << " failed at offset " << offset;
+                LOGFFUN << "parse sm log " << m_sLogFilePath.c_str() << " failed at offset " << offset;
             }
 
             auto startPtr = buf + offset;
             auto endPtr = buf + len - 1;
             b.Refresh(startPtr, endPtr, startPtr, endPtr, nullptr);
-            auto rflogEntry = new RfLogEntry();
-            if (UNLIKELY(!common::ProtoBufUtils::Deserialize(&b, rflogEntry))) {
-                LOGFFUN << "deserialize rflog at offset " << offset << " failed!";
+            auto entry = m_entryCreator();
+            if (!entry->Decode(b)) {
+                LOGFFUN << "deserialize sm log entry at offset " << offset << " failed!";
             }
 
-            ++m_iCurIdxToSync;
-            m_vEntries.push_back(rflogEntry);
+            auto we = WalEntry(m_iCurrentLogIdx, entry);
+            rs.push_back(std::move(we));
             offset += (len + sizeof(uint32_t));
+            m_mpEntriesIdEndOffset[m_iCurrentLogIdx++] = offset - 1;
         }
 
         if (-1 == munmap(mapRet, m_iFileSize)) {
@@ -114,196 +160,40 @@ std::vector<WalEntry> SimpleWal::Load() {
     }
 
     LSeekFileWithFatalLOG(m_iFd, 0, SEEK_END, m_sLogFilePath.c_str());
+    return rs;
 }
 
-void SimpleWal::TruncateAhead() {
-
-}
-
-void SimpleWal::Clean() {
-
-}
-
-RtDiskRfLogger::RtDiskRfLogger(std::string &&logFilePath, bool autoSync) :
-        m_sLogFilePath(std::move(logFilePath)), m_bAutoSync(autoSync) {
-    initialize();
-}
-
-RtDiskRfLogger::~RtDiskRfLogger() {
-    if (-1 != m_iFd) {
-        close(m_iFd);
-        m_iFd = -1;
+bool SimpleWal::TruncateAhead(uint64_t id) {
+    if (m_mpEntriesIdEndOffset.end() == m_mpEntriesIdEndOffset[id]) {
+        return false;
     }
 
-    for (auto p : m_vEntries) {
-        delete p;
-    }
-}
-
-const RfLogEntry *RtDiskRfLogger::GetLastEntry() {
-    if (m_vEntries.empty()) {
-        return nullptr;
+    if (0 == m_iFileSize) {
+        return true;
     }
 
-    return m_vEntries[m_vEntries.size()];
-}
-
-const RfLogEntry *RtDiskRfLogger::GetEntry(uint32_t index) {
-    if (LIKELY(index < m_vEntries.size())) {
-        return m_vEntries[index];
-    }
-
-    return nullptr;
-}
-
-void RtDiskRfLogger::AppendEntries(RepeatedPtrField<RfLogEntry> *entries) {
-    for (auto iter = entries->begin(); iter < entries->end(); ++iter) {
-        auto entry = new RfLogEntry();
-        entry->set_term(iter->term());
-        entry->set_index(iter->index());
-        entry->set_type(iter->type());
-        auto data = iter->release_data();
-        entry->set_data(std::move(*data));
-        DELETE_PTR(data);
-
-        m_vEntries.push_back(entry);
-    }
-
-    if (m_bAutoSync) {
-        Sync();
-    }
-}
-
-void RtDiskRfLogger::AppendEntry(RfLogEntry *rfEntry) {
-    auto entry = new RfLogEntry();
-    entry->set_term(rfEntry->term());
-    entry->set_index(rfEntry->index());
-    entry->set_type(rfEntry->type());
-    auto data = rfEntry->release_data();
-    entry->set_data(std::move(*data));
-    DELETE_PTR(data);
-
-    m_vEntries.push_back(entry);
-
-    if (m_bAutoSync) {
-        Sync();
-    }
-}
-
-void RtDiskRfLogger::Sync() {
-    uint32_t len = 0;
-    for (auto idx = m_iCurIdxToSync; idx < m_vEntries.size(); ++idx) {
-        len += 8; // size + offset
-        len += m_vEntries[idx]->ByteSize();
-    }
-
-    // mpo will be Putted in Buffer 'b'.
-    auto mpo = common::g_pMemPool->Get(len);
-    auto bufferStart = (uchar*)(mpo->Pointer());
-    common::Buffer b;
-    b.Refresh(bufferStart, bufferStart + len, bufferStart, bufferStart + len, mpo);
-    uint32_t curFileSize = m_iFileSize;
-    uint32_t offset = 0;
-    for (auto idx = m_iCurIdxToSync; idx < m_vEntries.size(); ++idx) {
-        uint32_t entryStartOffset = curFileSize + offset;
-        // size
-        auto entrySize = (uint32_t)(m_vEntries[idx]->GetCachedSize());
-        ByteOrderUtils::WriteUInt32(b.GetPos(), entrySize);
-        b.SetPos(b.GetPos() + (offset += 4));
-
-        // content
-        common::ProtoBufUtils::Serialize(m_vEntries[idx], &b);
-        b.SetPos(b.GetPos() + (offset += entrySize));
-
-        // offset
-        ByteOrderUtils::WriteUInt32(b.GetPos(), entryStartOffset);
-        b.SetPos(b.GetPos() + (offset += 4));
-    }
-
-    WriteFileFullyWithFatalLOG(m_iFd, (char*)(b.GetStart()), len, m_sLogFilePath.c_str());
-    // Now we don't need flush file metadata real-time? to use FDataSync?
-    FSyncFileWithFatalLOG(m_iFd, m_sLogFilePath.c_str());
-    m_iFileSize += len;
-}
-
-void RtDiskRfLogger::initialize() {
-    if (!fsio::FileUtils::Exist(m_sLogFilePath)) {
-        LOGDFUN2("create rflog file ", m_sLogFilePath.c_str());
-        if (-1 == (m_iFd = fsio::FileUtils::Open(m_sLogFilePath, O_WRONLY, O_CREAT, 0644))) {
-            auto err = errno;
-            LOGFFUN << "create rflog file " << m_sLogFilePath.c_str() << " failed with errmsg " << strerror(err);
+    auto endOffset = m_mpEntriesIdEndOffset[id];
+    auto reserveStartOffset = endOffset + 1;
+    if (reserveStartOffset == m_iFileSize) {
+        if (-1 == ftruncate(m_iFd, 4/*reserve header*/)) {
+            LOGFFUN << "simple wal clean failed with errmsg " << strerror(errno);
         }
+        m_iFileSize = 0;
+        m_mpEntriesIdEndOffset.clear();
 
-        // write file header.
-        uchar header[RFLOG_MAGIC_NO_LEN];
-        ByteOrderUtils::WriteUInt32(header, RFLOG_MAGIC_NO);
-        WriteFileFullyWithFatalLOG(m_iFd, (char*)header, RFLOG_MAGIC_NO_LEN, m_sLogFilePath.c_str());
-    } else {
-        if (-1 == (m_iFd = fsio::FileUtils::Open(m_sLogFilePath, O_RDWR, 0, 0))) {
-            auto err = errno;
-            LOGFFUN << "open rflog file " << m_sLogFilePath.c_str() << " failed with errmsg " << strerror(err);
-        }
-
-        // 1. check if file is empty.
-        auto fileSize = fsio::FileUtils::GetFileSize(m_iFd);
-        if (-1 == fileSize) {
-            auto err = errno;
-            LOGFFUN << "get file size for " << m_sLogFilePath.c_str() << " failed with errmsg " << strerror(err);
-        }
-        if (0 == (m_iFileSize = (uint32_t)fileSize)) {
-            LOGDFUN3("rflog file ", m_sLogFilePath.c_str(), " is empty!");
-            return;
-        }
-
-        // 2. check if file header is corrupt.
-        if (m_iFileSize < RFLOG_MAGIC_NO_LEN) {
-            LOGFFUN << "rflog file " << m_sLogFilePath.c_str() << " header is corrupt!";
-        }
-
-        auto mapRet = mmap(nullptr, (size_t)m_iFileSize, PROT_READ, MAP_PRIVATE, m_iFd, 0);
-        if (MAP_FAILED == mapRet) {
-            auto err = errno;
-            LOGFFUN << "mmap rflog " << m_sLogFilePath.c_str() << " failed with errmsg " << strerror(err);
-        }
-
-        auto buf = (uchar*)mapRet;
-        uint32_t offset = 0;
-        uint32_t magicNo = ByteOrderUtils::ReadUInt32(buf);
-        if (RFLOG_MAGIC_NO != magicNo) {
-            LOGFFUN << "rflog " << m_sLogFilePath.c_str() << " header is corrupt!";
-        }
-
-        offset += RFLOG_MAGIC_NO_LEN;
-        common::Buffer b;
-        // 3. load rflog content
-        while (offset <= m_iFileSize - 1) {
-            // 3.1 read rflog len
-            auto len = ByteOrderUtils::ReadUInt32(buf + offset);
-            auto startPos = ByteOrderUtils::ReadUInt32(buf + offset + len);
-            if (startPos != offset) {
-                LOGFFUN << "parse rflog " << m_sLogFilePath.c_str() << " failed at offset " << offset;
-            }
-
-            auto startPtr = buf + offset;
-            auto endPtr = buf + len - 1;
-            b.Refresh(startPtr, endPtr, startPtr, endPtr, nullptr);
-            auto rflogEntry = new RfLogEntry();
-            if (UNLIKELY(!common::ProtoBufUtils::Deserialize(&b, rflogEntry))) {
-                LOGFFUN << "deserialize rflog at offset " << offset << " failed!";
-            }
-
-            ++m_iCurIdxToSync;
-            m_vEntries.push_back(rflogEntry);
-            offset += (len + sizeof(uint32_t));
-        }
-
-        if (-1 == munmap(mapRet, m_iFileSize)) {
-            auto err = errno;
-            LOGFFUN << "munmap file " << m_sLogFilePath.c_str() << " failed with errmsg " << strerror(err);
-        }
+        return true;
     }
 
-    LSeekFileWithFatalLOG(m_iFd, 0, SEEK_END, m_sLogFilePath.c_str());
+
+}
+
+void SimpleWal::Reset() {
+    if (-1 == ftruncate(m_iFd, 0)) {
+        LOGFFUN << "simple wal clean failed with errmsg " << strerror(errno);
+    }
+    m_iCurrentLogIdx = 0;
+    m_iFileSize = 0;
+    m_mpEntriesIdEndOffset.clear();
 }
 }
 }

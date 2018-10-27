@@ -6,7 +6,7 @@
 #ifndef MINIKV_MNKV_ENTRY_H
 #define MINIKV_MNKV_ENTRY_H
 
-#include "../../wal/ientry.h"
+#include "../../wal/entry.h"
 #include "../../codegen/meta.pb.h"
 
 namespace minikv {

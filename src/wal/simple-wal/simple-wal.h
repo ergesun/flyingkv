@@ -22,28 +22,29 @@ namespace wal {
  * Not thread-safe!
  * log format on disk file(file header + log segments)：
  *  |<-log file header(magic no)->|
- *  |<-log content len(u64)->|<-log content->|<-log segment start pos(u64)->|
+ *  |<-log content len(u32)->|<-log content->|<-log segment start pos(u32)->|
  *   ...(log segments)...
- *  |<-log content len(u64)->|<-log content->|<-log segment start pos(u64)->|
+ *  |<-log content len(u32)->|<-log content->|<-log segment start pos(u32)->|
  */
 class SimpleWal : public IWal {
 public:
-    SimpleWal(std::string &rootDir);
+    SimpleWal(std::string &rootDir, EntryCreateHandler &&handler);
     ~SimpleWal() override;
 
-    void AppendEntry(IEntry *entry) override;
+    uint64_t AppendEntry(IEntry *entry) override;
     std::vector<WalEntry> Load() override;
-    void TruncateAhead() override;
-    void Clean() override;
+    bool TruncateAhead(uint64_t id) override;
+    void Reset() override;
 
 private:
     std::string                           m_sRootDir;
-    std::unordered_map<uint64_t, int64_t> m_mpEntriesIdOffset;
+    std::unordered_map<uint64_t, int64_t> m_mpEntriesIdEndOffset;
     uint64_t                              m_iCurrentLogIdx;
     std::string                           m_sLogFilePath;
     int                                   m_iFd           = -1;
-    uint32_t                              m_iCurIdxToSync = 0;
     uint32_t                              m_iFileSize     = 0;
+    EntryCreateHandler                    m_entryCreator;
+    bool                                  m_bLoaded       = false;
 };
 }
 }
