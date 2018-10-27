@@ -6,15 +6,40 @@
 #ifndef MINIKV_IWAL_H
 #define MINIKV_IWAL_H
 
+#include <functional>
 
+#include "ientry.h"
 
 namespace minikv {
 namespace wal {
+struct WalEntry {
+    WalEntry() = delete;
+    WalEntry(uint64_t id, IEntry *e) : Id(id), Entry(e) {}
+    WalEntry(const WalEntry &we) {
+        this->Id = we.Id;
+        this->Entry = we.Entry;
+    }
+
+    WalEntry(WalEntry &&we) noexcept {
+        this->Id = we.Id;
+        this->Entry = we.Entry;
+        we.Entry = nullptr;
+    }
+
+    uint64_t  Id;
+    IEntry   *Entry;
+};
+
+typedef std::function<IEntry*(void)> EntryCreateHandler;
+
 class IWal {
 public:
     virtual ~IWal() = default;
 
-    virtual void PutEntry() = 0;
+    virtual void AppendEntry(IEntry*) = 0;
+    virtual std::vector<WalEntry> Load() = 0;
+    virtual void TruncateAhead() = 0;
+    virtual void Clean() = 0;
 };
 }
 }
