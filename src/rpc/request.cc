@@ -15,7 +15,7 @@
 namespace minikv {
 namespace rpc {
 uint32_t RpcRequest::getDerivePayloadLength() {
-    if (m_sspMsg.get()) {
+    if (m_sspMsg) {
         return sizeof(uint16_t) + m_sspMsg->ByteSize();
     } else {
         return sizeof(uint16_t);
@@ -25,7 +25,7 @@ uint32_t RpcRequest::getDerivePayloadLength() {
 void RpcRequest::encodeDerive(common::Buffer *b) {
     ByteOrderUtils::WriteUInt16(b->GetPos(), (uint16_t)m_iHandlerId);
     b->MoveHeadBack(sizeof(uint16_t));
-    if (m_sspMsg.get()) {
+    if (m_sspMsg) {
         utils::ProtoBufUtils::Serialize(m_sspMsg.get(), b);
     }
 }

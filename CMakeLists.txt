@@ -1,3 +1,4 @@
+# cmake 3.2 start to support cpp11
 cmake_minimum_required(VERSION 3.2)
 project(minikv)
 
@@ -5,12 +6,12 @@ project(minikv)
 SET (CMAKE_C_FLAGS                  "-Wall -std=c99")
 SET (CMAKE_C_FLAGS_DEBUG            "-O0 -g")
 SET (CMAKE_C_FLAGS_MINSIZEREL       "-Os -DNDEBUG")
-SET (CMAKE_C_FLAGS_RELEASE          "-O3 -DNDEBUG")
+SET (CMAKE_C_FLAGS_RELEASE          "-O2 -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELWITHDEBINFO   "-O2 -g")
 SET (CMAKE_CXX_FLAGS                "-Wall")
 SET (CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
 SET (CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
-SET (CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG")
+SET (CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
 SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
 # 自定义宏

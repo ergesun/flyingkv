@@ -8,11 +8,11 @@
 namespace minikv {
 namespace kv {
 MiniKV::MiniKV() {
-
+    m_pMp = new sys::MemPool();
 }
 
 MiniKV::~MiniKV() {
-
+    DELETE_PTR(m_pMp);
 }
 
 bool MiniKV::Start() {

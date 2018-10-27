@@ -17,8 +17,8 @@ class Buffer;
 class ProtoBufUtils {
 public:
     static bool Deserialize(const common::Buffer *from, google::protobuf::Message *to);
-    static void Serialize(const google::protobuf::Message *from, common::Buffer *to, sys::MemPool *mp);
-    static void Serialize(const google::protobuf::Message *from, common::Buffer *to);
+    static bool Serialize(const google::protobuf::Message *from, common::Buffer *to, sys::MemPool *mp);
+    static bool Serialize(const google::protobuf::Message *from, common::Buffer *to);
 };
 }
 }

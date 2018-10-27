@@ -19,17 +19,20 @@ bool ProtoBufUtils::Deserialize(const common::Buffer *from, google::protobuf::Me
     return true;
 }
 
-void ProtoBufUtils::Serialize(const google::protobuf::Message *from, common::Buffer *to, sys::MemPool *mp) {
+bool ProtoBufUtils::Serialize(const google::protobuf::Message *from, common::Buffer *to, sys::MemPool *mp) {
     auto len = static_cast<uint32_t>(from->ByteSize());
 
     auto mo = mp->Get(len);
     auto start = reinterpret_cast<uchar*>(mo->Pointer());
-    from->SerializeToArray(start, len);
+    if (!from->SerializeToArray(start, len)) {
+        return false;
+    }
     to->Refresh(start, start + len - 1, start, start + mo->Size() - 1, mo);
+    return true;
 }
 
-void ProtoBufUtils::Serialize(const google::protobuf::Message *from, common::Buffer *to) {
-    from->SerializeToArray(to->GetPos(), from->ByteSize());
+bool ProtoBufUtils::Serialize(const google::protobuf::Message *from, common::Buffer *to) {
+    return from->SerializeToArray(to->GetPos(), from->ByteSize());
 }
 }
 }

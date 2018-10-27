@@ -41,7 +41,7 @@ public:
 
     void Refresh(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPool::MemObject *mpo);
 
-    inline bool Valid() {
+    inline bool Valid() const {
         return m_bAvailable;
     }
 
