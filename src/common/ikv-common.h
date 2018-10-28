@@ -15,6 +15,13 @@
 
 namespace minikv {
 namespace common {
+enum class ReqRespType {
+    Put = 0,
+    Get,
+    Delete,
+    Scan
+};
+
 typedef std::shared_ptr<google::protobuf::Message> SP_PB_MSG;
 typedef std::shared_ptr<protocol::PutRequest> KVPutRequest;
 typedef std::shared_ptr<protocol::GetRequest> KVGetRequest;

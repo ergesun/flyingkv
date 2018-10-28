@@ -13,6 +13,8 @@ set(LINK_LIBS
         net
         utils
         common
+        acc
+        cjson
         sys
         glog
         gflags

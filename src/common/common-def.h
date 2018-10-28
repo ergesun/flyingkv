@@ -97,6 +97,7 @@
 #define INOUT_LOG minikv::common::FuncInOutLogger __in__out_log__(__FUNCTION__);
 
 typedef unsigned char uchar;
+#define NANOSEC 1000000000L
 
 namespace minikv {
 namespace common {
