@@ -54,7 +54,7 @@ uint64_t SimpleWal::AppendEntry(common::IEntry *entry) {
 
     auto walEntryStartOffset = m_iFileSize;
     auto rawEntrySize = eb->AvailableLength();
-    auto walEntrySize = walEntrySize + 8/*len 4 + start pos 4*/;
+    auto walEntrySize = rawEntrySize + 8/*len 4 + start pos 4*/;
     // mpo will be Putted in Buffer 'b'.
     auto mpo = common::g_pMemPool->Get(walEntrySize);
     auto bufferStart = (uchar*)(mpo->Pointer());
@@ -165,7 +165,7 @@ std::vector<WalEntry> SimpleWal::Load() {
 }
 
 bool SimpleWal::TruncateAhead(uint64_t id) {
-    if (m_mpEntriesIdEndOffset.end() == m_mpEntriesIdEndOffset[id]) {
+    if (m_mpEntriesIdEndOffset.end() == m_mpEntriesIdEndOffset.find(id)) {
         return false;
     }
 

@@ -4,6 +4,8 @@
  */
 
 #include "../../utils/protobuf-utils.h"
+#include "../../common/common-def.h"
+#include "../../common/buffer.h"
 
 #include "entry.h"
 

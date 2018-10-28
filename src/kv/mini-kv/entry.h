@@ -11,7 +11,7 @@
 
 namespace minikv {
 namespace mnkv {
-class Entry : public wal::IEntry {
+class Entry : public common::IEntry {
 public:
     explicit Entry(sys::MemPool*);
     Entry(sys::MemPool*, protocol::Entry*);

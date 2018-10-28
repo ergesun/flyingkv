@@ -6,6 +6,8 @@
 #ifndef MINIKV_COMMON_KV_ENTRY_H
 #define MINIKV_COMMON_KV_ENTRY_H
 
+#include <memory>
+
 namespace minikv {
 namespace common {
 class Buffer;

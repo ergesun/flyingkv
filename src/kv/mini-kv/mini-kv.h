@@ -30,7 +30,7 @@ class EntryComparer
 
 class MiniKV : public common::IService, public IKVHandler {
 public:
-    MiniKV(std::string &walType);
+    MiniKV(std::string &walType, std::string &checkpointType);
     ~MiniKV() override;
 
     bool Start() override;

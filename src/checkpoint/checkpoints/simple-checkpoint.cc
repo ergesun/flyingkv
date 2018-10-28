@@ -131,16 +131,16 @@ bool SimpleCheckpoint::Save(IEntriesTraveller *traveller) {
     common::IEntry *entry = nullptr;
     uint32_t offset = SMCP_MAGIC_NO_LEN;
     LSeekFileWithFatalLOG(fd, SMCP_MAGIC_NO_LEN, SEEK_SET, m_sNewLogFilePath);
-    while (entry = traveller->GetNextEntry()) {
+    while ((entry = traveller->GetNextEntry())) {
         std::shared_ptr<common::Buffer> eb;
         if (UNLIKELY(!entry->Encode(eb))) {
             LOGFFUN << "simple wal encode entry error";
         }
 
         auto rawEntrySize = eb->AvailableLength();
-        auto walEntrySize = walEntrySize + 8/*len 4 + start pos 4*/;
+        auto walEntrySize = rawEntrySize + 8/*len 4 + start pos 4*/;
         // mpo will be Putted in Buffer 'b'.
-        auto mpo = common::g_pMemPool->Get(walEntrySize);
+        auto mpo = common::g_pMemPool->Get(uint32_t(walEntrySize));
         auto bufferStart = (uchar*)(mpo->Pointer());
         common::Buffer wb;
         wb.Refresh(bufferStart, bufferStart + walEntrySize - 1, bufferStart, bufferStart + walEntrySize - 1, mpo);

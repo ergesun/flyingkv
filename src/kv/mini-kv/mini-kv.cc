@@ -7,7 +7,7 @@
 
 namespace minikv {
 namespace kv {
-MiniKV::MiniKV() {
+MiniKV::MiniKV(std::string &walType, std::string &checkpointType) {
     m_pMp = new sys::MemPool();
 }
 

@@ -9,6 +9,9 @@
 #include <google/protobuf/message.h>
 
 namespace minikv {
+namespace common {
+class Buffer;
+}
 namespace sys {
 class MemPool;
 }

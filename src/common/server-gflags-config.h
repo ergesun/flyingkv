@@ -28,4 +28,10 @@ DECLARE_int32(rpc_port);
 DECLARE_int32(rpc_server_threads_cnt);
 DECLARE_int32(rpc_io_threads_cnt);
 
+/**
+ * kv
+ */
+DECLARE_string(checkpoint_dir);
+DECLARE_string(wal_dir);
+
 #endif //MINIKV_GFLAGS_CONFIG_H

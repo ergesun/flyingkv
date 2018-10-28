@@ -62,7 +62,7 @@ void uninit_gflags_glog() {
 void startup() {
     std::unique_lock<std::mutex> l(g_m);
     // TODO:configurable
-    auto pKV = new kv::MiniKV();
+    auto pKV = new kv::MiniKV(FLAGS_wal_dir, FLAGS_checkpoint_dir);
     g_pKV = pKV;
     if (!g_pKV->Start()) {
         LOGFFUN << "start kv service is failure.";
