@@ -12,15 +12,22 @@
 #include "../../common/iservice.h"
 
 #include "../../common/ikv-common.h"
+#include "../../common/blocking-queue.h"
 
 namespace minikv {
+namespace common {
+class IEntry;
+}
 namespace sys {
 class MemPool;
 }
 namespace wal {
 class IWal;
 }
-namespace kv {
+namespace checkpoint {
+class ICheckpoint;
+}
+namespace mnkv {
 class EntryComparer
 {
     bool operator()(const protocol::Entry *x, const protocol::Entry *y) const {
@@ -30,7 +37,8 @@ class EntryComparer
 
 class MiniKV : public common::IService, public common::IKVHandler {
 public:
-    MiniKV(std::string &walType, std::string &checkpointType);
+    MiniKV(std::string &walType, std::string &checkpointType,
+           std::string &walDir, std::string &checkpointDir, uint32_t maxPendingCnt);
     ~MiniKV() override;
 
     bool Start() override;
@@ -42,9 +50,14 @@ public:
     common::SP_PB_MSG OnScan(common::KVScanRequest)   override;
 
 private:
+    common::IEntry* create_new_entry();
+
+private:
+    common::BlockingQueue<common::SP_PB_MSG>  *m_pbqPendingTasks;
     std::map<protocol::Entry*, protocol::Entry*, EntryComparer> m_kvs;
-    sys::MemPool       *m_pMp = nullptr;
-    wal::IWal          *m_pWal = nullptr;
+    sys::MemPool                 *m_pMp = nullptr;
+    wal::IWal                    *m_pWal = nullptr;
+    checkpoint::ICheckpoint      *m_pCheckpoint = nullptr;
 };
 }
 }

@@ -32,6 +32,9 @@ DECLARE_int32(rpc_io_threads_cnt);
  * kv
  */
 DECLARE_string(checkpoint_dir);
+DECLARE_string(checkpoint_type)
 DECLARE_string(wal_dir);
+DECLARE_string(wal_type);
+DECLARE_uint32(max_kv_pending_cnt);
 
 #endif //MINIKV_GFLAGS_CONFIG_H
