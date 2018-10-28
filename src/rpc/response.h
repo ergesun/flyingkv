@@ -12,6 +12,7 @@
 #include "../utils/codec-utils.h"
 #include "../common/buffer.h"
 #include "common-def.h"
+#include "../common/ikv-common.h"
 
 namespace minikv {
 namespace rpc {
@@ -32,7 +33,7 @@ protected:
 
 class RpcResponse : public RpcResponseBase {
 public:
-    RpcResponse(SP_PB_MSG msg, HandlerType ht) :
+    RpcResponse(common::SP_PB_MSG msg, HandlerType ht) :
             RpcResponseBase(RpcCode::OK, ht), m_pMsg(msg) {}
 
 protected:
@@ -40,7 +41,7 @@ protected:
     void encodeDerive(common::Buffer *b) override;
 
 private:
-    SP_PB_MSG      m_pMsg = nullptr;
+    common::SP_PB_MSG      m_pMsg = nullptr;
 };
 
 //typedef RpcResponseBase RpcErrorResponse;

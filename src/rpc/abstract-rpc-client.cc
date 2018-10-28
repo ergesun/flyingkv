@@ -71,7 +71,7 @@ bool ARpcClient::Stop() {
 }
 
 
-ARpcClient::SentRet ARpcClient::SendMessageAsync(std::string &&rpcName, SP_PB_MSG msg, net::net_peer_info_t &&peer) {
+ARpcClient::SentRet ARpcClient::SendMessageAsync(std::string &&rpcName, common::SP_PB_MSG msg, net::net_peer_info_t &&peer) {
     if (m_hmapRpcs.end() == m_hmapRpcs.find(rpcName)) {
         throw BadRpcException((uint16_t)RpcCode::ErrorNoRegisteredRpc, std::move(rpcName));
     }
@@ -94,7 +94,7 @@ ARpcClient::SentRet ARpcClient::SendMessageAsync(std::string &&rpcName, SP_PB_MS
 }
 
 ARpcClient::SentRet ARpcClient::SendMessageAsync(std::string &&rpcName, net::Message::Id id,
-                                                SP_PB_MSG msg, net::net_peer_info_t &&peer) {
+                                                 common::SP_PB_MSG msg, net::net_peer_info_t &&peer) {
     if (m_hmapRpcs.end() == m_hmapRpcs.find(rpcName)) {
         throw BadRpcException((uint16_t)RpcCode::ErrorNoRegisteredRpc, std::move(rpcName));
     }

@@ -8,11 +8,11 @@
 namespace minikv {
 namespace rpc {
 std::shared_ptr<google::protobuf::Message>
-TypicalRpcHandler::Handle(SP_PB_MSG req) {
+TypicalRpcHandler::Handle(common::SP_PB_MSG req) {
     return m_handle(req);
 }
 
-SP_PB_MSG TypicalRpcHandler::CreateMessage() {
+    common::SP_PB_MSG TypicalRpcHandler::CreateMessage() {
     return m_requestCreator();
 }
 } // namespace rpc

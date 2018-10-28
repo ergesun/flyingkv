@@ -9,6 +9,7 @@
 #include "../../../common/iservice.h"
 #include "../../../rpc/rpc-server.h"
 #include "../../../rpc/common-def.h"
+#include "../../../common/ikv-common.h"
 
 namespace minikv {
 namespace test {
@@ -24,8 +25,8 @@ public:
 
 private:
     void register_rpc_handlers();
-    rpc::SP_PB_MSG on_get(rpc::SP_PB_MSG sspMsg);
-    rpc::SP_PB_MSG create_get_request();
+    common::SP_PB_MSG on_get(common::SP_PB_MSG sspMsg);
+    common::SP_PB_MSG create_get_request();
 
 private:
     rpc::RpcServer        *m_pRpcServer = nullptr;

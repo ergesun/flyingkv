@@ -10,6 +10,7 @@
 #include <functional>
 
 #include <glog/logging.h>
+#include <google/protobuf/message.h>
 
 /**
  * 控制目标不导出，即仅库内部可见。

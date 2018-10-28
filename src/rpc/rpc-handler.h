@@ -10,6 +10,7 @@
 #include <cassert>
 
 #include "common-def.h"
+#include "../common/ikv-common.h"
 
 namespace google {
 namespace protobuf {
@@ -35,8 +36,8 @@ public:
      * @param b 对端的消息内容buffer。
      * @param sm 本端的响应消息体。
      */
-    virtual SP_PB_MSG Handle(SP_PB_MSG req) = 0;
-    virtual SP_PB_MSG CreateMessage() = 0;
+    virtual common::SP_PB_MSG Handle(common::SP_PB_MSG req) = 0;
+    virtual common::SP_PB_MSG CreateMessage() = 0;
 };
 
 /**
@@ -44,8 +45,8 @@ public:
  */
 class TypicalRpcHandler : public IRpcHandler {
 public:
-    typedef std::function<SP_PB_MSG(SP_PB_MSG)> RpcHandle;
-    typedef std::function<SP_PB_MSG(void)> RequestCreator;
+    typedef std::function<common::SP_PB_MSG(common::SP_PB_MSG)> RpcHandle;
+    typedef std::function<common::SP_PB_MSG(void)> RequestCreator;
 
 public:
     TypicalRpcHandler(RpcHandle handle, RequestCreator requestCreator) :
@@ -53,8 +54,8 @@ public:
         assert((nullptr != m_handle) && (nullptr != m_requestCreator));
     }
 
-    SP_PB_MSG Handle(SP_PB_MSG req) override;
-    SP_PB_MSG CreateMessage() override;
+    common::SP_PB_MSG Handle(common::SP_PB_MSG req) override;
+    common::SP_PB_MSG CreateMessage() override;
 
 private:
     RpcHandle             m_handle;

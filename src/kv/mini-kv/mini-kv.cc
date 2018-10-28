@@ -23,20 +23,20 @@ bool MiniKV::Stop() {
     return false;
 }
 
-rpc::SP_PB_MSG MiniKV::OnPut(rpc::SP_PB_MSG sspMsg) {
-    return rpc::SP_PB_MSG(nullptr);
+common::SP_PB_MSG MiniKV::OnPut(common::KVPutRequest req) {
+    return common::SP_PB_MSG(nullptr);
 }
 
-rpc::SP_PB_MSG MiniKV::OnGet(rpc::SP_PB_MSG sspMsg) {
-    return rpc::SP_PB_MSG(nullptr);
+common::SP_PB_MSG MiniKV::OnGet(common::KVGetRequest req) {
+    return common::SP_PB_MSG(nullptr);
 }
 
-rpc::SP_PB_MSG MiniKV::OnDelete(rpc::SP_PB_MSG sspMsg) {
-    return rpc::SP_PB_MSG(nullptr);
+common::SP_PB_MSG MiniKV::OnDelete(common::KVDeleteRequest req) {
+    return common::SP_PB_MSG(nullptr);
 }
 
-rpc::SP_PB_MSG MiniKV::OnScan(rpc::SP_PB_MSG sspMsg) {
-    return rpc::SP_PB_MSG(nullptr);
+common::SP_PB_MSG MiniKV::OnScan(common::KVScanRequest req) {
+    return common::SP_PB_MSG(nullptr);
 }
 }
 }

@@ -9,6 +9,7 @@
 
 #include "../../net/isocket-service.h"
 #include "../../common/global-vars.h"
+#include "../../common/ikv-common.h"
 #include "../../rpc/rpc-handler.h"
 #include "../../rpc/common-def.h"
 #include "../../net/rcv-message.h"
@@ -97,7 +98,7 @@ TEST(RpcTest, ClientServerTest) {
     std::shared_ptr<protocol::GetResponse> getRes;
     auto id = net::SndMessage::GetNewId();
     g_sndMsgIds[id] = false;
-    EXPECT_NO_THROW(getRes = g_pClient->Get(id, rpc::SP_PB_MSG(getReq), std::move(tmpPeer)));
+    EXPECT_NO_THROW(getRes = g_pClient->Get(id, common::SP_PB_MSG(getReq), std::move(tmpPeer)));
 
     std::cout << "server resp: rc = " << getRes->rc() << std::endl;
 

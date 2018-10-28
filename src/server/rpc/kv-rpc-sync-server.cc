@@ -13,13 +13,13 @@
 #include "../../sys/gcc-buildin.h"
 #include "../../net/notify-message.h"
 
-#include "../../kv/ikv-handler.h"
+#include "../../common/ikv-common.h"
 
 #include "kv-rpc-sync-server.h"
 
 namespace minikv {
 namespace server {
-KVRpcServerSync::KVRpcServerSync(kv::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadsCnt,
+KVRpcServerSync::KVRpcServerSync(common::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadsCnt,
                                  uint16_t port, sys::MemPool *memPool) : m_pHandler(handler) {
 
     CHECK(handler);
@@ -98,36 +98,52 @@ void KVRpcServerSync::register_rpc_handlers() {
     m_pRpcServer->FinishRegisterRpc();
 }
 
-rpc::SP_PB_MSG KVRpcServerSync::on_put(rpc::SP_PB_MSG sspMsg) {
-    return m_pHandler->OnPut(sspMsg);
+common::SP_PB_MSG KVRpcServerSync::on_put(common::SP_PB_MSG sspMsg) {
+    common::KVPutRequest req;
+    auto reqPtr = sspMsg.get();
+    sspMsg.reset();
+    req.reset(dynamic_cast<protocol::PutRequest*>(reqPtr));
+    return m_pHandler->OnPut(req);
 }
 
-rpc::SP_PB_MSG KVRpcServerSync::create_put_request() {
-    return rpc::SP_PB_MSG(new protocol::PutRequest());
+common::SP_PB_MSG KVRpcServerSync::create_put_request() {
+    return common::SP_PB_MSG(new protocol::PutRequest());
 }
 
-rpc::SP_PB_MSG KVRpcServerSync::on_get(rpc::SP_PB_MSG sspMsg) {
-    return m_pHandler->OnGet(sspMsg);
+common::SP_PB_MSG KVRpcServerSync::on_get(common::SP_PB_MSG sspMsg) {
+    common::KVGetRequest req;
+    auto reqPtr = sspMsg.get();
+    sspMsg.reset();
+    req.reset(dynamic_cast<protocol::GetRequest*>(reqPtr));
+    return m_pHandler->OnGet(req);
 }
 
-rpc::SP_PB_MSG KVRpcServerSync::create_get_request() {
-    return rpc::SP_PB_MSG(new protocol::GetRequest());
+common::SP_PB_MSG KVRpcServerSync::create_get_request() {
+    return common::SP_PB_MSG(new protocol::GetRequest());
 }
 
-rpc::SP_PB_MSG KVRpcServerSync::on_delete(rpc::SP_PB_MSG sspMsg) {
-    return m_pHandler->OnDelete(sspMsg);
+common::SP_PB_MSG KVRpcServerSync::on_delete(common::SP_PB_MSG sspMsg) {
+    common::KVDeleteRequest req;
+    auto reqPtr = sspMsg.get();
+    sspMsg.reset();
+    req.reset(dynamic_cast<protocol::DeleteRequest*>(reqPtr));
+    return m_pHandler->OnDelete(req);
 }
 
-rpc::SP_PB_MSG KVRpcServerSync::create_delete_request() {
-    return rpc::SP_PB_MSG(new protocol::DeleteRequest());
+common::SP_PB_MSG KVRpcServerSync::create_delete_request() {
+    return common::SP_PB_MSG(new protocol::DeleteRequest());
 }
 
-rpc::SP_PB_MSG KVRpcServerSync::on_scan(rpc::SP_PB_MSG sspMsg) {
-    return m_pHandler->OnScan(sspMsg);
+common::SP_PB_MSG KVRpcServerSync::on_scan(common::SP_PB_MSG sspMsg) {
+    common::KVScanRequest req;
+    auto reqPtr = sspMsg.get();
+    sspMsg.reset();
+    req.reset(dynamic_cast<protocol::ScanRequest*>(reqPtr));
+    return m_pHandler->OnScan(req);
 }
 
-rpc::SP_PB_MSG KVRpcServerSync::create_scan_request() {
-    return rpc::SP_PB_MSG(new protocol::ScanRequest());
+common::SP_PB_MSG KVRpcServerSync::create_scan_request() {
+    return common::SP_PB_MSG(new protocol::ScanRequest());
 }
 
 void KVRpcServerSync::onRecvNetMessage(std::shared_ptr<net::NotifyMessage> sspNM) {

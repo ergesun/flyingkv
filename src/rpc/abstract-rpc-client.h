@@ -19,6 +19,7 @@
 
 #include "common-def.h"
 #include "imessage-handler.h"
+#include "../common/ikv-common.h"
 
 namespace google {
 namespace protobuf {
@@ -40,10 +41,10 @@ class RpcRequest;
  * 返回值SentRet的msgId为INVALID_MSG_ID(0)表示发送失败，原因为发送队列满了。
  */
 #define DefineStandardAsyncRpcWithNoMsgId(RpcName)                                                                             \
-    rpc::ARpcClient::SentRet RpcName(rpc::SP_PB_MSG req, net::net_peer_info_t &&peer)
+    rpc::ARpcClient::SentRet RpcName(common::SP_PB_MSG req, net::net_peer_info_t &&peer)
 
 #define ImplStandardAsyncRpcWithNoMsgId(ClassName, RpcName)                                                                    \
-    rpc::ARpcClient::SentRet ClassName::RpcName(rpc::SP_PB_MSG req, net::net_peer_info_t &&peer) {                             \
+    rpc::ARpcClient::SentRet ClassName::RpcName(common::SP_PB_MSG req, net::net_peer_info_t &&peer) {                             \
         return rpc::ARpcClient::SendMessageAsync(#RpcName, std::move(req), std::move(peer));                                   \
     }
 
@@ -51,10 +52,10 @@ class RpcRequest;
  * 返回值SentRet的msgId为INVALID_MSG_ID(0)表示发送失败，原因为发送队列满了。
  */
 #define DefineStandardAsyncRpcWithMsgId(RpcName)                                                                               \
-    rpc::ARpcClient::SentRet RpcName(net::Message::Id id, rpc::SP_PB_MSG req, net::net_peer_info_t &&peer)
+    rpc::ARpcClient::SentRet RpcName(net::Message::Id id, common::SP_PB_MSG req, net::net_peer_info_t &&peer)
 
 #define ImplStandardAsyncRpcWithMsgId(ClassName, RpcName)                                                                      \
-    rpc::ARpcClient::SentRet ClassName::RpcName(net::Message::Id id, rpc::SP_PB_MSG req, net::net_peer_info_t &&peer) {        \
+    rpc::ARpcClient::SentRet ClassName::RpcName(net::Message::Id id, common::SP_PB_MSG req, net::net_peer_info_t &&peer) {        \
         return rpc::ARpcClient::SendMessageAsync(#RpcName, id, std::move(req), std::move(peer));                               \
     }
 
@@ -102,14 +103,14 @@ public:
      * @param msg
      * @return SentRet::msgId如果是INVALID_MSG_ID(0)则失败，否则成功。
      */
-    SentRet SendMessageAsync(std::string &&rpcName, SP_PB_MSG msg, net::net_peer_info_t &&peer);
+    SentRet SendMessageAsync(std::string &&rpcName, common::SP_PB_MSG msg, net::net_peer_info_t &&peer);
     /**
      * 指定消息id
      * @param rpcName
      * @param msg
      * @return SentRet::msgId如果是INVALID_MSG_ID(0)则失败，否则成功。
      */
-    SentRet SendMessageAsync(std::string &&rpcName, net::Message::Id id, SP_PB_MSG msg, net::net_peer_info_t &&peer);
+    SentRet SendMessageAsync(std::string &&rpcName, net::Message::Id id, common::SP_PB_MSG msg, net::net_peer_info_t &&peer);
     void HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) override final;
 
 protected:

@@ -47,7 +47,7 @@ void TestRpcServer::register_rpc_handlers() {
     m_pRpcServer->FinishRegisterRpc();
 }
 
-rpc::SP_PB_MSG TestRpcServer::on_get(rpc::SP_PB_MSG sspMsg) {
+common::SP_PB_MSG TestRpcServer::on_get(common::SP_PB_MSG sspMsg) {
     auto getReq = dynamic_cast<protocol::GetRequest*>(sspMsg.get());
     auto k = getReq->key();
     EXPECT_EQ(k.c_str()[0], 'a');
@@ -58,11 +58,11 @@ rpc::SP_PB_MSG TestRpcServer::on_get(rpc::SP_PB_MSG sspMsg) {
     auto response = new protocol::GetResponse();
     response->set_rc(minikv::protocol::OK);
 
-    return rpc::SP_PB_MSG(response);
+    return common::SP_PB_MSG(response);
 }
 
-rpc::SP_PB_MSG TestRpcServer::create_get_request() {
-    return rpc::SP_PB_MSG(new protocol::GetRequest());
+common::SP_PB_MSG TestRpcServer::create_get_request() {
+    return common::SP_PB_MSG(new protocol::GetRequest());
 }
 }
 }

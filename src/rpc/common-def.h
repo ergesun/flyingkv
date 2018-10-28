@@ -16,8 +16,6 @@ class Message;
 
 namespace minikv {
 namespace rpc {
-typedef std::shared_ptr<google::protobuf::Message> SP_PB_MSG;
-
 typedef uint16_t HandlerType;
 
 enum class RpcCode {

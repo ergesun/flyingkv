@@ -11,7 +11,7 @@
 #include "../../codegen/meta.pb.h"
 #include "../../common/iservice.h"
 
-#include "../ikv-handler.h"
+#include "../../common/ikv-common.h"
 
 namespace minikv {
 namespace sys {
@@ -28,7 +28,7 @@ class EntryComparer
     }
 };
 
-class MiniKV : public common::IService, public IKVHandler {
+class MiniKV : public common::IService, public common::IKVHandler {
 public:
     MiniKV(std::string &walType, std::string &checkpointType);
     ~MiniKV() override;
@@ -36,10 +36,10 @@ public:
     bool Start() override;
     bool Stop() override;
 
-    rpc::SP_PB_MSG OnPut(rpc::SP_PB_MSG sspMsg)    override;
-    rpc::SP_PB_MSG OnGet(rpc::SP_PB_MSG sspMsg)    override;
-    rpc::SP_PB_MSG OnDelete(rpc::SP_PB_MSG sspMsg) override;
-    rpc::SP_PB_MSG OnScan(rpc::SP_PB_MSG sspMsg)   override;
+    common::SP_PB_MSG OnPut(common::KVPutRequest)    override;
+    common::SP_PB_MSG OnGet(common::KVGetRequest)    override;
+    common::SP_PB_MSG OnDelete(common::KVDeleteRequest) override;
+    common::SP_PB_MSG OnScan(common::KVScanRequest)   override;
 
 private:
     std::map<protocol::Entry*, protocol::Entry*, EntryComparer> m_kvs;

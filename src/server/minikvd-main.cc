@@ -16,7 +16,7 @@
 #include "../common/server-gflags-config.h"
 #include "../common/global-vars.h"
 #include "../common/iservice.h"
-#include "../kv/ikv-handler.h"
+#include "../common/ikv-common.h"
 #include "../kv/mini-kv/mini-kv.h"
 
 #include "./rpc/kv-rpc-sync-server.h"
