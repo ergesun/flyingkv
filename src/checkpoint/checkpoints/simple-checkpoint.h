@@ -6,21 +6,40 @@
 #ifndef MINIKV_SIMPLE_CHECKPOINT_H
 #define MINIKV_SIMPLE_CHECKPOINT_H
 
+#include <string>
+
 #include "../icheckpoint.h"
+#include "../../common/ientry.h"
+
+//         SMCP_MAGIC_NO          s m c p
+#define    SMCP_MAGIC_NO        0x736d6370
+#define    SMCP_MAGIC_NO_LEN    4
+#define    SMCP_PREFIX_NAME     "smcp"
+#define    SMCP_COMPLETE_FLAG   "smcp.ok"
+#define    SMCP_NEW_FILE_SUFFIX ".new"
 
 namespace minikv {
 namespace checkpoint {
 class SimpleCheckpoint : public ICheckpoint {
 public:
-    SimpleCheckpoint();
+    explicit SimpleCheckpoint(const std::string &rootDir, common::EntryCreateHandler &&ech);
     ~SimpleCheckpoint() override;
 
-    void Load(EntryLoadedCallback callback) override;
-    void Save(IEntriesTraveller *traveller) override;
+    bool Load(EntryLoadedCallback callback) override;
+    bool Save(IEntriesTraveller *traveller) override;
+
+private:
+    int create_new_checkpoint();
+    inline bool is_completed();
+    inline bool rm_completed_status();
+    inline bool create_completed_status();
 
 private:
     std::string                           m_sRootDir;
-    std::string                           m_sLogFilePath;
+    std::string                           m_sCpFilePath;
+    std::string                           m_sNewLogFilePath;
+    std::string                           m_sStatusFilePath;
+    common::EntryCreateHandler            m_entryCreator;
 };
 }
 }

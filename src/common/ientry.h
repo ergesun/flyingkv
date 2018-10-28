@@ -6,10 +6,9 @@
 #ifndef MINIKV_COMMON_KV_ENTRY_H
 #define MINIKV_COMMON_KV_ENTRY_H
 
-#include "buffer.h"
-
 namespace minikv {
 namespace common {
+class Buffer;
 class IEntry {
 public:
     virtual ~IEntry() = default;
@@ -17,6 +16,8 @@ public:
     virtual bool Encode(std::shared_ptr<Buffer>&) = 0;
     virtual bool Decode(const Buffer&) = 0;
 };
+
+typedef std::function<common::IEntry*(void)> EntryCreateHandler;
 }
 }
 

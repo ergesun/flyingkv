@@ -8,13 +8,15 @@
 
 #include <string>
 
+#include "../common/ientry.h"
+
 #include "icheckpoint.h"
 
 namespace minikv {
 namespace checkpoint {
 class CheckpointFactory {
 public:
-    static ICheckpoint* CreateInstance(const std::string &type, std::string &rootDir);
+    static ICheckpoint* CreateInstance(const std::string &type, std::string &rootDir, common::EntryCreateHandler &&handle);
 };
 }
 }

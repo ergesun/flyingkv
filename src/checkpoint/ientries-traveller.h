@@ -15,7 +15,8 @@ class IEntriesTraveller {
 public:
     virtual ~IEntriesTraveller() = default;
 
-    virtual const common::IEntry* GetNextEntry() = 0;
+    virtual common::IEntry* GetNextEntry() = 0;
+    virtual bool Empty() = 0;
 };
 }
 }

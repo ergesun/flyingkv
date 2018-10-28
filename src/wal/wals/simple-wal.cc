@@ -17,11 +17,12 @@
 #include "../../utils/codec-utils.h"
 #include "../../utils/protobuf-utils.h"
 #include "../../common/global-vars.h"
+#include "../../common/buffer.h"
 
 namespace minikv {
 using namespace utils;
 namespace wal {
-SimpleWal::SimpleWal(std::string &rootDir, EntryCreateHandler &&entryCreateHandler) :
+SimpleWal::SimpleWal(std::string &rootDir, common::EntryCreateHandler &&entryCreateHandler) :
         m_sRootDir(rootDir), m_entryCreator(std::move(entryCreateHandler)) {
     if (rootDir.empty()) {
         LOGFFUN << "wal root dir is empty";

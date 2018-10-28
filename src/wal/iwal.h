@@ -31,8 +31,6 @@ struct WalEntry {
     common::IEntry   *Entry;
 };
 
-typedef std::function<common::IEntry*(void)> EntryCreateHandler;
-
 class IWal {
 public:
     virtual ~IWal() = default;

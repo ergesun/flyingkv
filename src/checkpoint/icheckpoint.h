@@ -22,8 +22,8 @@ class ICheckpoint {
 public:
     virtual ~ICheckpoint() = default;
 
-    virtual void Load(EntryLoadedCallback) = 0;
-    virtual void Save(IEntriesTraveller*) = 0;
+    virtual bool Load(EntryLoadedCallback) = 0;
+    virtual bool Save(IEntriesTraveller*) = 0;
 };
 }
 }

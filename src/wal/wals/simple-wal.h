@@ -31,7 +31,7 @@ namespace wal {
  */
 class SimpleWal : public IWal {
 public:
-    SimpleWal(std::string &rootDir, EntryCreateHandler &&handler);
+    SimpleWal(std::string &rootDir, common::EntryCreateHandler &&handler);
     ~SimpleWal() override;
 
     uint64_t AppendEntry(common::IEntry *entry) override;
@@ -46,7 +46,7 @@ private:
     std::string                           m_sLogFilePath;
     int                                   m_iFd           = -1;
     uint32_t                              m_iFileSize     = 0;
-    EntryCreateHandler                    m_entryCreator;
+    common::EntryCreateHandler            m_entryCreator;
     bool                                  m_bLoaded       = false;
 };
 }

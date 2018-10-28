@@ -7,12 +7,13 @@
 #define MINIKV_WAL_FACTORY_H
 
 #include "iwal.h"
+#include "../common/ientry.h"
 
 namespace minikv {
 namespace wal {
 class WALFactory {
 public:
-    static IWal* CreateInstance(const std::string &type, std::string &rootDir, EntryCreateHandler &&handler);
+    static IWal* CreateInstance(const std::string &type, std::string &rootDir, common::EntryCreateHandler &&handler);
 };
 }
 }

@@ -6,6 +6,8 @@ add_executable(minikvd ${SOURCE_FILES} ${ND_SRCS} ${ND_RPC_SRCS})
 set(LINK_LIBS
         kv
         codegen
+        checkpoint
+        wal
         protobuf
         rpc
         net
@@ -18,9 +20,13 @@ set(LINK_LIBS
         )
 
 set(DEPEN_LIBS
+        kv
         codegen
+        checkpoint
+        wal
         net
         common
+        rpc
         )
 
 add_dependencies(minikvd ${DEPEN_LIBS})

@@ -16,14 +16,14 @@ static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<st
 
 namespace minikv {
 namespace checkpoint {
-ICheckpoint* CheckpointFactory::CreateInstance(const std::string &type, std::string &rootDir) {
+ICheckpoint* CheckpointFactory::CreateInstance(const std::string &type, std::string &rootDir, common::EntryCreateHandler &&handler) {
     auto rs = g_typeMapper.find(type);
     if (rs == g_typeMapper.end()) {
         LOGFFUN << "cannot find checkpoint class type " << type;
     }
     switch (rs->second) {
         case 0:
-            return new SimpleCheckpoint();
+            return new SimpleCheckpoint(rootDir, std::move(handler));
         default:
             return nullptr;
     }

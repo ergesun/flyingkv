@@ -154,6 +154,19 @@ public:
     }
 };
 
+class FileCloser {
+public:
+    explicit FileCloser(int fd) : m_fd(fd) {}
+    ~FileCloser() {
+        if (-1 != m_fd) {
+            close(m_fd);
+        }
+    }
+
+private:
+    int m_fd = -1;
+};
+
 } // namespace common
 } // namespace minikv
 #endif //MINIKV_COMMON_COMMON_DEF_H
