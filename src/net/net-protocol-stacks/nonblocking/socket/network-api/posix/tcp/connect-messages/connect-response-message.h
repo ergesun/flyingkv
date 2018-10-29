@@ -13,17 +13,17 @@
 namespace flyingkv {
 namespace net {
 class ConnectResponseMessage : public SndMessage {
-public:
+PUBLIC
     enum class Status {
         OK     = 0,
         ERROR  = 1
     };
 
-public:
+PUBLIC
     ConnectResponseMessage(sys::MemPool *mp, Status stat, std::string &&what) :
         SndMessage(mp, net_peer_info_s()), m_stat(stat), m_sWhat(std::move(what)) {}
 
-protected:
+PROTECTED
     uint32_t getDerivePayloadLength() override {
         return sizeof(uint16_t)/*Status*/ + m_sWhat.length()/*what*/;
     }
@@ -34,7 +34,7 @@ protected:
         memcpy(b->GetPos(), m_sWhat.c_str(), m_sWhat.length());
     }
 
-private:
+PRIVATE
     Status                  m_stat;
     std::string             m_sWhat;
 };

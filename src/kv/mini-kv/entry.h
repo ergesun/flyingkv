@@ -15,7 +15,7 @@ class MemPool;
 }
 namespace minikv {
 class Entry : public common::IEntry {
-public:
+PUBLIC
     explicit Entry(sys::MemPool*);
     Entry(sys::MemPool*, protocol::Entry*);
     ~Entry() override;
@@ -27,7 +27,7 @@ public:
         return m_pContent;
     }
 
-private:
+PRIVATE
     sys::MemPool      *m_pMp      = nullptr;
     protocol::Entry   *m_pContent = nullptr;
 };

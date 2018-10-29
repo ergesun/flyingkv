@@ -8,12 +8,12 @@
 
 #include <string>
 
-#include "../cjson/cJSON.h"
+#include "../3rd/cjson/cJSON.h"
 
 namespace flyingkv {
 namespace acc {
 class IConfParser {
-public:
+PUBLIC
     virtual ~IConfParser() = default;
 
     /**

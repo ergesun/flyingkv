@@ -26,7 +26,7 @@ namespace rflog {
  *                             |<-log content len(u32)->|<-log content->|<-log segment start pos(u32)->|
  */
 class RtDiskRfLogger : public IRfLogger {
-public:
+PUBLIC
     explicit RtDiskRfLogger(std::string &&logFilePath, bool autoSync = false);
     ~RtDiskRfLogger() override;
 
@@ -37,10 +37,10 @@ public:
 
     void Sync() override;
 
-private:
+PRIVATE
     void initialize();
 
-private:
+PRIVATE
     std::string                           m_sLogFilePath;
     bool                                  m_bAutoSync = false;
     int                                   m_iFd = -1;

@@ -102,7 +102,7 @@ typedef unsigned char uchar;
 namespace flyingkv {
 namespace common {
 class FuncInOutLogger {
-public:
+PUBLIC
     FuncInOutLogger() = delete;
     FuncInOutLogger(const std::string &&content) {
         this->content = std::move(content);
@@ -113,13 +113,13 @@ public:
         LOG(INFO) << this->content << " [Out].";
     }
 
-private:
+PRIVATE
     std::string content;
 };
 
 template <typename T>
 class ObjReleaseHandler {
-public:
+PUBLIC
     ObjReleaseHandler(T *p, std::function<void(T *arg)> func) : __p(p), __func(func) {}
     ~ObjReleaseHandler() {
         if (__func) {
@@ -127,14 +127,14 @@ public:
         }
     }
 
-private:
+PRIVATE
     T *__p;
     std::function<void(T *arg)> __func;
 };
 
 template <typename T>
 class ObjFreer {
-public:
+PUBLIC
     void operator() (T* p) {
         FREE_PTR(p);
     }
@@ -142,7 +142,7 @@ public:
 
 template <typename T>
 class ObjDeleter {
-public:
+PUBLIC
     void operator() (T* p) {
         DELETE_PTR(p);
     }
@@ -150,14 +150,14 @@ public:
 
 template <typename T>
 class ArrDeleter {
-public:
+PUBLIC
     void operator() (T* p) {
         DELETE_ARR_PTR(p);
     }
 };
 
 class FileCloser {
-public:
+PUBLIC
     explicit FileCloser(int fd) : m_fd(fd) {}
     ~FileCloser() {
         if (-1 != m_fd) {
@@ -165,7 +165,7 @@ public:
         }
     }
 
-private:
+PRIVATE
     int m_fd = -1;
 };
 

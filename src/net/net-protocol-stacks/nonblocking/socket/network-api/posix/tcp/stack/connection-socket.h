@@ -18,7 +18,7 @@ namespace net {
  * 当前只考虑了ipv4.
  */
 class PosixTcpConnectionSocket : public FileDescriptor {
-public:
+PUBLIC
     PosixTcpConnectionSocket() = default;
     PosixTcpConnectionSocket(net_addr_t peerAddr) {
         m_real_peer = net_peer_info_t(peerAddr, SocketProtocol::Tcp);
@@ -84,7 +84,7 @@ public:
      */
     bool SetNonBlocking(bool val);
 
-private:
+PRIVATE
     volatile bool m_connected = false;
 };
 

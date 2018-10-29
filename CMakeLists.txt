@@ -16,9 +16,16 @@ SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
 # 自定义宏
 option(DEFINE_MACRO "Option for [debug logs] macro" OFF)
+add_definitions(-DPUBLIC=public:)
 if(DEFINE_MACRO)
-    ADD_DEFINITIONS(-DDEBUG_LOG)
+    add_definitions(-DDEBUG_LOG)
 endif(DEFINE_MACRO)
+
+if(${PROJECT_TYPE} MATCHES "UT")
+    add_definitions(-DPRIVATE -DPROTECTED)
+else()
+    add_definitions(-DPRIVATE=private: -DPROTECTED=protected:)
+endif()
 
 # 使用c++11标准
 set(CMAKE_CXX_STANDARD 11)
@@ -42,18 +49,19 @@ message(STATUS "EXTERN_COMPILE_THIRDPARTY_ROOT = ${EXTERN_COMPILE_THIRDPARTY_ROO
 link_directories(${EXTERN_COMPILE_THIRDPARTY_ROOT}/lib)
 
 ##---------------------------------for clion debug ut-------------------------------------------
-#add_definitions(-DGTEST_LANG_CXX11=1 -DGTEST_HAS_TR1_TUPLE=0 -DGTEST_USE_OWN_TR1_TUPLE=0)
+#add_definitions(-DPRIVATE -DPROTECTED)
+#add_definitions(-DUNIT_TEST -DGTEST_LANG_CXX11=1 -DGTEST_HAS_TR1_TUPLE=0 -DGTEST_USE_OWN_TR1_TUPLE=0)
 #add_subdirectory(${SRC_ROOT}/sys)
 #add_subdirectory(${SRC_ROOT}/utils)
+#add_subdirectory(${SRC_ROOT}/3rd/cjson)
 #add_subdirectory(${SRC_ROOT}/common)
-#add_subdirectory(${SRC_ROOT}/net)
-#add_subdirectory(${SRC_ROOT}/rpc)
 #add_subdirectory(${SRC_ROOT}/codegen)
+#add_subdirectory(${SRC_ROOT}/wal)
 #
 #set(BUILD_OUTPUT_ROOT_DIR ${PROJECT_SOURCE_DIR}/build/ut/debug)
 #set(LIBRARY_OUTPUT_PATH ${BUILD_OUTPUT_ROOT_DIR}/lib)
 #set(EXECUTABLE_OUTPUT_PATH ${BUILD_OUTPUT_ROOT_DIR})
-#add_subdirectory(${UT_ROOT}/rpc)
+#add_subdirectory(${UT_ROOT}/wal)
 ##----------------------------------------------------------------------------------------------
 
 if(${PROJECT_TYPE} MATCHES "UT")

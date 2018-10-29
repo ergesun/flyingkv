@@ -6,16 +6,16 @@
 #ifndef FLYINGKV_AC_RLC_H
 #define FLYINGKV_AC_RLC_H
 
-#include "../../common/ikv-common.h"
+#include "../common/ikv-common.h"
 
 namespace flyingkv {
 namespace acc {
-class ILimiter {
-public:
-    virtual ~ILimiter() = default;
+class IGranter {
+PUBLIC
+    virtual ~IGranter() = default;
 
-    virtual bool GrantUntil(int64_t deadlineTs, common::ReqRespType) = 0;
-    virtual void GiveBack(common::ReqRespType) = 0;
+    virtual bool GrantUntil(int64_t deadlineTs, common::ReqRespType rt) = 0;
+    virtual void GiveBack(common::ReqRespType rt) = 0;
     virtual std::string GetName() = 0;
 };
 }

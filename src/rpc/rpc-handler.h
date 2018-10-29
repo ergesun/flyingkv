@@ -29,7 +29,7 @@ class SndMessage;
 
 namespace rpc {
 class IRpcHandler {
-public:
+PUBLIC
     virtual ~IRpcHandler() = default;
     /**
      * rpc事件的回调。
@@ -44,11 +44,11 @@ public:
  * 辅助的通用rpc handler。
  */
 class TypicalRpcHandler : public IRpcHandler {
-public:
+PUBLIC
     typedef std::function<common::SP_PB_MSG(common::SP_PB_MSG)> RpcHandle;
     typedef std::function<common::SP_PB_MSG(void)> RequestCreator;
 
-public:
+PUBLIC
     TypicalRpcHandler(RpcHandle handle, RequestCreator requestCreator) :
         m_handle(std::move(handle)), m_requestCreator(std::move(requestCreator)) {
         assert((nullptr != m_handle) && (nullptr != m_requestCreator));
@@ -57,7 +57,7 @@ public:
     common::SP_PB_MSG Handle(common::SP_PB_MSG req) override;
     common::SP_PB_MSG CreateMessage() override;
 
-private:
+PRIVATE
     RpcHandle             m_handle;
     RequestCreator        m_requestCreator;
 };

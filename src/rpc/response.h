@@ -18,29 +18,29 @@ namespace flyingkv {
 namespace rpc {
 typedef uint16_t RpcCodeType;
 class RpcResponseBase : public net::SndMessage {
-public:
+PUBLIC
     RpcResponseBase(RpcCode code, HandlerType ht) :
             m_code(code), m_ht(ht) {}
 
-protected:
+PROTECTED
     uint32_t getDerivePayloadLength() override;
     void encodeDerive(common::Buffer *b) override;
 
-protected:
+PROTECTED
     RpcCode          m_code;
     HandlerType      m_ht;
 };
 
 class RpcResponse : public RpcResponseBase {
-public:
+PUBLIC
     RpcResponse(common::SP_PB_MSG msg, HandlerType ht) :
             RpcResponseBase(RpcCode::OK, ht), m_pMsg(msg) {}
 
-protected:
+PROTECTED
     uint32_t getDerivePayloadLength() override;
     void encodeDerive(common::Buffer *b) override;
 
-private:
+PRIVATE
     common::SP_PB_MSG      m_pMsg = nullptr;
 };
 

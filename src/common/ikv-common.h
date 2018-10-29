@@ -32,7 +32,7 @@ typedef std::shared_ptr<protocol::ScanRequest> KVScanRequest;
  * rpc通信的消息接收接口。
  */
 class IKVHandler {
-public:
+PUBLIC
     virtual ~IKVHandler() = default;
     virtual SP_PB_MSG OnPut(KVPutRequest sspMsg)       = 0;
     virtual SP_PB_MSG OnGet(KVGetRequest sspMsg)       = 0;

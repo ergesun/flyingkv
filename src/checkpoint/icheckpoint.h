@@ -19,7 +19,7 @@ namespace checkpoint {
 typedef std::function<void(common::IEntry*)> EntryLoadedCallback;
 
 class ICheckpoint {
-public:
+PUBLIC
     virtual ~ICheckpoint() = default;
 
     virtual bool Load(EntryLoadedCallback) = 0;

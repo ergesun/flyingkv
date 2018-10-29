@@ -17,7 +17,7 @@ class IKVHandler;
 
 namespace server {
 class KVRpcServerSync : public common::IService {
-public:
+PUBLIC
     KVRpcServerSync(common::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadCnt,
                     uint16_t port, sys::MemPool *memPool = nullptr);
     ~KVRpcServerSync() override;
@@ -25,7 +25,7 @@ public:
     bool Start() override;
     bool Stop() override;
 
-private:
+PRIVATE
     void register_rpc_handlers();
     common::SP_PB_MSG on_put(common::SP_PB_MSG sspMsg);
     /**
@@ -42,7 +42,7 @@ private:
 
     void onRecvNetMessage(std::shared_ptr<net::NotifyMessage> sspNM);
 
-private:
+PRIVATE
     bool                      m_bStopped        = true;
     uint16_t                  m_iIOThreadsCnt   = 0;
     rpc::RpcServer           *m_pRpcServer      = nullptr;

@@ -11,7 +11,7 @@ namespace common {
  * 所有服务的统一接口类。
  */
 class IService {
-public:
+PUBLIC
     virtual bool Start() = 0;
 
     virtual bool Stop() = 0;

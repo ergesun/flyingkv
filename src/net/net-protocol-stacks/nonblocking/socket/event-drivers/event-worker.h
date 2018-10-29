@@ -21,7 +21,7 @@ namespace net {
  * -> 需要通过GetInternalEvent和GetExternalEvents两个函数才能获取所有事件。
  */
 class EventWorker {
-public:
+PUBLIC
     struct EpollAddEvent {
         EpollAddEvent(AFileEventHandler *h, int32_t curMask, int32_t m)
                     : socketEventHandler(h), cur_mask(curMask), mask(m) {}
@@ -30,7 +30,7 @@ public:
         int32_t mask;
     };
 
-public:
+PUBLIC
     EventWorker(uint32_t maxEvents, NonBlockingEventModel m);
     ~EventWorker();
 
@@ -90,7 +90,7 @@ public:
      */
     void Wakeup();
 
-private:
+PRIVATE
     friend class PosixEventManager;
     int32_t AddEvent(AFileEventHandler *socketEventHandler, int32_t cur_mask, int32_t mask) {
         return m_pEventDriver->AddEvent(socketEventHandler, cur_mask, mask);
@@ -100,7 +100,7 @@ private:
         return m_pEventDriver->DeleteHandler(socketEventHandler);
     }
 
-private:
+PRIVATE
     std::vector<NetEvent>            m_vDriverInternalEvents;
     IEventDriver                    *m_pEventDriver;
 

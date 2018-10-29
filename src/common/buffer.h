@@ -21,7 +21,7 @@ namespace common {
  *   - 有效长度为：[pos, last]  --> 闭区间
  */
 class Buffer {
-public:
+PUBLIC
     Buffer() = default;
     Buffer(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPool::MemObject *mpo) :
         m_pPos(pos), m_pLast(last), m_pStart(start), m_pEnd(end), m_pMpObject(mpo) {
@@ -147,7 +147,7 @@ public:
         return m_pEnd;
     }
 
-private:
+PRIVATE
     inline void check_available() {
         if (!m_pStart || !m_pEnd || !m_pPos || !m_pLast) {
             m_bAvailable = false;
@@ -157,7 +157,7 @@ private:
         m_bAvailable = (uintptr_t)m_pPos <= (uintptr_t)m_pLast;
     }
 
-private:
+PRIVATE
     uchar                     *m_pPos              = nullptr;
     uchar                     *m_pLast             = nullptr;
     uchar                     *m_pStart            = nullptr;

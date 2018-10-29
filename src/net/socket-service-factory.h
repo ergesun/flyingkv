@@ -18,7 +18,7 @@ class MemPool;
 namespace net {
 class INetStackWorkerManager;
 class SocketServiceFactory {
-public:
+PUBLIC
     /**
      *
      */

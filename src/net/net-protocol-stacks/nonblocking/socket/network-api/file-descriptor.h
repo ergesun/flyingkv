@@ -11,7 +11,7 @@
 namespace flyingkv {
 namespace net {
 class FileDescriptor {
-public:
+PUBLIC
     FileDescriptor() = default;
     FileDescriptor(int sd, net_peer_info_t realPeer) : m_fd(sd), m_real_peer(realPeer) {}
 
@@ -47,7 +47,7 @@ public:
         return m_logic_peer;
     }
 
-protected:
+PROTECTED
     int               m_fd = -1;
     net_peer_info_t   m_real_peer;
     net_peer_info_t   m_logic_peer;

@@ -13,7 +13,7 @@ namespace common {
  * 维护一个引用计数的类。
  */
 class ReferenceCounter {
-public:
+PUBLIC
     explicit ReferenceCounter(uint32_t ref) : m_iRef(ref) {}
     virtual ~ReferenceCounter() = default;
 
@@ -27,7 +27,7 @@ public:
      */
     virtual void Release();
 
-protected:
+PROTECTED
     /**
      * 指定一个引用计数。
      * @param val
@@ -40,7 +40,7 @@ protected:
      */
     int32_t GetRef();
 
-private:
+PRIVATE
     int32_t        m_iRef = 0;
 }; // class ReferenceCounter
 } // namespace common

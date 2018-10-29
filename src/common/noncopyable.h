@@ -10,10 +10,10 @@
 namespace flyingkv {
 namespace common {
 class Noncopyable {
-protected:
+PROTECTED
     Noncopyable() {}
     ~Noncopyable() {}
-private:  // emphasize the following members are private
+PRIVATE  // emphasize the following members are private
     Noncopyable(const Noncopyable&);
     const Noncopyable& operator=(const Noncopyable&);
     Noncopyable(const Noncopyable&&);

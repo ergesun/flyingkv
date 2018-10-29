@@ -9,7 +9,7 @@
 namespace flyingkv {
 namespace sys {
 class cctime {
-public:
+PUBLIC
     cctime() : sec(0), nsec(0) {}
 
     cctime(long s, long n) : sec(s), nsec(n) {}

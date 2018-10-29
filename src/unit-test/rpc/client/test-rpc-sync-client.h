@@ -17,7 +17,7 @@ class RequestVoteResponse;
 
 namespace test {
 class TestRpcClientSync : public rpc::ARpcSyncClient {
-public:
+PUBLIC
     TestRpcClientSync(net::ISocketService *ss, const sys::cctime &timeout,
                                 uint16_t workThreadsCnt, sys::MemPool *memPool = nullptr) :
         rpc::ARpcSyncClient(ss, timeout, workThreadsCnt, memPool) {}
@@ -26,11 +26,11 @@ public:
     DefineStandardSyncRpcWithMsgId(Get);
     // Define Rpc end
 
-protected:
+PROTECTED
     bool onStart() override;
     bool onStop() override;
 
-private:
+PRIVATE
     bool register_rpc_handlers();
 };
 } // namespace test

@@ -18,7 +18,7 @@ namespace flyingkv {
 namespace net {
 class ANetStackMessageWorker;
 class AFileEventHandler : public common::ReferenceCounter, public IEventHandler {
-public:
+PUBLIC
     AFileEventHandler() : common::ReferenceCounter(1) {}
     explicit AFileEventHandler(FileDescriptor *socketDesc) : common::ReferenceCounter(1), m_socketDesc(socketDesc) {}
 
@@ -53,12 +53,12 @@ public:
 
     virtual ANetStackMessageWorker* GetStackMsgWorker() = 0;
 
-protected:
+PROTECTED
     inline void setSocketDescriptor(FileDescriptor *psd) {
         m_socketDesc = psd;
     }
 
-private:
+PRIVATE
     FileDescriptor *m_socketDesc = nullptr;
     EventWorker    *m_pOwnEvWorker = nullptr;
 };

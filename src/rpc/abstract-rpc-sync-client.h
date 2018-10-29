@@ -64,15 +64,15 @@ class NotifyMessage;
 }
 namespace rpc {
 class ARpcSyncClient : public ARpcClient {
-private:
+PRIVATE
     class RpcCtx {
-    public:
+    PUBLIC
         enum class State {
             Ok          = 0,
             Timeout     = 1,
             BrokenPipe  = 2
         };
-    public:
+    PUBLIC
         RpcCtx() {
             cv = new std::condition_variable();
             mtx = new std::mutex();
@@ -87,7 +87,7 @@ private:
             ssp_nm.reset();
         }
 
-    public:
+    PUBLIC
         std::condition_variable             *cv        = nullptr;
         std::mutex                          *mtx       = nullptr;
         net::net_peer_info_t                 peer;
@@ -98,12 +98,12 @@ private:
         std::shared_ptr<net::NotifyMessage>  ssp_nm;
     };
 
-public:
+PUBLIC
     ARpcSyncClient(net::ISocketService *ss, const sys::cctime &timeout,
             uint16_t workThreadsCnt, sys::MemPool *memPool = nullptr) :
     rpc::ARpcClient(ss, memPool), m_timeout(timeout) {}
 
-protected:
+PROTECTED
     std::shared_ptr<net::NotifyMessage> recvMessage(RpcCtx *rc);
     void onRecvMessage(std::shared_ptr<net::NotifyMessage> sspNM) override;
     /**
@@ -120,7 +120,7 @@ protected:
      */
     std::shared_ptr<net::NotifyMessage> sendMessage(std::string &&rpcName, net::Message::Id id, common::SP_PB_MSG msg, net::net_peer_info_t &&peer);
 
-private:
+PRIVATE
     common::ResourcePool<RpcCtx>                                   m_rpcCtxPool = common::ResourcePool<RpcCtx>(200);
     std::unordered_map<uint64_t, RpcCtx*>                          m_hmapRpcCtxs;
     std::unordered_map<net::net_peer_info_t, std::set<RpcCtx*>>    m_hmapPeerRpcs;

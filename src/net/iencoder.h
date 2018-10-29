@@ -18,7 +18,7 @@ namespace net {
  * 编码器接口。
  */
 class IEncoder {
-public:
+PUBLIC
     virtual ~IEncoder() {}
     virtual common::Buffer* Encode() = 0;
 }; // interface IEncoder

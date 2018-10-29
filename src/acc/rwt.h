@@ -25,11 +25,11 @@ struct hash<flyingkv::common::ReqRespType> {
 namespace flyingkv {
 namespace acc {
 class RWT : public IConfParser {
-public:
+PUBLIC
     bool Parse(cJSON *blockRoot) override;
     uint32_t GetWeight(common::ReqRespType rt);
 
-private:
+PRIVATE
     std::unordered_map<common::ReqRespType, uint32_t>   m_hmWeightTable;
 };
 } // namespace acc

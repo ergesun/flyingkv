@@ -14,18 +14,18 @@ using namespace flyingkv::net;
 namespace flyingkv {
 namespace test {
 class TestSndMessage : public net::SndMessage {
-public:
+PUBLIC
     TestSndMessage(sys::MemPool *mp, net::net_peer_info_t &&socketInfo, std::string msg);
 
 #ifdef WITH_MSG_ID
     TestSndMessage(sys::MemPool *mp, net::net_peer_info_t &&socketInfo, net::Message::Id id, std::string msg);
 #endif
 
-protected:
+PROTECTED
     uint32_t getDerivePayloadLength() override;
     void encodeDerive(common::Buffer *b) override;
 
-private:
+PRIVATE
     std::string    m_str;
 };
 }

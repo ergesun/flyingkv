@@ -15,7 +15,7 @@ namespace net {
 * TODO(sunchao)：考虑也做成回收利用？
 */
 class RcvMessage : public Message {
-public:
+PUBLIC
     RcvMessage(sys::MemPoolObject *refMpo, sys::MemPool *mp, net_peer_info_t &&peerInfo,
                Message::Header h, common::Buffer *buffer) : Message(mp) {
         m_header = h;
@@ -47,7 +47,7 @@ public:
         return m_pBuffer;
     }
 
-private:
+PRIVATE
     common::Buffer             *m_pBuffer;
     sys::MemPoolObject         *m_refMpo;
 };

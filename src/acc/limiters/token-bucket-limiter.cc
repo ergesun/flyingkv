@@ -7,6 +7,7 @@
 
 #include "../../sys/cctime.h"
 #include "../../common/common-def.h"
+
 #include "../rwt.h"
 
 #include "token-bucket-limiter.h"
@@ -135,7 +136,7 @@ void TokenBucketLimiter::initialize(){
 
 // Update current token bucket status
 void TokenBucketLimiter::update(int64_t currentTs){
-    auto passedTime := currentTs - m_lastUpdateTs;
+    auto passedTime = currentTs - m_lastUpdateTs;
     // 2 simple optimizations before update work
     if (0 == passedTime) {
         return;
@@ -151,7 +152,7 @@ void TokenBucketLimiter::update(int64_t currentTs){
 }
 
 int64_t TokenBucketLimiter::calc_tokens_to_add(int64_t passedTime) {
-    auto tokensToAdd := m_tokenPerTimeUnit * passedTime;
+    auto tokensToAdd = m_tokenPerTimeUnit * passedTime;
     m_timeAccumulated += m_timeRemainder * passedTime;
     if (m_timeAccumulated >= m_timeUnit) {
         tokensToAdd += m_timeAccumulated / m_timeUnit;

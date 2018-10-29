@@ -14,7 +14,7 @@
 namespace flyingkv {
 namespace test {
 class TestRpcServer : public common::IService, public rpc::IMessageHandler {
-public:
+PUBLIC
     TestRpcServer(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool = nullptr);
     ~TestRpcServer() override;
 
@@ -23,12 +23,12 @@ public:
 
     void HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) override;
 
-private:
+PRIVATE
     void register_rpc_handlers();
     common::SP_PB_MSG on_get(common::SP_PB_MSG sspMsg);
     common::SP_PB_MSG create_get_request();
 
-private:
+PRIVATE
     rpc::RpcServer        *m_pRpcServer = nullptr;
 };
 } // namespace test

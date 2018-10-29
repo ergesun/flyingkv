@@ -28,7 +28,7 @@ class AEventManager;
  * TODO(sunchao): 扩展为可listen多个端口？
  */
 class NBSocketService : public ASocketService {
-public:
+PUBLIC
     /**
      */
     explicit NBSocketService(NssConfig nssConfig);
@@ -63,13 +63,13 @@ public:
      */
     bool Disconnect(const net_peer_info_t &peer) override;
 
-private:
+PRIVATE
     bool connect(net_peer_info_t &npt);
     void on_stack_connect(AFileEventHandler *handler);
     bool on_logic_connect(AFileEventHandler *handler);
     void on_finish(AFileEventHandler *handler);
 
-private:
+PRIVATE
     NssConfig                                 m_conf;
     std::shared_ptr<INetStackWorkerManager>   m_sspMgr;
     AEventManager                            *m_pEventManager = nullptr;

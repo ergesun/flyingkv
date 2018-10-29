@@ -16,7 +16,7 @@
 namespace flyingkv {
 namespace sys {
 class RwMutex {
-public:
+PUBLIC
     RwMutex();
     ~RwMutex();
 
@@ -52,12 +52,12 @@ public:
         }
     }
 
-private:
+PRIVATE
     pthread_rwlock_t  m_rwLockMtx = PTHREAD_RWLOCK_INITIALIZER;
 };
 
 class ReadLock {
-public:
+PUBLIC
     ReadLock(RwMutex *const m) : m_pRwMutex(m) {
         assert(m_pRwMutex);
         m_pRwMutex->RLock();
@@ -97,13 +97,13 @@ public:
         m_bOwnLock = false;
     }
 
-private:
+PRIVATE
     RwMutex   *const m_pRwMutex      = nullptr;
     volatile   bool  m_bOwnLock      = false;
 };
 
 class WriteLock {
-public:
+PUBLIC
     WriteLock(RwMutex *const m) : m_pRwMutex(m) {
         assert(m_pRwMutex);
         m_pRwMutex->WLock();
@@ -143,7 +143,7 @@ public:
         m_bOwnLock = false;
     }
 
-private:
+PRIVATE
     RwMutex   *const m_pRwMutex      = nullptr;
     volatile   bool  m_bOwnLock      = false;
 };

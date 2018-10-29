@@ -13,11 +13,11 @@
 namespace flyingkv {
 namespace net {
 class ConnectRequestMessage : public SndMessage {
-public:
+PUBLIC
     ConnectRequestMessage(sys::MemPool *mp, int16_t logicPort) :
         SndMessage(mp, net_peer_info_s()), m_logicPort(std::move(logicPort)) {}
 
-protected:
+PROTECTED
     uint32_t getDerivePayloadLength() override {
         return sizeof(uint16_t)/*logic port*/;
     }
@@ -26,7 +26,7 @@ protected:
         ByteOrderUtils::WriteUInt16(b->GetPos(), (uint16_t)m_logicPort);
     }
 
-private:
+PRIVATE
     int16_t          m_logicPort;
 };
 }

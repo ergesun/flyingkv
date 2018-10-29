@@ -12,7 +12,7 @@ namespace flyingkv {
 namespace common {
 class Buffer;
 class IEntry {
-public:
+PUBLIC
     virtual ~IEntry() = default;
 
     virtual bool Encode(std::shared_ptr<Buffer>&) = 0;

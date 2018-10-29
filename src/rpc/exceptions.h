@@ -14,17 +14,17 @@
 namespace flyingkv {
 namespace rpc {
 class RpcException : public std::exception {
-public:
+PUBLIC
     RpcException() = default;
     RpcException(std::string &what) : m_sWhat(what) {}
     RpcException(std::string &&what) : m_sWhat(std::move(what)) {}
 
-protected:
+PROTECTED
     std::string m_sWhat;
 };
 
 class BadRpcException : public RpcException {
-public:
+PUBLIC
     explicit BadRpcException(uint16_t code, std::string &&rpcName) : m_iCode(code), m_sRpcName(std::move(rpcName)) {
         std::stringstream ss;
         ss << "Cannot found registered rpc " << m_sRpcName << ".";
@@ -39,13 +39,13 @@ public:
         return m_iCode;
     }
 
-private:
+PRIVATE
     uint16_t m_iCode;
     std::string m_sRpcName;
 };
 
 class BadRpcHandlerIdException : public RpcException {
-public:
+PUBLIC
     BadRpcHandlerIdException(uint16_t code, uint16_t handlerId) : m_iCode(code), m_iHandlerId(handlerId) {
         std::stringstream ss;
         ss << "Bad handler id " << m_iHandlerId << ".";
@@ -64,14 +64,14 @@ public:
         return m_iHandlerId;
     }
 
-private:
+PRIVATE
     uint16_t m_iCode;
     uint16_t m_iHandlerId;
 
 };
 
 class RpcClientInternalException : public RpcException {
-public:
+PUBLIC
     RpcClientInternalException() {
         m_sWhat = "Rpc client internal error!";
     }
@@ -82,7 +82,7 @@ public:
 };
 
 class RpcClientSendTimeoutException : public RpcException {
-public:
+PUBLIC
     RpcClientSendTimeoutException() {
         m_sWhat = "Rpc client send timeout!";
     }
@@ -93,7 +93,7 @@ public:
 };
 
 class RpcBrokenPipeException : public RpcException {
-public:
+PUBLIC
     RpcBrokenPipeException() {
         m_sWhat = "Rpc pipe is broken!";
     }
@@ -104,7 +104,7 @@ public:
 };
 
 class RpcMessageCorruptException : public RpcException {
-public:
+PUBLIC
     RpcMessageCorruptException(uint16_t handlerId) {
         std::stringstream ss;
         ss << "Cannot parse sent message error for handler id " << handlerId << ".";
@@ -117,7 +117,7 @@ public:
 };
 
 class RpcServerInternalException : public RpcException {
-public:
+PUBLIC
     RpcServerInternalException() {
         m_sWhat = "Rpc peer server internal error! Maybe oom.";
     }
@@ -128,7 +128,7 @@ public:
 };
 
 class RpcClientIsBusyException : public rpc::RpcException {
-public:
+PUBLIC
     RpcClientIsBusyException() {
         m_sWhat = "Cannot push message into sent msg queue, the sent msg queue is full!";
     }

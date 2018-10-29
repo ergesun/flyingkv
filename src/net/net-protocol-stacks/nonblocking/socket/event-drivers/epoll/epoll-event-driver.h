@@ -11,7 +11,7 @@
 namespace flyingkv {
 namespace net {
 class EpollEventDriver : public IEventDriver {
-public:
+PUBLIC
     ~EpollEventDriver() override;
     /**
      * nevent在kernel 2.6.8之后是被忽略的，参考man 2 epoll_create
@@ -34,7 +34,7 @@ public:
      */
     int EventWait(std::vector<NetEvent> *events, struct timeval *tp) override;
 
-private:
+PRIVATE
     int m_epfd;
     int m_max_events;
     struct epoll_event *m_events;

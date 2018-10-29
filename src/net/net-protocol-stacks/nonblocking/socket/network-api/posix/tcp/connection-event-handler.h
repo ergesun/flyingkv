@@ -18,7 +18,7 @@ class MemPool;
 
 namespace net {
 class PosixTcpConnectionEventHandler : public AFileEventHandler {
-public:
+PUBLIC
     PosixTcpConnectionEventHandler(PosixTcpClientSocket *pSocket, sys::MemPool *memPool,
         NotifyMessageCallbackHandler msgCallbackHandler, uint16_t logicPort,
         ConnectFunc onLogicConnect);
@@ -36,7 +36,7 @@ public:
         return m_pClientSocket;
     }
 
-private:
+PRIVATE
     PosixTcpClientSocket   *m_pClientSocket = nullptr;
     PosixTcpNetStackWorker *m_pNetStackWorker = nullptr;
     sys::MemPool           *m_pMemPool;

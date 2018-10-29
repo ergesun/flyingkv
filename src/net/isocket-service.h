@@ -14,7 +14,7 @@ namespace flyingkv {
 namespace net {
 class SndMessage;
 class ISocketService {
-public:
+PUBLIC
     virtual ~ISocketService() = default;
     /**
      * 开启服务。

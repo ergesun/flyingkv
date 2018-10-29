@@ -68,7 +68,7 @@ class RpcRequest;
 * Rpc client base class.
 */
 class ARpcClient : public common::IService, public IMessageHandler {
-public:
+PUBLIC
     struct SentRet {
         SentRet() = default;
         SentRet(SentRet &&sr) noexcept {
@@ -84,7 +84,7 @@ public:
         uint64_t                             msgId     = 0;
     };
 
-public:
+PUBLIC
     /**
      *
      * @param workThreadsCnt
@@ -113,7 +113,7 @@ public:
     SentRet SendMessageAsync(std::string &&rpcName, net::Message::Id id, common::SP_PB_MSG msg, net::net_peer_info_t &&peer);
     void HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) override final;
 
-protected:
+PROTECTED
     bool registerRpc(std::string &&rpcName, uint16_t id);
     void finishRegisterRpc();
 
@@ -121,10 +121,10 @@ protected:
     virtual bool onStop() = 0;
     virtual void onRecvMessage(std::shared_ptr<net::NotifyMessage> sspNM) = 0;
 
-protected:
+PROTECTED
     sys::MemPool                                                  *m_pMemPool;
 
-private:
+PRIVATE
     bool                                                           m_bStopped          = true;
     // 关联关系，无需本类释放。
     net::ISocketService                                           *m_pSocketService    = nullptr;

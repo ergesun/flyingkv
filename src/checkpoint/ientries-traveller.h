@@ -12,7 +12,7 @@ class IEntry;
 }
 namespace checkpoint {
 class IEntriesTraveller {
-public:
+PUBLIC
     virtual ~IEntriesTraveller() = default;
 
     virtual common::IEntry* GetNextEntry() = 0;

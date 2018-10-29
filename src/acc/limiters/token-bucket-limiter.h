@@ -9,13 +9,16 @@
 #include "../../sys/spin-lock.h"
 #include "../../common/common-def.h"
 
+#include "../conf-parser.h"
+#include "../igranter.h"
+
 #include "common-def.h"
-#include "limiter.h"
 
 namespace flyingkv {
 namespace acc {
-class TokenBucketLimiter : public ILimiter, public IConfParser {
-public:
+class RWT;
+class TokenBucketLimiter : public IGranter, public IConfParser {
+PUBLIC
     explicit TokenBucketLimiter(int64_t timeUnit = NANOSEC);
     TokenBucketLimiter(int64_t capacity, uint32_t speed, int64_t timeUnit);
     ~TokenBucketLimiter() override;
@@ -27,7 +30,7 @@ public:
         return m_sName;
     }
 
-private:
+PRIVATE
     bool update_and_consume_tokens(int64_t currentTs, int64_t requiredTokenCnt);
     bool consume_tokens(int64_t requiredTokenCnt);
     void initialize();
@@ -40,11 +43,9 @@ private:
         return m_currentResCount >= m_maxResCnt;
     }
 
-private:
-    uint32_t          m_speed;
+PRIVATE
     spin_lock_t       m_sl = UNLOCKED;
     int64_t           m_lastUpdateTs; // last updated timestamp
-    const int64_t     m_timeUnit; // Time granularity for one second
     int64_t           m_tokenPerTimeUnit;
     int64_t           m_timeRemainder;
     int64_t           m_timeAccumulated;
@@ -52,12 +53,10 @@ private:
     RWT              *m_pRWT = nullptr;
     int64_t           m_maxResCnt;  // Max resource value
     int64_t           m_currentResCount;
+    uint32_t          m_speed;
+    const int64_t     m_timeUnit; // Time granularity for one second
     std::string       m_sName;
     bool              m_bSkipped = false;
-#ifdef UNIT_TEST // We expose these functions for unit test only
-public:
-#endif
-
 };
 } // namespace acc
 } // namespace flyingkv

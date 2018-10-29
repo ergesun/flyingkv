@@ -23,7 +23,7 @@ typedef std::function<bool(AFileEventHandler*)> ValidHandlerFunc;
  * TODO(sunchao): 考虑一下本类stop后，其管理的所有AFileEventHandler的释放问题。
  */
 class PosixEventManager : public AEventManager {
-public:
+PUBLIC
     PosixEventManager(SocketProtocol sp, std::shared_ptr<net_addr_t> sspNat, sys::MemPool *memPool, uint32_t maxEvents,
         uint32_t connWorkersCnt, ConnectHandler stackConnectHandler, ConnectFunc logicConnectHandler,
     FinishHandler finishHandler, NotifyMessageCallbackHandler msgCallbackHandler);
@@ -35,11 +35,11 @@ public:
 
     void AddEvent(AFileEventHandler *socketEventHandler, int cur_mask, int mask) override;
 
-private:
+PRIVATE
     void worker_loop(EventWorker *ew);
     inline void process_event(NetEvent *netEvent);
 
-private:
+PRIVATE
     SocketProtocol                                           m_sp;
     std::shared_ptr<net_addr_t>                              m_sspNat;
     uint32_t                                                 m_iConnWorkersCnt;

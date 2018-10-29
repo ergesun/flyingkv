@@ -18,7 +18,7 @@ class MemPool;
 namespace utils {
 class Buffer;
 class ProtoBufUtils {
-public:
+PUBLIC
     static bool Deserialize(const common::Buffer *from, google::protobuf::Message *to);
     static bool Serialize(const google::protobuf::Message *from, common::Buffer *to, sys::MemPool *mp);
     static bool Serialize(const google::protobuf::Message *from, common::Buffer *to);

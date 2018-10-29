@@ -17,7 +17,7 @@ namespace common {
  */
 template <typename T>
 class BlockingQueue {
-public:
+PUBLIC
     /**
      *
      * @param queueMaxSize 保有的队列元素的最大个数，0为无限制。
@@ -144,7 +144,7 @@ public:
         m_cond.notify_all();
     }
 
-private:
+PRIVATE
     uint32_t m_iQueueMaxSize = 0;
     std::queue<T> m_queue;
     std::mutex m_mutex;

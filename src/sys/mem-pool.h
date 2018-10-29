@@ -69,7 +69,7 @@ namespace sys {
  *                (如果unordered_map已经是这个方案就不需要自己实现了。)
  */
 class MemPool {
-public:
+PUBLIC
     enum class MemObjectType {
         Tiny = 0,
         Small,
@@ -78,14 +78,14 @@ public:
     };
 
     class MemObject {
-    public:
+    PUBLIC
         MemObject(const MemObject&) = default;
 
         char* Pointer() const;
         uint32_t Size() const;
         void Put();
 
-    private:
+    PRIVATE
         friend class MemPool;
         MemObject() = default;
         ~MemObject() = default;
@@ -105,7 +105,7 @@ public:
         inline uintptr_t ObjectPagePointerValue() const;
         inline void refresh(MemObjectType type, uint32_t slotSize, uintptr_t objPv, uintptr_t objPagePv);
 
-    private:
+    PRIVATE
         MemObjectType  m_type;
         uint32_t       m_slot_size; /* 空间大小(可能比申请的大) */
         uintptr_t      m_obj_pv; /* object pointer value */
@@ -115,7 +115,7 @@ public:
 
     friend class MemObject;
 
-private:
+PRIVATE
     struct SlotObjPage {
         spin_lock_t                                         sl;
         // <页的首地址， <slot obj首地址>>
@@ -123,7 +123,7 @@ private:
         uint32_t                                            cnt;
     };
 
-public:
+PUBLIC
     /**
      * 使用默认构造函数，默认配置。
      */
@@ -163,7 +163,7 @@ public:
      */
     std::string DumpDebugInfo();
 
-private:
+PRIVATE
     /**
      * 回收对象。回收的时候无需检验，因为调用它的Put函数的入参MemObject是只读的。
      * @param type
@@ -221,7 +221,7 @@ private:
     inline void get_suitable_bulk_page(uint32_t needSlotIdx, uint32_t &suitableSlotIdx, uintptr_t &suitableObjPv,
                                        uintptr_t &suitablePagePv, float moreThanFactor = 2.0);
 
-private: // 有了槽位的思想，便对齐了。
+PRIVATE // 有了槽位的思想，便对齐了。
     /****************************tiny objects********************************************/
     spin_lock_t m_tiny_obj_pages_lock = UNLOCKED;
     /**

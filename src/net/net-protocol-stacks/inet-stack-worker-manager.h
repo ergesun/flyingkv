@@ -21,7 +21,7 @@ class AFileEventHandler;
  * worker管理器。
  */
 class INetStackWorkerManager {
-public:
+PUBLIC
     virtual ~INetStackWorkerManager() = default;
 
     /**

@@ -41,7 +41,7 @@
 namespace flyingkv {
 namespace utils {
 class IOUtils {
-public:
+PUBLIC
     /**
      * 将size大小的buf写入fd。
      * @param fd

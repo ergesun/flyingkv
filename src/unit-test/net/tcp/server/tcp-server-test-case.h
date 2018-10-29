@@ -20,10 +20,10 @@ namespace net {
 
 namespace test {
 class TcpServerTest {
-public:
+PUBLIC
     static void Run();
 
-private:
+PRIVATE
     static void recv_msg(std::shared_ptr<flyingkv::net::NotifyMessage> sspNM);
     static flyingkv::net::ISocketService     *s_ss;
     static flyingkv::sys::MemPool          *m_mp;

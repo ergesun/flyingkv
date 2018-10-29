@@ -12,10 +12,10 @@
 namespace flyingkv {
 namespace net {
 class ASocketService : public ISocketService {
-public:
+PUBLIC
     ASocketService(SocketProtocol sp, std::shared_ptr<net_addr_t> sspNat) : m_sp(sp), m_nlt(sspNat) {}
 
-protected:
+PROTECTED
     /**
      * service的socket类型。
      */

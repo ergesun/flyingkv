@@ -25,7 +25,7 @@ namespace common {
 using common::Buffer;
 namespace utils {
 class CommonUtils {
-public:
+PUBLIC
     /**
      *
      * @param mpo

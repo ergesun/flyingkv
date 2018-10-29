@@ -15,7 +15,7 @@
 namespace flyingkv {
 namespace sys {
 class Random {
-public:
+PUBLIC
     struct Range {
         Range() {
             start = end = INVALID_RANGE;
@@ -24,13 +24,13 @@ public:
             assert(s < e && s > 0 && e > 0);
         }
 
-    private:
+    PRIVATE
         friend class Random;
         int32_t start, end;
         static const int32_t INVALID_RANGE;
     };
 
-public:
+PUBLIC
     Random() {
         init_ts_seed();
     }
@@ -49,7 +49,7 @@ public:
     int32_t GetNew();
     static int32_t GetNewWithSRand();
 
-private:
+PRIVATE
     static inline void init_ts_seed() {
         timeval tv;
         gettimeofday(&tv, nullptr);
@@ -60,7 +60,7 @@ private:
         return !(Range::INVALID_RANGE == m_r.start || Range::INVALID_RANGE == m_r.end);
     }
 
-private:
+PRIVATE
     Range m_r;
 };
 }

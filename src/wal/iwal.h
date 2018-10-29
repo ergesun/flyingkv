@@ -33,7 +33,7 @@ struct WalEntry {
 };
 
 class IWal {
-public:
+PUBLIC
     virtual ~IWal() = default;
 
     /**

@@ -19,7 +19,7 @@ class Message;
 namespace flyingkv {
 namespace rpc {
 class RpcRequest : public net::SndMessage {
-public:
+PUBLIC
     RpcRequest(sys::MemPool *mp, net::net_peer_info_t &&peerInfo,
                uint16_t handlerId, std::shared_ptr<google::protobuf::Message> &&msg) :
         net::SndMessage(mp, std::move(peerInfo)), m_iHandlerId(handlerId), m_sspMsg(std::move(msg)) {}
@@ -28,11 +28,11 @@ public:
                uint16_t handlerId, std::shared_ptr<google::protobuf::Message> &&msg) :
         net::SndMessage(mp, std::move(peerInfo), id), m_iHandlerId(handlerId), m_sspMsg(std::move(msg)) {}
 
-protected:
+PROTECTED
     uint32_t getDerivePayloadLength() override;
     void encodeDerive(common::Buffer *b) override;
 
-private:
+PRIVATE
     uint16_t                                   m_iHandlerId;
     std::shared_ptr<google::protobuf::Message> m_sspMsg;
 };

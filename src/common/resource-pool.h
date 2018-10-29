@@ -22,7 +22,7 @@ namespace common {
  */
 template <typename T>
 class ResourcePool {
-public:
+PUBLIC
     ResourcePool(uint32_t maxResCnt) : m_iMaxResCnt(maxResCnt) {}
     ~ResourcePool() {
         SpinLock l(&m_sl);
@@ -70,7 +70,7 @@ public:
         return 0 == m_iCurResCnt;
     }
 
-private:
+PRIVATE
     uint32_t                 m_iMaxResCnt = 0;
     uint32_t                 m_iCurResCnt = 0;
     std::list<T*>            m_freeRes;

@@ -34,7 +34,7 @@ enum class WorkerNotifyMessageCode {
  * user不需要释放。
  */
 class NotifyMessage {
-public:
+PUBLIC
     NotifyMessage(NotifyMessageType type, std::string &&msg) : m_type(type), m_msg(std::move(msg)) {}
     virtual ~NotifyMessage() = default;
 
@@ -45,13 +45,13 @@ public:
     inline std::string What() {
         return m_msg;
     }
-private:
+PRIVATE
     NotifyMessageType m_type;
     std::string       m_msg;
 };
 
 class ServerNotifyMessage : public NotifyMessage {
-public:
+PUBLIC
     ServerNotifyMessage(ServerNotifyMessageCode code, std::string &&msg) :
         NotifyMessage(NotifyMessageType::Server, std::move(msg)), m_code(code) {}
 
@@ -59,12 +59,12 @@ public:
         return m_code;
     }
 
-private:
+PRIVATE
     ServerNotifyMessageCode m_code;
 };
 
 class WorkerNotifyMessage : public NotifyMessage {
-public:
+PUBLIC
     WorkerNotifyMessage(WorkerNotifyMessageCode code, net::net_peer_info_t &&peer, std::string &&msg) :
         NotifyMessage(NotifyMessageType::Worker, std::move(msg)), m_code(code), m_peer(std::move(peer)) {}
 
@@ -76,14 +76,14 @@ public:
         return m_peer;
     }
 
-private:
+PRIVATE
     WorkerNotifyMessageCode m_code;
     net::net_peer_info_t    m_peer;
 };
 
 class RcvMessage;
 class MessageNotifyMessage : public NotifyMessage {
-public:
+PUBLIC
     MessageNotifyMessage(RcvMessage* rm, std::function<void(RcvMessage*)> releaseHandle) :
         NotifyMessage(NotifyMessageType::Message, ""), m_ref(rm) {}
 
@@ -98,7 +98,7 @@ public:
         return m_ref;
     }
 
-private:
+PRIVATE
     RcvMessage                      *m_ref;
     std::function<void(RcvMessage*)> m_releaseHandle;
 };

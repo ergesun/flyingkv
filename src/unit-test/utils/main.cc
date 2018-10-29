@@ -13,8 +13,8 @@ int main(int argc, char **argv) {
     return RUN_ALL_TESTS();
 }
 
-TEST(FsioTest, FSTest) {
+TEST(UtilsTest, FSTest) {
 }
 
-TEST(FsioTest, IOTest) {
+TEST(UtilsTest, IOTest) {
 }

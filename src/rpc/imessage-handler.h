@@ -15,7 +15,7 @@ namespace net {
 
 namespace rpc {
 class IMessageHandler {
-public:
+PUBLIC
     virtual ~IMessageHandler() = default;
 
     virtual void HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) = 0;

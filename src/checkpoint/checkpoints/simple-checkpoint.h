@@ -21,20 +21,20 @@
 namespace flyingkv {
 namespace checkpoint {
 class SimpleCheckpoint : public ICheckpoint {
-public:
+PUBLIC
     explicit SimpleCheckpoint(const std::string &rootDir, common::EntryCreateHandler &&ech);
     ~SimpleCheckpoint() override;
 
     bool Load(EntryLoadedCallback callback) override;
     bool Save(IEntriesTraveller *traveller) override;
 
-private:
+PRIVATE
     int create_new_checkpoint();
     inline bool is_completed();
     inline bool rm_completed_status();
     inline bool create_completed_status();
 
-private:
+PRIVATE
     std::string                           m_sRootDir;
     std::string                           m_sCpFilePath;
     std::string                           m_sNewLogFilePath;

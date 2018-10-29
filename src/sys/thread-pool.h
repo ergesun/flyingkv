@@ -28,7 +28,7 @@ namespace sys {
  */
 template <typename TaskCtxType>
 class ThreadPool {
-public:
+PUBLIC
     struct Task {
         Task() = default;
         /**
@@ -137,7 +137,7 @@ public:
         WaitAllUntilTimeAt(now);
     }
 
-private:
+PRIVATE
     void proc() {
         while (true) {
             auto task = m_bqTasks.Pop();
@@ -157,7 +157,7 @@ private:
         }
     }
 
-private:
+PRIVATE
     bool                           m_bStopping = false;
     std::vector<std::thread*>      m_vThreadps;
     common::BlockingQueue<Task>    m_bqTasks;

@@ -6,6 +6,8 @@
 #ifndef FLYINGKV_SYS_SPIN_LOCK_H
 #define FLYINGKV_SYS_SPIN_LOCK_H
 
+#include <cstdint>
+
 #define UNLOCKED                       0
 #define LOCKED                         1
 
@@ -21,7 +23,7 @@ typedef unsigned long spin_lock_t;
  * 注意：原子变量自带屏障，所以无需在使用的时候设置memory barrier，和std::unique_lock<std::mutex>一样使用即可。
  */
 class SpinLock {
-public:
+PUBLIC
     /**
      * 创建一个默认的自旋锁对象，构造函数自动Lock()加锁，析构函数自动解锁。
      * @param sl
@@ -63,12 +65,12 @@ public:
 
     void Unlock();
 
-private:
+PRIVATE
     SpinLock(const SpinLock &sl) = delete;
 
     const SpinLock &operator=(const SpinLock &sl) = delete;
 
-private:
+PRIVATE
     spin_lock_t *const m_psl;
     int m_iSpin = 1 << 11;
     volatile bool m_bOwnLock = false;

@@ -3,9 +3,7 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#include "../cjson/cJSON.h"
-
-#include "rwt.h"
+#include "../3rd/cjson/cJSON.h"
 
 #include "../common/common-def.h"
 
@@ -14,13 +12,13 @@
 namespace flyingkv {
 namespace acc {
 bool RWT::Parse(cJSON *blockRoot) {
-    auto putItem = cJSON_GetObjectItem(blockRoot, "Put");
+    auto putItem = cJSON_GetObjectItem(blockRoot, "put");
     m_hmWeightTable[common::ReqRespType::Put] = (uint32_t)putItem->valueint;
-    auto getItem = cJSON_GetObjectItem(blockRoot, "Get");
+    auto getItem = cJSON_GetObjectItem(blockRoot, "get");
     m_hmWeightTable[common::ReqRespType::Get] = (uint32_t)getItem->valueint;
-    auto listItem = cJSON_GetObjectItem(blockRoot, "Delete");
+    auto listItem = cJSON_GetObjectItem(blockRoot, "delete");
     m_hmWeightTable[common::ReqRespType::Delete] = (uint32_t)listItem->valueint;
-    auto deleteItem = cJSON_GetObjectItem(blockRoot, "Scan");
+    auto deleteItem = cJSON_GetObjectItem(blockRoot, "scan");
     m_hmWeightTable[common::ReqRespType::Scan] = (uint32_t)deleteItem->valueint;
 
     return true;

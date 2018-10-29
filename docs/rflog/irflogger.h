@@ -18,7 +18,7 @@ namespace protocol {
 using protocol::RfLogEntry;
 namespace rflog {
 class IRfLogger {
-public:
+PUBLIC
     virtual ~IRfLogger() = default;
     /**
      *

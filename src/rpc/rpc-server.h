@@ -34,7 +34,7 @@ class IRpcHandler;
  *    server -> client :  |net common header(Message::HeaderSize() bytes)|[rpc code(2bytes)|[handler id(2bytes)|protobuf msg(n bytes or 0 if no return value)]|
  */
 class RpcServer : public common::IService, public IMessageHandler {
-public:
+PUBLIC
     /**
      *
      * @param workThreadsCnt
@@ -52,10 +52,10 @@ public:
 
     void HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) override;
 
-private:
+PRIVATE
     void proc_msg(std::shared_ptr<net::NotifyMessage> sspNM);
 
-private:
+PRIVATE
     bool                                                        m_bStopped              = true;
     uint16_t                                                    m_iWorkThreadsCnt       = 0;
     // 关联指针，无需本类释放。

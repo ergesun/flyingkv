@@ -17,7 +17,7 @@ using std::string;
 namespace flyingkv {
 namespace utils {
 class FileUtils {
-public:
+PUBLIC
     /**
      * 创建目录
      * @param dir

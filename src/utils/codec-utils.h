@@ -19,7 +19,7 @@
 namespace flyingkv {
 namespace utils {
 class LittleEndianCodecUtils {
-public:
+PUBLIC
     // encode
     static void WriteUInt16(uchar *buf, uint16_t n);
     static void WriteUInt32(uchar *buf, uint32_t n);
@@ -32,7 +32,7 @@ public:
 }; // class LittleEndianCodecUtils
 
 class BigEndianCodecUtils {
-public:
+PUBLIC
     // encode
     static void WriteUInt16(uchar *buf, uint16_t n);
     static void WriteUInt32(uchar *buf, uint32_t n);

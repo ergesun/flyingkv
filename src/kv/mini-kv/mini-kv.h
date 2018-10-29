@@ -36,7 +36,7 @@ class EntryComparer
 };
 
 class MiniKV : public common::IService, public common::IKVHandler {
-public:
+PUBLIC
     MiniKV(std::string &walType, std::string &checkpointType,
            std::string &walDir, std::string &checkpointDir, uint32_t maxPendingCnt);
     ~MiniKV() override;
@@ -49,10 +49,10 @@ public:
     common::SP_PB_MSG OnDelete(common::KVDeleteRequest) override;
     common::SP_PB_MSG OnScan(common::KVScanRequest)   override;
 
-private:
+PRIVATE
     common::IEntry* create_new_entry();
 
-private:
+PRIVATE
     common::BlockingQueue<common::SP_PB_MSG>  *m_pbqPendingTasks;
     std::map<protocol::Entry*, protocol::Entry*, EntryComparer> m_kvs;
     sys::MemPool                 *m_pMp = nullptr;

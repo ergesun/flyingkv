@@ -13,8 +13,8 @@ set(LINK_LIBS
         net
         utils
         common
-        #acc
-        #cjson
+        acc
+        cjson
         sys
         glog
         gflags
@@ -27,6 +27,7 @@ set(DEPEN_LIBS
         checkpoint
         wal
         net
+        #acc
         common
         rpc
         )

@@ -56,7 +56,7 @@ class RcvMessage;
  * Derive Message的内存空间你可以选择通过内存池mp分配(这样做性能友好)，然后通过placement new来构建你的Message具体类对象。
  */
 class Message {
-public:
+PUBLIC
 #if WITH_MSG_ID
 #if BULK_MSG_ID
     struct Id {
@@ -93,7 +93,7 @@ public:
 #endif
     };
 
-public:
+PUBLIC
     /**
      * 之后你需要设置mem pool。
      */
@@ -134,12 +134,12 @@ public:
     static common::Buffer* GetNewAvailableBuffer(sys::MemPoolObject *mpo, uint32_t totalBufferSize);
     static void            PutBuffer(common::Buffer *buffer);
 
-protected:
+PROTECTED
     Header              m_header;
     sys::MemPool       *m_pMemPool;
     net_peer_info_t     m_peerInfo;
 
-private:
+PRIVATE
     static sys::spin_lock_t                 s_freeBufferLock;
     // TODO(sunchao): 做一个个数限制？
     static std::list<common::Buffer*>       s_freeBuffers;

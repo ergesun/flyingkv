@@ -13,7 +13,7 @@
 namespace flyingkv {
 namespace net {
 class EventDriverFactory {
-public:
+PUBLIC
     static IEventDriver* GetNewDriver(NonBlockingEventModel m) {
         IEventDriver *eventDriver = nullptr;
         if (NonBlockingEventModel::DPDK == m) {

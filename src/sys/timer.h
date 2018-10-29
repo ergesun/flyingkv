@@ -23,7 +23,7 @@ namespace sys {
  * TODO(sunchao)：添加一个线程池、一个到期任务队列用来执行到期的作业？还是觉得这项任务交给用户比较合适。
  */
 class Timer {
-public:
+PUBLIC
     typedef std::function<void(void *)> TimerCallback, *TimerCallbackPointer;
     // TODO(sunchao): 优化EventId。
     struct EventId {
@@ -105,13 +105,13 @@ public:
      */
     void UnsubscribeAllEvent();
 
-private:
+PRIVATE
     /**
      * 事件处理线程。
      */
     void process();
 
-private:
+PRIVATE
     bool m_stop = true;
     TimerEvents m_mapSubscribedEvents;
     EventsTable m_mapEventsEntry;

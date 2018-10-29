@@ -21,12 +21,12 @@ namespace net {
  * Posix tcp的消息处理类。事件管理器有事件了会调用。
  */
 class PosixTcpNetStackWorker : public ANetStackMessageWorker {
-public:
+PUBLIC
     enum CreatorType {
         Client = 0,
         Server
     };
-public:
+PUBLIC
     PosixTcpNetStackWorker(CreatorType ct, AFileEventHandler *eventHandler, sys::MemPool *memPool,
     PosixTcpClientSocket *socket, NotifyMessageCallbackHandler msgCallbackHandler,
     uint16_t logicPort, ConnectFunc logicConnect);
@@ -55,7 +55,7 @@ public:
      */
     bool Send() override;
 
-private:
+PRIVATE
     enum class ConnectionState {
         Connecting,
         ConnectSe,    /* client发起connect之后 */
@@ -64,14 +64,14 @@ private:
         Connected
     };
 
-private:
+PRIVATE
     void handshake(RcvMessage *rm);
 
-private:
+PRIVATE
     static WorkerNotifyMessage* get_closed_by_peer_worker_message(net::net_peer_info_t peer, std::string &&msg);
     static WorkerNotifyMessage* get_broken_worker_message(net::net_peer_info_t peer, std::string &&msg);
 
-private:
+PRIVATE
     /**
      * 创建者类型，用于框架概念内的握手逻辑。
      */

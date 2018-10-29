@@ -12,7 +12,7 @@
 namespace flyingkv {
 namespace sys {
 class Utils {
-public:
+PUBLIC
     /**
      * 设置fd为非阻塞。
      * @param fd

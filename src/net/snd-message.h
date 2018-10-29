@@ -14,7 +14,7 @@ namespace net {
  * 一旦发送，则SndMessage的所有权便属于了net库，user无需再管理此SndMessage。生命周期由net库控制。
  */
 class SndMessage : public Message, public IEncoder {
-public:
+PUBLIC
     /**
      * 调用此构造一般用与发送新消息，其内部会自动产生一个全局单调递增的id以便回应时进行区分。
      * 之后你需要调用函数设置mem pool和peer info。
@@ -39,7 +39,7 @@ public:
     SndMessage(sys::MemPool *mp, net_peer_info_t &&peerInfo, Id id);
 #endif
 
-public:
+PUBLIC
     common::Buffer* Encode() override final;
     inline void SetMemPool(sys::MemPool *mp) {
         m_pMemPool = mp;
@@ -53,7 +53,7 @@ public:
         m_header.id = id;
     }
 
-protected:
+PROTECTED
     /**
      * 获取派生类的消息encode之后待发送字节的长度。
      * 负载的最大长度为MAX_MSG_PAYLOAD_SIZE。
@@ -67,13 +67,13 @@ protected:
      */
     virtual void encodeDerive(common::Buffer *b) = 0;
 
-private:
+PRIVATE
     static void encode_header(common::Buffer *b, Header &h);
 #ifdef WITH_MSG_ID
-public:
+PUBLIC
     static Id GetNewId();
 
-private:
+PRIVATE
     static sys::spin_lock_t                 s_idLock;
     static Id                               s_lastId;
 #endif

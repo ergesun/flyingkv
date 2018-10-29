@@ -22,7 +22,7 @@ class MemPool;
 
 namespace net {
 class PosixTcpServerEventHandler : public AFileEventHandler {
-public:
+PUBLIC
     PosixTcpServerEventHandler(EventWorker *ew, net_addr_t *nat,
         ConnectHandler stackConnectHandler, ConnectFunc onLogicConnect,
         sys::MemPool *memPool, NotifyMessageCallbackHandler msgCallbackHandler);
@@ -34,10 +34,10 @@ public:
 
     ANetStackMessageWorker *GetStackMsgWorker() override;
 
-private:
+PRIVATE
     inline void handle_message(NotifyMessage* nm);
 
-private:
+PRIVATE
     PosixTcpServerSocket             *m_pSrvSocket;
     ConnectHandler                    m_onStackConnect;
     ConnectFunc                       m_onLogicConnect;

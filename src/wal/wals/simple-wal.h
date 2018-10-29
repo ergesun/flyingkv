@@ -30,7 +30,7 @@ namespace wal {
  *  |<-log content len(u32)->|<-log content->|<-log segment start pos(u32)->|
  */
 class SimpleWal : public IWal {
-public:
+PUBLIC
     SimpleWal(std::string &rootDir, common::EntryCreateHandler &&handler);
     ~SimpleWal() override;
 
@@ -39,7 +39,7 @@ public:
     bool TruncateAhead(uint64_t id) override;
     void Reset() override;
 
-private:
+PRIVATE
     std::string                           m_sRootDir;
     std::unordered_map<uint64_t, int64_t> m_mpEntriesIdEndOffset;
     uint64_t                              m_iCurrentLogIdx;

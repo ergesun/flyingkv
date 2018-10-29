@@ -22,7 +22,7 @@ class AFileEventHandler;
 typedef std::function<bool(AFileEventHandler*)> ConnectFunc;
 typedef std::function<void(AFileEventHandler*)> ConnectHandler, FinishHandler;
 class AEventManager {
-public:
+PUBLIC
     AEventManager(sys::MemPool *memPool, uint32_t maxEvents) :
         m_pMemPool(memPool), m_iMaxEvents(maxEvents) {}
     virtual ~AEventManager() = default;
@@ -30,7 +30,7 @@ public:
     virtual bool Stop() = 0;
     virtual void AddEvent(AFileEventHandler *socketEventHandler, int cur_mask, int mask) = 0;
 
-protected:
+PROTECTED
     sys::MemPool      *m_pMemPool;
     uint32_t           m_iMaxEvents;
 };

@@ -17,7 +17,7 @@ namespace net {
  * 两个节点间复用同一连接的管理器。
  */
 class UniqueWorkerManager : public INetStackWorkerManager {
-public:
+PUBLIC
     ~UniqueWorkerManager();
 
     /**
@@ -56,10 +56,10 @@ public:
      */
     AFileEventHandler* RemoveWorkerEventHandler(const net_peer_info_t &logicNpt) override;
 
-private:
+PRIVATE
     inline AFileEventHandler *lookup_worker(const net_peer_info_t &logicNpt);
 
-private:
+PRIVATE
     sys::spin_lock_t                                                 m_sl = UNLOCKED;
     /**
      * logic peer -> handler

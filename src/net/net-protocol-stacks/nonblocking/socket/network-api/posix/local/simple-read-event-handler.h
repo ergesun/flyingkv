@@ -11,7 +11,7 @@
 namespace flyingkv {
 namespace net {
 class PosixLocalReadEventHandler : public AFileEventHandler {
-public:
+PUBLIC
     PosixLocalReadEventHandler(int fd);
     ~PosixLocalReadEventHandler();
 
@@ -22,7 +22,7 @@ public:
 
     ANetStackMessageWorker *GetStackMsgWorker() override;
 
-private:
+PRIVATE
     int m_fd;
 };
 } // namespace net

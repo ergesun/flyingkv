@@ -13,7 +13,7 @@
 namespace flyingkv {
 namespace net {
 class PosixTcpServerSocket : public PosixTcpConnectionSocket {
-public:
+PUBLIC
     PosixTcpServerSocket(net_addr_t *localAddr, int maxConns) : PosixTcpConnectionSocket(),
     m_local_addr(*localAddr),
     m_max_listen_conns(maxConns) {}
@@ -26,12 +26,12 @@ public:
     /* sock opts interfaces */
     bool SetPortReuse();
 
-private:
+PRIVATE
     inline bool Connect() {
         throw new std::runtime_error("server socket doesn't support connect api.");
     }
 
-private:
+PRIVATE
     net_addr_t  m_local_addr;
     int         m_max_listen_conns;
 };
