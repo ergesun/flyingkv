@@ -14,7 +14,7 @@
 #include "test-rpc-server.h"
 #include "../../../codegen/kvrpc.pb.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace test {
 TestRpcServer::TestRpcServer(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool) {
     m_pRpcServer = new rpc::RpcServer(workThreadsCnt, ss, memPool);
@@ -56,7 +56,7 @@ common::SP_PB_MSG TestRpcServer::on_get(common::SP_PB_MSG sspMsg) {
     EXPECT_EQ(k.c_str()[3], 'd');
 
     auto response = new protocol::GetResponse();
-    response->set_rc(minikv::protocol::OK);
+    response->set_rc(flyingkv::protocol::OK);
 
     return common::SP_PB_MSG(response);
 }

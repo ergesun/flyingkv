@@ -9,7 +9,7 @@
 
 #include "rcv-message.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 bool RcvMessage::DecodeMsgHeader(common::Buffer *buffer, Header *header) {
     if ((uint32_t)buffer->AvailableLength() < RcvMessage::HeaderSize()) {
@@ -48,5 +48,5 @@ bool RcvMessage::DecodeMsgHeader(common::Buffer *buffer, Header *header) {
     return rc;
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 

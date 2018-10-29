@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_SOCKETAPI_NETSTACKMESSAGEWORKER_H
-#define MINIKV_NET_CORE_SOCKETAPI_NETSTACKMESSAGEWORKER_H
+#ifndef FLYINGKV_NET_CORE_SOCKETAPI_NETSTACKMESSAGEWORKER_H
+#define FLYINGKV_NET_CORE_SOCKETAPI_NETSTACKMESSAGEWORKER_H
 
 #include <unordered_map>
 
@@ -14,7 +14,7 @@
 #include "../../../../snd-message.h"
 #include "../../../../notify-message.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class MemPool;
 }
@@ -99,6 +99,6 @@ protected:
     NotifyMessageCallbackHandler        m_msgCallback;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_SOCKETAPI_NETSTACKMESSAGEWORKER_H
+#endif //FLYINGKV_NET_CORE_SOCKETAPI_NETSTACKMESSAGEWORKER_H

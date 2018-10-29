@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_UTILS_FILE_UTILS_H
-#define MINIKV_UTILS_FILE_UTILS_H
+#ifndef FLYINGKV_UTILS_FILE_UTILS_H
+#define FLYINGKV_UTILS_FILE_UTILS_H
 
 #include <unistd.h>
 #include <sys/stat.h>
@@ -14,7 +14,7 @@
 
 using std::string;
 
-namespace minikv {
+namespace flyingkv {
 namespace utils {
 class FileUtils {
 public:
@@ -116,4 +116,4 @@ public:
 }
 }
 
-#endif //MINIKV_UTILS_FILE_UTILS_H
+#endif //FLYINGKV_UTILS_FILE_UTILS_H

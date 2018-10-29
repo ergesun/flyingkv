@@ -3,13 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_UTILS_H
-#define MINIKV_SYS_UTILS_H
+#ifndef FLYINGKV_SYS_UTILS_H
+#define FLYINGKV_SYS_UTILS_H
 
 #include <cstdlib>
 #include <string>
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class Utils {
 public:
@@ -48,4 +48,4 @@ public:
 }
 }
 
-#endif //MINIKV_SYS_UTILS_H
+#endif //FLYINGKV_SYS_UTILS_H

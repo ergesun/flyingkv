@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_SOCKETAPI_SOCKET_H
-#define MINIKV_NET_CORE_SOCKETAPI_SOCKET_H
+#ifndef FLYINGKV_NET_CORE_SOCKETAPI_SOCKET_H
+#define FLYINGKV_NET_CORE_SOCKETAPI_SOCKET_H
 
 #include "../../../../common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class FileDescriptor {
 public:
@@ -55,4 +55,4 @@ protected:
 }
 }
 
-#endif //MINIKV_NET_CORE_SOCKETAPI_SOCKET_H
+#endif //FLYINGKV_NET_CORE_SOCKETAPI_SOCKET_H

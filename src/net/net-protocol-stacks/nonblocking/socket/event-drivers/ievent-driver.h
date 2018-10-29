@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_IEVENTDRIVER_H
-#define MINIKV_NET_CORE_IEVENTDRIVER_H
+#ifndef FLYINGKV_NET_CORE_IEVENTDRIVER_H
+#define FLYINGKV_NET_CORE_IEVENTDRIVER_H
 
 #include <vector>
 #include <cstdint>
@@ -14,7 +14,7 @@
 #define EVENT_READ       1
 #define EVENT_WRITE      2
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class AFileEventHandler;
 struct NetEvent {
@@ -73,5 +73,5 @@ public:
     virtual int32_t EventWait(std::vector<NetEvent> *events, struct timeval *tp) = 0;
 }; // interface IEventDriver
 }  // namespace net
-}  // namespace minikv
-#endif //MINIKV_NET_CORE_IEVENTDRIVER_H
+}  // namespace flyingkv
+#endif //FLYINGKV_NET_CORE_IEVENTDRIVER_H

@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_HANDLER_H
-#define MINIKV_RPC_HANDLER_H
+#ifndef FLYINGKV_RPC_HANDLER_H
+#define FLYINGKV_RPC_HANDLER_H
 
 #include <memory>
 #include <cassert>
@@ -18,7 +18,7 @@ class Message;
 }
 }
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class Buffer;
 }
@@ -64,4 +64,4 @@ private:
 }
 }
 
-#endif //MINIKV_RPC_HANDLER_H
+#endif //FLYINGKV_RPC_HANDLER_H

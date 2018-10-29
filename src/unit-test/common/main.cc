@@ -13,8 +13,8 @@
 #include "../../utils/common-utils.h"
 #include "../../common/global-vars.h"
 
-using namespace minikv::sys;
-using namespace minikv::common;
+using namespace flyingkv::sys;
+using namespace flyingkv::common;
 
 const std::string CommonTestBinName = "common_test";
 
@@ -22,7 +22,7 @@ std::string g_sConfTestFileRootPath;
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
-    minikv::common::initialize();
+    flyingkv::common::initialize();
 
     std::string exePath = argv[0];
     auto projectStartPos = exePath.find(CommonTestBinName);

@@ -13,7 +13,7 @@
 
 #include "net-stack-msg-worker.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 std::function<void(RcvMessage*)> ANetStackMessageWorker::s_release_rm_handle = std::bind(
                                                     &ANetStackMessageWorker::releaseRcvMessage, std::placeholders::_1);
@@ -83,4 +83,4 @@ void ANetStackMessageWorker::releaseRcvMessage(RcvMessage *rm) {
     rm->~RcvMessage();
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

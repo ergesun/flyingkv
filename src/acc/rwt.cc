@@ -11,7 +11,7 @@
 
 #include "rwt.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace acc {
 bool RWT::Parse(cJSON *blockRoot) {
     auto putItem = cJSON_GetObjectItem(blockRoot, "Put");
@@ -35,4 +35,4 @@ uint32_t RWT::GetWeight(common::ReqRespType rt) {
     return m_hmWeightTable[rt];
 }
 } // namespace acc
-} // namespace minikv
+} // namespace flyingkv

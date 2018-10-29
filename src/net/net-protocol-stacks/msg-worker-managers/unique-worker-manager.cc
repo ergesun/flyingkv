@@ -7,7 +7,7 @@
 
 #include "unique-worker-manager.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 UniqueWorkerManager::~UniqueWorkerManager() {
     sys::SpinLock l(&m_sl);
@@ -92,4 +92,4 @@ inline AFileEventHandler *UniqueWorkerManager::lookup_worker(const net_peer_info
     return nullptr;
 }
 }  // namespace net
-}  // namespace minikv
+}  // namespace flyingkv

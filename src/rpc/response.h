@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_RESPONSE_H
-#define MINIKV_RPC_RESPONSE_H
+#ifndef FLYINGKV_RPC_RESPONSE_H
+#define FLYINGKV_RPC_RESPONSE_H
 
 #include <sstream>
 
@@ -14,7 +14,7 @@
 #include "common-def.h"
 #include "../common/ikv-common.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 typedef uint16_t RpcCodeType;
 class RpcResponseBase : public net::SndMessage {
@@ -46,6 +46,6 @@ private:
 
 //typedef RpcResponseBase RpcErrorResponse;
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_RPC_RESPONSE_H
+#endif //FLYINGKV_RPC_RESPONSE_H

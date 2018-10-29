@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_GCC_BUILDIN_H
-#define MINIKV_SYS_GCC_BUILDIN_H
+#ifndef FLYINGKV_SYS_GCC_BUILDIN_H
+#define FLYINGKV_SYS_GCC_BUILDIN_H
 
 #define LIKELY(x)                         __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)                       __builtin_expect(!!(x), 0)
@@ -19,4 +19,4 @@
 #define atomic_subone_and_fetch(lock)     __sync_sub_and_fetch(lock, 1)
 #define atomic_fetch_and_set(lock, val)   __sync_lock_test_and_set(lock, val)
 
-#endif //MINIKV_SYS_GCC_BUILDIN_H
+#endif //FLYINGKV_SYS_GCC_BUILDIN_H

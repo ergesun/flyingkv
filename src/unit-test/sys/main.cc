@@ -17,7 +17,7 @@
 #include "../../sys/random.h"
 #include "../../sys/utils.h"
 
-using namespace minikv::sys;
+using namespace flyingkv::sys;
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
@@ -79,7 +79,7 @@ TEST(SysTest, CommonUtilsTest) {
     std::string localIp = "127.0.0.1";
     std::string host = "localhost";
     std::string ip;
-    minikv::sys::Utils::GetAddrInfo(host, ip);
+    flyingkv::sys::Utils::GetAddrInfo(host, ip);
     EXPECT_STREQ(localIp.c_str(), ip.c_str());
 }
 

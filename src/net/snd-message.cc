@@ -9,7 +9,7 @@
 #include "snd-message.h"
 #include "../utils/common-utils.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 #if WITH_MSG_ID
 sys::spin_lock_t SndMessage::s_idLock = UNLOCKED;
@@ -117,4 +117,4 @@ Message::Id SndMessage::GetNewId() {
 }
 #endif
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

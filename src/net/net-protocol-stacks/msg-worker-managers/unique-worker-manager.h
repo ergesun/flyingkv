@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_NETSTACKWORKERPOLICY_H
-#define MINIKV_NET_CORE_NETSTACKWORKERPOLICY_H
+#ifndef FLYINGKV_NET_CORE_NETSTACKWORKERPOLICY_H
+#define FLYINGKV_NET_CORE_NETSTACKWORKERPOLICY_H
 
 #include <unordered_map>
 
 #include "../inet-stack-worker-manager.h"
 #include "../../../sys/spin-lock.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 /**
  * 两个节点间复用同一连接的管理器。
@@ -69,5 +69,5 @@ private:
     std::unordered_map<uintptr_t, net_peer_info_t>                   m_hmap_handler_rp;
 }; // class UniqueWorkerManager
 }  // namespace net
-}  // namespace minikv
-#endif //MINIKV_NET_CORE_NETSTACKWORKERPOLICY_H
+}  // namespace flyingkv
+#endif //FLYINGKV_NET_CORE_NETSTACKWORKERPOLICY_H

@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_TEST_RPC_SERVER_H
-#define MINIKV_TEST_RPC_SERVER_H
+#ifndef FLYINGKV_TEST_RPC_SERVER_H
+#define FLYINGKV_TEST_RPC_SERVER_H
 
 #include "../../../common/iservice.h"
 #include "../../../rpc/rpc-server.h"
 #include "../../../rpc/common-def.h"
 #include "../../../common/ikv-common.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace test {
 class TestRpcServer : public common::IService, public rpc::IMessageHandler {
 public:
@@ -32,6 +32,6 @@ private:
     rpc::RpcServer        *m_pRpcServer = nullptr;
 };
 } // namespace test
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_TEST_RPC_SERVER_H
+#endif //FLYINGKV_TEST_RPC_SERVER_H

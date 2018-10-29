@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RESOURCE_POOL_H
-#define MINIKV_RESOURCE_POOL_H
+#ifndef FLYINGKV_RESOURCE_POOL_H
+#define FLYINGKV_RESOURCE_POOL_H
 
 #include <cstdint>
 #include <list>
@@ -13,7 +13,7 @@
 #include "common-def.h"
 #include "../sys/spin-lock.h"
 
-namespace minikv {
+namespace flyingkv {
 using namespace sys;
 namespace common {
 /**
@@ -79,4 +79,4 @@ private:
 }
 }
 
-#endif //MINIKV_RESOURCE_POOL_H
+#endif //FLYINGKV_RESOURCE_POOL_H

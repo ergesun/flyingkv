@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_ACC_TOKEN_BUCKET_LIMITER_H
-#define MINIKV_ACC_TOKEN_BUCKET_LIMITER_H
+#ifndef FLYINGKV_ACC_TOKEN_BUCKET_LIMITER_H
+#define FLYINGKV_ACC_TOKEN_BUCKET_LIMITER_H
 
 #include "../../sys/spin-lock.h"
 #include "../../common/common-def.h"
@@ -12,7 +12,7 @@
 #include "common-def.h"
 #include "limiter.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace acc {
 class TokenBucketLimiter : public ILimiter, public IConfParser {
 public:
@@ -60,6 +60,6 @@ public:
 
 };
 } // namespace acc
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_ACC_TOKEN_BUCKET_LIMITER_H
+#endif //FLYINGKV_ACC_TOKEN_BUCKET_LIMITER_H

@@ -8,12 +8,11 @@
 #include <arpa/inet.h>
 
 #include "../../../../../../../sys/utils.h"
-#include "../../../../../../../common/server-gflags-config.h"
 #include "connection-event-handler.h"
 
 #include "server-event-handler.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 PosixTcpServerEventHandler::PosixTcpServerEventHandler(EventWorker *ew, net_addr_t *nat,
                                                        ConnectHandler stackConnectHandler, ConnectFunc onLogicConnect,
@@ -123,4 +122,4 @@ inline void PosixTcpServerEventHandler::handle_message(NotifyMessage *nm) {
     }
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

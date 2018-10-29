@@ -7,7 +7,7 @@
 
 #include "message.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 sys::spin_lock_t Message::s_freeBufferLock = UNLOCKED;
 std::list<common::Buffer*> Message::s_freeBuffers = std::list<common::Buffer*>();
@@ -54,5 +54,5 @@ void Message::PutBuffer(common::Buffer *buffer) {
     s_freeBuffers.push_back(buffer);
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 

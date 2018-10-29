@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_COMMON_BLOCKING_GET_QUEUE_H
-#define MINIKV_COMMON_BLOCKING_GET_QUEUE_H
+#ifndef FLYINGKV_COMMON_BLOCKING_GET_QUEUE_H
+#define FLYINGKV_COMMON_BLOCKING_GET_QUEUE_H
 
 #include <mutex>
 #include <condition_variable>
 #include <queue>
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 /**
  * 阻塞队列。
@@ -151,6 +151,6 @@ private:
     std::condition_variable m_cond;
 }; /* class BlockingQueue */
 } // namespace common
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_COMMON_BLOCKING_GET_QUEUE_H
+#endif //FLYINGKV_COMMON_BLOCKING_GET_QUEUE_H

@@ -3,14 +3,17 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_MNKV_ENTRY_H
-#define MINIKV_MNKV_ENTRY_H
+#ifndef FLYINGKV_MNKV_ENTRY_H
+#define FLYINGKV_MNKV_ENTRY_H
 
 #include "../../common/ientry.h"
 #include "../../codegen/meta.pb.h"
 
+namespace flyingkv {
+namespace sys {
+class MemPool;
+}
 namespace minikv {
-namespace mnkv {
 class Entry : public common::IEntry {
 public:
     explicit Entry(sys::MemPool*);
@@ -31,4 +34,4 @@ private:
 }
 }
 
-#endif //MINIKV_MNKV_ENTRY_H
+#endif //FLYINGKV_MNKV_ENTRY_H

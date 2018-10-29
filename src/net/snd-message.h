@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_SND_MESSAGE_H
-#define MINIKV_NET_CORE_SND_MESSAGE_H
+#ifndef FLYINGKV_NET_CORE_SND_MESSAGE_H
+#define FLYINGKV_NET_CORE_SND_MESSAGE_H
 
 #include "message.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 /**
  * 一旦发送，则SndMessage的所有权便属于了net库，user无需再管理此SndMessage。生命周期由net库控制。
@@ -79,6 +79,6 @@ private:
 #endif
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_SND_MESSAGE_H
+#endif //FLYINGKV_NET_CORE_SND_MESSAGE_H

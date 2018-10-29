@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_MESSAGE_HANDLER_H
-#define MINIKV_RPC_MESSAGE_HANDLER_H
+#ifndef FLYINGKV_RPC_MESSAGE_HANDLER_H
+#define FLYINGKV_RPC_MESSAGE_HANDLER_H
 
 #include <memory>
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
     class NotifyMessage;
 }
@@ -21,6 +21,6 @@ public:
     virtual void HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) = 0;
 }; // class IMessageHandler
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_RPC_MESSAGE_HANDLER_H
+#endif //FLYINGKV_RPC_MESSAGE_HANDLER_H

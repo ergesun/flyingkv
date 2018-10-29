@@ -1,6 +1,6 @@
 # cmake 3.2 start to support cpp11
 cmake_minimum_required(VERSION 3.2)
-project(minikv)
+project(flyingkv)
 
 # debug/release编译控制
 SET (CMAKE_C_FLAGS                  "-Wall -std=c99")
@@ -83,9 +83,9 @@ if(${PROJECT_TYPE} MATCHES "UT")
     add_subdirectory(${UT_ROOT}/${UT_MODULE})
 else()
     if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
-        set(BUILD_OUTPUT_ROOT_DIR ${PROJECT_SOURCE_DIR}/build/minikv/release)
+        set(BUILD_OUTPUT_ROOT_DIR ${PROJECT_SOURCE_DIR}/build/flyingkv/release)
     else()
-        set(BUILD_OUTPUT_ROOT_DIR ${PROJECT_SOURCE_DIR}/build/minikv/debug)
+        set(BUILD_OUTPUT_ROOT_DIR ${PROJECT_SOURCE_DIR}/build/flyingkv/debug)
     endif()
     set(LIBRARY_OUTPUT_PATH ${BUILD_OUTPUT_ROOT_DIR}/lib)
     set(EXECUTABLE_OUTPUT_PATH ${BUILD_OUTPUT_ROOT_DIR})

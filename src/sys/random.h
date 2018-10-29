@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_RANDOM_H
-#define MINIKV_SYS_RANDOM_H
+#ifndef FLYINGKV_SYS_RANDOM_H
+#define FLYINGKV_SYS_RANDOM_H
 
 #include <sys/time.h>
 #include <cstdint>
@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <cassert>
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class Random {
 public:
@@ -66,4 +66,4 @@ private:
 }
 }
 
-#endif //MINIKV_SYS_RANDOM_H
+#endif //FLYINGKV_SYS_RANDOM_H

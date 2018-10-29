@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_THREAD_POOL_H
-#define MINIKV_SYS_THREAD_POOL_H
+#ifndef FLYINGKV_SYS_THREAD_POOL_H
+#define FLYINGKV_SYS_THREAD_POOL_H
 
 #include <thread>
 #include <vector>
@@ -19,7 +19,7 @@
 
 #include "../sys/spin-lock.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 /**
  * 当前仅支持FIFO调度的线程池。
@@ -166,5 +166,5 @@ private:
     std::condition_variable        m_cvActiveWorkerCnt;
 }; // class ThreadPool
 }  // namespace sys
-}  // namespace minikv
-#endif //MINIKV_SYS_THREAD_POOL_H
+}  // namespace flyingkv
+#endif //FLYINGKV_SYS_THREAD_POOL_H

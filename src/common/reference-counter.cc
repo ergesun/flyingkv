@@ -8,7 +8,7 @@
 
 #include "reference-counter.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 void ReferenceCounter::AddRef() {
     atomic_addone_and_fetch(&m_iRef);

@@ -17,7 +17,7 @@
 
 #include "abstract-rpc-client.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 ARpcClient::ARpcClient(net::ISocketService *ss, sys::MemPool *memPool) :
     m_pMemPool(memPool), m_pSocketService(ss) {
@@ -133,4 +133,4 @@ void ARpcClient::finishRegisterRpc() {
     hw_sw_memory_barrier();
 }
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv

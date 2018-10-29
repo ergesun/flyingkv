@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SERVER_RF_NODE_H
-#define MINIKV_SERVER_RF_NODE_H
+#ifndef FLYINGKV_SERVER_RF_NODE_H
+#define FLYINGKV_SERVER_RF_NODE_H
 
 #include "../../common/iservice.h"
 #include "../../rpc/rpc-server.h"
 #include "../../rpc/common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class IKVHandler;
 }
@@ -52,6 +52,6 @@ private:
     sys::MemPool             *m_pMemPool        = nullptr;
 };
 } // namespace server
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_SERVER_RF_NODE_H
+#endif //FLYINGKV_SERVER_RF_NODE_H

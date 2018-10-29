@@ -3,10 +3,10 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_CHECKPOINT_ENTRIES_TRAVELLER_H
-#define MINIKV_CHECKPOINT_ENTRIES_TRAVELLER_H
+#ifndef FLYINGKV_CHECKPOINT_ENTRIES_TRAVELLER_H
+#define FLYINGKV_CHECKPOINT_ENTRIES_TRAVELLER_H
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class IEntry;
 }
@@ -21,4 +21,4 @@ public:
 }
 }
 
-#endif //MINIKV_CHECKPOINT_ENTRIES_TRAVELLER_H
+#endif //FLYINGKV_CHECKPOINT_ENTRIES_TRAVELLER_H

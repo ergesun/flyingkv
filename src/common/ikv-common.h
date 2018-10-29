@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SN_INODE_INTERNAL_RPC_HANDLER_H
-#define MINIKV_SN_INODE_INTERNAL_RPC_HANDLER_H
+#ifndef FLYINGKV_SN_INODE_INTERNAL_RPC_HANDLER_H
+#define FLYINGKV_SN_INODE_INTERNAL_RPC_HANDLER_H
 
 #include <memory>
 #include <google/protobuf/message.h>
@@ -13,7 +13,7 @@
 #include "../rpc/common-def.h"
 #include "../codegen/kvrpc.pb.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 enum class ReqRespType {
     Put = 0,
@@ -40,6 +40,6 @@ public:
     virtual SP_PB_MSG OnScan(KVScanRequest sspMsg)     = 0;
 };
 } // namespace server
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_SN_INODE_INTERNAL_RPC_HANDLER_H
+#endif //FLYINGKV_SN_INODE_INTERNAL_RPC_HANDLER_H

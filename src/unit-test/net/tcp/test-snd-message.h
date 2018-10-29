@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_TEST_SEND_MESSAGE_H
-#define MINIKV_TEST_SEND_MESSAGE_H
+#ifndef FLYINGKV_TEST_SEND_MESSAGE_H
+#define FLYINGKV_TEST_SEND_MESSAGE_H
 
 #include "../../../common/common-def.h"
 #include "../../../net/snd-message.h"
 
-using namespace minikv::net;
+using namespace flyingkv::net;
 
-namespace minikv {
+namespace flyingkv {
 namespace test {
 class TestSndMessage : public net::SndMessage {
 public:
@@ -31,4 +31,4 @@ private:
 }
 }
 
-#endif //MINIKV_TEST_SEND_MESSAGE_H
+#endif //FLYINGKV_TEST_SEND_MESSAGE_H

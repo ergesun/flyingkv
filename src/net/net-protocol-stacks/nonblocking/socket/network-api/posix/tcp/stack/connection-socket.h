@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_POSIX_TCPCONNECTIONSOCKET_H
-#define MINIKV_NET_CORE_POSIX_TCPCONNECTIONSOCKET_H
+#ifndef FLYINGKV_NET_CORE_POSIX_TCPCONNECTIONSOCKET_H
+#define FLYINGKV_NET_CORE_POSIX_TCPCONNECTIONSOCKET_H
 
 #include <stdexcept>
 #include <sys/socket.h>
@@ -12,7 +12,7 @@
 #include "../../../../../../../common-def.h"
 #include "../../../file-descriptor.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 /**
  * 当前只考虑了ipv4.
@@ -90,5 +90,5 @@ private:
 
 typedef PosixTcpConnectionSocket PosixTcpClientSocket;
 } // namespace net
-} // namespace minikv
-#endif //MINIKV_NET_CORE_POSIX_TCPCONNECTIONSOCKET_H
+} // namespace flyingkv
+#endif //FLYINGKV_NET_CORE_POSIX_TCPCONNECTIONSOCKET_H

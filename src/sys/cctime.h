@@ -3,10 +3,10 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_CCTIME_H
-#define MINIKV_SYS_CCTIME_H
+#ifndef FLYINGKV_SYS_CCTIME_H
+#define FLYINGKV_SYS_CCTIME_H
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class cctime {
 public:
@@ -92,4 +92,4 @@ inline bool operator!=(const cctime &a, const cctime &b) {
 }
 }
 
-#endif //MINIKV_SYS_CCTIME_H
+#endif //FLYINGKV_SYS_CCTIME_H

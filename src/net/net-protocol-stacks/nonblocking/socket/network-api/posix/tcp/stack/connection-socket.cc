@@ -20,7 +20,7 @@
             throw new std::runtime_error("you should set this opt before connect.");         \
         }
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 bool PosixTcpConnectionSocket::Socket() {
     m_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -173,4 +173,4 @@ bool PosixTcpConnectionSocket::SetNonBlocking(bool val) {
     }
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

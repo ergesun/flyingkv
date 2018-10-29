@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SIMPLE_CHECKPOINT_H
-#define MINIKV_SIMPLE_CHECKPOINT_H
+#ifndef FLYINGKV_SIMPLE_CHECKPOINT_H
+#define FLYINGKV_SIMPLE_CHECKPOINT_H
 
 #include <string>
 
@@ -18,7 +18,7 @@
 #define    SMCP_COMPLETE_FLAG   "smcp.ok"
 #define    SMCP_NEW_FILE_SUFFIX ".new"
 
-namespace minikv {
+namespace flyingkv {
 namespace checkpoint {
 class SimpleCheckpoint : public ICheckpoint {
 public:
@@ -44,4 +44,4 @@ private:
 }
 }
 
-#endif //MINIKV_SIMPLE_CHECKPOINT_H
+#endif //FLYINGKV_SIMPLE_CHECKPOINT_H

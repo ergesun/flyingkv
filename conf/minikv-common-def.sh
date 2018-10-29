@@ -1,6 +1,6 @@
 #!/bin/bash
-MINIKVD_CONFIG_NAME="minikv.conf.base"
-MINIKVD_BINARY_FILE_NAME="minikvd"
+FLYINGKVD_CONFIG_NAME="flyingkv.conf.base"
+FLYINGKVD_BINARY_FILE_NAME="flyingkvd"
 
 # generate VARS
 GEN_CONF_ROOT_DIR=${BIN_DIR}/../gen-configs

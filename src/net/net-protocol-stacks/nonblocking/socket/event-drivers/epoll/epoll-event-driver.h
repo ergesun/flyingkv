@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_EPOLL_EVENT_DRIVER_H
-#define MINIKV_NET_CORE_EPOLL_EVENT_DRIVER_H
+#ifndef FLYINGKV_NET_CORE_EPOLL_EVENT_DRIVER_H
+#define FLYINGKV_NET_CORE_EPOLL_EVENT_DRIVER_H
 
 #include "../ievent-driver.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class EpollEventDriver : public IEventDriver {
 public:
@@ -40,6 +40,6 @@ private:
     struct epoll_event *m_events;
 }; // class EpollEventDriver
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_EPOLL_EVENT_DRIVER_H
+#endif //FLYINGKV_NET_CORE_EPOLL_EVENT_DRIVER_H

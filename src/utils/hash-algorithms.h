@@ -5,8 +5,8 @@
 
 // url: https://github.com/PeterScott/murmur3/blob/master/murmur3.h
 
-#ifndef MINIKV_COMMON_HASH_ALGORITHMS_H
-#define MINIKV_COMMON_HASH_ALGORITHMS_H
+#ifndef FLYINGKV_COMMON_HASH_ALGORITHMS_H
+#define FLYINGKV_COMMON_HASH_ALGORITHMS_H
 
 #include <stdint.h>
 
@@ -28,4 +28,4 @@ void MurmurHash3_x64_128(const void *key, int len, uint32_t seed, void *out);
 }
 #endif
 
-#endif //MINIKV_COMMON_HASH_ALGORITHMS_H
+#endif //FLYINGKV_COMMON_HASH_ALGORITHMS_H

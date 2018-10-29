@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_ARPC_CLIENT_H
-#define MINIKV_RPC_ARPC_CLIENT_H
+#ifndef FLYINGKV_RPC_ARPC_CLIENT_H
+#define FLYINGKV_RPC_ARPC_CLIENT_H
 
 #include <cstdint>
 #include <string>
@@ -27,7 +27,7 @@ class Message;
 }
 }
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class MemPool;
 }
@@ -133,6 +133,6 @@ private:
     bool                                                           m_bOwnPool = false;
 }; // class ARpcClient
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_RPC_ARPC_CLIENT_H
+#endif //FLYINGKV_RPC_ARPC_CLIENT_H

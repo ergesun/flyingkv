@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SERVER_RFLOG_RFLOGGER_H
-#define MINIKV_SERVER_RFLOG_RFLOGGER_H
+#ifndef FLYINGKV_SERVER_RFLOG_RFLOGGER_H
+#define FLYINGKV_SERVER_RFLOG_RFLOGGER_H
 
 #include <string>
 #include <vector>
@@ -15,7 +15,7 @@
 #define    RFLOG_MAGIC_NO      0x72666c67
 #define    RFLOG_MAGIC_NO_LEN  4
 
-namespace minikv {
+namespace flyingkv {
 namespace rflog {
 /**
  * Not thread-safe!
@@ -49,6 +49,6 @@ private:
     uint32_t                              m_iFileSize = 0;
 };
 } // namespace rflog
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_SERVER_RFLOG_RFLOGGER_H
+#endif //FLYINGKV_SERVER_RFLOG_RFLOGGER_H

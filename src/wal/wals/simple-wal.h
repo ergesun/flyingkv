@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SIMPLE_WAL_H
-#define MINIKV_SIMPLE_WAL_H
+#ifndef FLYINGKV_SIMPLE_WAL_H
+#define FLYINGKV_SIMPLE_WAL_H
 
 #include <unordered_map>
 
@@ -15,7 +15,7 @@
 #define    SMLOG_MAGIC_NO_LEN  4
 #define    SMLOG_PREFIX_NAME   "smlog"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class IEntry;
 }
@@ -52,4 +52,4 @@ private:
 }
 }
 
-#endif //MINIKV_SIMPLE_WAL_H
+#endif //FLYINGKV_SIMPLE_WAL_H

@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_RW_MUTEX_H
-#define MINIKV_SYS_RW_MUTEX_H
+#ifndef FLYINGKV_SYS_RW_MUTEX_H
+#define FLYINGKV_SYS_RW_MUTEX_H
 
 #include <pthread.h>
 #include <cstdlib>
@@ -13,7 +13,7 @@
 
 #include "gcc-buildin.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class RwMutex {
 public:
@@ -150,4 +150,4 @@ private:
 }
 }
 
-#endif //MINIKV_SYS_RW_MUTEX_H
+#endif //FLYINGKV_SYS_RW_MUTEX_H

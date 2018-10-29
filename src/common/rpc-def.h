@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_DEF_H
-#define MINIKV_RPC_DEF_H
+#ifndef FLYINGKV_RPC_DEF_H
+#define FLYINGKV_RPC_DEF_H
 
 #define PUT_RPC_ID              1
 #define GET_RPC_ID              2
@@ -17,4 +17,4 @@
 #define RpcScan   "Scan"
 
 
-#endif //MINIKV_RPC_DEF_H
+#endif //FLYINGKV_RPC_DEF_H

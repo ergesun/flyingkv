@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_POSIXTCPCONNECTION_H
-#define MINIKV_NET_CORE_POSIXTCPCONNECTION_H
+#ifndef FLYINGKV_NET_CORE_POSIXTCPCONNECTION_H
+#define FLYINGKV_NET_CORE_POSIXTCPCONNECTION_H
 
 #include "../../../../../../../common/common-def.h"
 #include "../../../../../../common-def.h"
@@ -15,7 +15,7 @@
 #include "../../../../../../notify-message.h"
 #include "../../../../../../../sys/thread-pool.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class MemPool;
 }
@@ -49,6 +49,6 @@ private:
     sys::ThreadPool<void*>           *m_tp;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_POSIXTCPCONNECTION_H
+#endif //FLYINGKV_NET_CORE_POSIXTCPCONNECTION_H

@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_ACC_SIMPLE_RLC_H
-#define MINIKV_ACC_SIMPLE_RLC_H
+#ifndef FLYINGKV_ACC_SIMPLE_RLC_H
+#define FLYINGKV_ACC_SIMPLE_RLC_H
 
 #include "rlc.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace acc {
 class SimpleRlc : public IRlc {
 public:
@@ -20,4 +20,4 @@ public:
 }
 }
 
-#endif //MINIKV_ACC_SIMPLE_RLC_H
+#endif //FLYINGKV_ACC_SIMPLE_RLC_H

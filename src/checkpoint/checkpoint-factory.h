@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_CHECKPOINT_FACTORY_H
-#define MINIKV_CHECKPOINT_FACTORY_H
+#ifndef FLYINGKV_CHECKPOINT_FACTORY_H
+#define FLYINGKV_CHECKPOINT_FACTORY_H
 
 #include <string>
 
@@ -12,7 +12,7 @@
 
 #include "icheckpoint.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace checkpoint {
 class CheckpointFactory {
 public:
@@ -21,4 +21,4 @@ public:
 }
 }
 
-#endif //MINIKV_CHECKPOINT_FACTORY_H
+#endif //FLYINGKV_CHECKPOINT_FACTORY_H

@@ -10,7 +10,7 @@
 #include "wal-factory.h"
 #include "wals/simple-wal.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace wal {
 static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<std::string, int> {
         {"simple", 0}

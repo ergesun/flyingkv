@@ -3,7 +3,7 @@
 BIN_DIR=$(cd `dirname $0`; pwd)
 ROOT_DIR=${BIN_DIR}/..
 
-. ${ROOT_DIR}/conf/minikv-common-def.sh
+. ${ROOT_DIR}/conf/flyingkv-common-def.sh
 
 BUILD_OBJS_FOLDER="cmake-objs"
 BUILD_OBJS_DIR=${BIN_DIR}/../${BUILD_OBJS_FOLDER}
@@ -29,7 +29,7 @@ do
     elif [ "$p" = "-pack" ]; then
         echo "cleaning packed..."
         rm -rf ${PACK_ROOT_DIR}
-        rm -rf ${ROOT_DIR}/minikv-dist.tgz
+        rm -rf ${ROOT_DIR}/flyingkv-dist.tgz
     elif [ "$p" = "-gen" ]; then
         echo "cleaning codegen..."
         rm -rf ${ROOT_DIR}/src/codegen
@@ -41,7 +41,7 @@ do
         echo "cleaning codegen..."
         rm -rf ${ROOT_DIR}/src/codegen
         echo "cleaning dist..."
-        rm -rf ${ROOT_DIR}/minikv-dist.tgz
+        rm -rf ${ROOT_DIR}/flyingkv-dist.tgz
     elif [ "$p" == "-h" ]; then
         print_usage
         exit 0

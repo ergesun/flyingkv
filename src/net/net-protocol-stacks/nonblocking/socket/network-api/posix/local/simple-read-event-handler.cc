@@ -8,7 +8,7 @@
 
 #include "simple-read-event-handler.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 PosixLocalReadEventHandler::PosixLocalReadEventHandler(int fd) : m_fd(fd) {
     net_peer_info_t peerInfo;
@@ -59,4 +59,4 @@ ANetStackMessageWorker *PosixLocalReadEventHandler::GetStackMsgWorker() {
     throw std::runtime_error("Not support -- PosixLocalReadEventHandler::GetStackMsgWorker!");
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

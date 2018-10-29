@@ -12,7 +12,7 @@
 #include "utils.h"
 #include "random.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 int Utils::SetNonBlocking(int fd) {
     int opts;

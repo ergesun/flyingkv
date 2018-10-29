@@ -5,7 +5,7 @@
 
 #include "connection-event-handler.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 PosixTcpConnectionEventHandler::PosixTcpConnectionEventHandler(PosixTcpClientSocket *pSocket,
                                                                sys::MemPool *memPool,
@@ -53,4 +53,4 @@ ANetStackMessageWorker *PosixTcpConnectionEventHandler::GetStackMsgWorker() {
     return m_pNetStackWorker;
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

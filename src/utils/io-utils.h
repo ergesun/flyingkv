@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_UTILS_IO_UTILS_H
-#define MINIKV_UTILS_IO_UTILS_H
+#ifndef FLYINGKV_UTILS_IO_UTILS_H
+#define FLYINGKV_UTILS_IO_UTILS_H
 
 #include <cstdio>
 
@@ -38,7 +38,7 @@
             LOGFFUN << "fdatasync file " << (filePath) << " failed with errmsg " << strerror(err);  \
         }
 
-namespace minikv {
+namespace flyingkv {
 namespace utils {
 class IOUtils {
 public:
@@ -74,4 +74,4 @@ public:
 }
 }
 
-#endif //MINIKV_UTILS_IO_UTILS_H
+#endif //FLYINGKV_UTILS_IO_UTILS_H

@@ -3,13 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_WAL_FACTORY_H
-#define MINIKV_WAL_FACTORY_H
+#ifndef FLYINGKV_WAL_FACTORY_H
+#define FLYINGKV_WAL_FACTORY_H
 
 #include "iwal.h"
 #include "../common/ientry.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace wal {
 class WALFactory {
 public:
@@ -18,4 +18,4 @@ public:
 }
 }
 
-#endif //MINIKV_WAL_FACTORY_H
+#endif //FLYINGKV_WAL_FACTORY_H

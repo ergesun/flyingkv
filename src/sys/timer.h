@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_SYS_TIMER_H
-#define MINIKV_SYS_SYS_TIMER_H
+#ifndef FLYINGKV_SYS_SYS_TIMER_H
+#define FLYINGKV_SYS_SYS_TIMER_H
 
 #include <functional>
 #include <map>
@@ -15,7 +15,7 @@
 
 #include "spin-lock.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 /**
  * 一个拥有一个检测、触发线程的操作安全的定时器。
@@ -121,5 +121,5 @@ private:
     spin_lock_t m_thread_safe_sl = UNLOCKED;
 }; // class Timer
 }  // namespace sys
-}  // namespace minikv
-#endif //MINIKV_SYS_TIMER_H
+}  // namespace flyingkv
+#endif //FLYINGKV_SYS_TIMER_H

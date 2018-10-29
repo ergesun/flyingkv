@@ -3,10 +3,10 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_POSIX_TCP_IEVENTHANDLER_H
-#define MINIKV_NET_CORE_POSIX_TCP_IEVENTHANDLER_H
+#ifndef FLYINGKV_NET_CORE_POSIX_TCP_IEVENTHANDLER_H
+#define FLYINGKV_NET_CORE_POSIX_TCP_IEVENTHANDLER_H
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 /**
  * 事件处理器。epoll的ptr管理，有事件了回调。
@@ -20,6 +20,6 @@ public:
     virtual bool HandleWriteEvent() = 0;
 }; // interface IEventHandler
 }  // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_POSIX_TCP_IEVENTHANDLER_H
+#endif //FLYINGKV_NET_CORE_POSIX_TCP_IEVENTHANDLER_H

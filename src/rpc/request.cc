@@ -12,7 +12,7 @@
 #include "request.h"
 #include "common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 uint32_t RpcRequest::getDerivePayloadLength() {
     if (m_sspMsg) {
@@ -30,4 +30,4 @@ void RpcRequest::encodeDerive(common::Buffer *b) {
     }
 }
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv

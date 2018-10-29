@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_COMMON_KV_ENTRY_H
-#define MINIKV_COMMON_KV_ENTRY_H
+#ifndef FLYINGKV_COMMON_KV_ENTRY_H
+#define FLYINGKV_COMMON_KV_ENTRY_H
 
 #include <memory>
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class Buffer;
 class IEntry {
@@ -23,4 +23,4 @@ typedef std::function<common::IEntry*(void)> EntryCreateHandler;
 }
 }
 
-#endif //MINIKV_COMMON_KV_ENTRY_H
+#endif //FLYINGKV_COMMON_KV_ENTRY_H

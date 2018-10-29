@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_RECVMESSAGE_H
-#define MINIKV_NET_CORE_RECVMESSAGE_H
+#ifndef FLYINGKV_NET_CORE_RECVMESSAGE_H
+#define FLYINGKV_NET_CORE_RECVMESSAGE_H
 
 #include "message.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 /**
 * 注：user无需释放。
@@ -52,6 +52,6 @@ private:
     sys::MemPoolObject         *m_refMpo;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_RECVMESSAGE_H
+#endif //FLYINGKV_NET_CORE_RECVMESSAGE_H

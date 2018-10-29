@@ -15,7 +15,7 @@
 #include "../../common/buffer.h"
 #include "../../common/global-vars.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace checkpoint {
 SimpleCheckpoint::SimpleCheckpoint(const std::string &rootDir, common::EntryCreateHandler &&ech) :
         m_sRootDir(rootDir), m_entryCreator(std::move(ech)) {

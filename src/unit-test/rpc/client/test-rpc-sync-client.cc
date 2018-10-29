@@ -13,7 +13,7 @@
 #include "test-rpc-sync-client.h"
 #include "../../../common/rpc-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace test {
 ImplStandardSyncRpcWithMsgId(TestRpcClientSync, Get)
 
@@ -35,4 +35,4 @@ bool TestRpcClientSync::onStop() {
     return true;
 }
 } // namespace test
-} // namespace minikv
+} // namespace flyingkv

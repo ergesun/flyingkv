@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_MEM_POOL_H
-#define MINIKV_SYS_MEM_POOL_H
+#ifndef FLYINGKV_SYS_MEM_POOL_H
+#define FLYINGKV_SYS_MEM_POOL_H
 
 #include <cstdint>
 #include <unordered_map>
@@ -55,7 +55,7 @@
  */
 #define DEFAULT_EXPAND_BULK_OBJ_CNT_FACTOR    4
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 /**
  * Thread-safe. !注意：本类的析构函数与其他函数的并发使用不是thread-safe的。
@@ -296,6 +296,6 @@ private: // 有了槽位的思想，便对齐了。
 
 typedef MemPool::MemObject MemPoolObject;
 }  // namespace sys
-}  // namespace minikv
+}  // namespace flyingkv
 
-#endif //MINIKV_SYS_MEM_POOL_H
+#endif //FLYINGKV_SYS_MEM_POOL_H

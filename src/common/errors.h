@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_ERRORS_H
-#define MINIKV_ERRORS_H
+#ifndef FLYINGKV_ERRORS_H
+#define FLYINGKV_ERRORS_H
 
 #include <string>
 #include <exception>
@@ -32,4 +32,4 @@ static const string CreateDirError = "Cannot create dir!";
 #define THROW_PARAM_OUT_RANGE_ERR()         THROW_INVALID_ARG_ERR(ParamOutOfRangeError)
 #define THROW_CREATE_DIR_ERR()              THROW_RUNTIME_ERR(CreateDirError)
 
-#endif //MINIKV_ERRORS_H
+#endif //FLYINGKV_ERRORS_H

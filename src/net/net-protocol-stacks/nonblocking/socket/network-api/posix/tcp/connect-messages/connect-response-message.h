@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_CONNECT_RESPONSE_MESSAGE_H
-#define MINIKV_CONNECT_RESPONSE_MESSAGE_H
+#ifndef FLYINGKV_CONNECT_RESPONSE_MESSAGE_H
+#define FLYINGKV_CONNECT_RESPONSE_MESSAGE_H
 
 #include "../../../../../../../snd-message.h"
 #include "../../../../../../../../utils/codec-utils.h"
 #include "../../../../../../../../common/buffer.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class ConnectResponseMessage : public SndMessage {
 public:
@@ -41,4 +41,4 @@ private:
 }
 }
 
-#endif //MINIKV_CONNECT_RESPONSE_MESSAGE_H
+#endif //FLYINGKV_CONNECT_RESPONSE_MESSAGE_H

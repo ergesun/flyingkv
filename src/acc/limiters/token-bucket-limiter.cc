@@ -11,9 +11,9 @@
 
 #include "token-bucket-limiter.h"
 
-using minikv::sys::SpinLock;
+using flyingkv::sys::SpinLock;
 
-namespace minikv {
+namespace flyingkv {
 namespace acc {
 TokenBucketLimiter::TokenBucketLimiter(int64_t timeUnit) : m_timeUnit(timeUnit){
     type = LimiterType::TOKEN_BUCKET;
@@ -201,4 +201,4 @@ void TokenBucketLimiter::put_tokens(int64_t tokens) {
     }
 }
 } // namespace acc
-} // namespace minikv
+} // namespace flyingkv

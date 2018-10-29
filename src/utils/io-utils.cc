@@ -9,7 +9,7 @@
 
 #include "io-utils.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace utils {
 ssize_t IOUtils::WriteFully(int fd, const char *buf, size_t size) {
     if (-1 == fd || !buf) {
@@ -85,4 +85,4 @@ ssize_t IOUtils::ReadFully_V2(int fd, char **buf, size_t size) {
     return nread;
 }
 } // namespace utils
-} // namespace minikv
+} // namespace flyingkv

@@ -19,7 +19,7 @@
 #include "../../common/global-vars.h"
 #include "../../common/buffer.h"
 
-namespace minikv {
+namespace flyingkv {
 using namespace utils;
 namespace wal {
 SimpleWal::SimpleWal(std::string &rootDir, common::EntryCreateHandler &&entryCreateHandler) :

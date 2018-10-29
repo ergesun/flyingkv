@@ -3,10 +3,10 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_SYS_CONFS_H
-#define MINIKV_SYS_SYS_CONFS_H
+#ifndef FLYINGKV_SYS_SYS_CONFS_H
+#define FLYINGKV_SYS_SYS_CONFS_H
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class Timer;
 class MemPool;
@@ -31,6 +31,6 @@ void initialize();
  */
 void uninitialize();
 } // namespace common
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_SYS_SYS_CONFS_H
+#endif //FLYINGKV_SYS_SYS_CONFS_H

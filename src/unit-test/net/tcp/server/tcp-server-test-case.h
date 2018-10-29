@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_TCP_SERVER_TEST_CASE_H
-#define MINIKV_TCP_SERVER_TEST_CASE_H
+#ifndef FLYINGKV_TCP_SERVER_TEST_CASE_H
+#define FLYINGKV_TCP_SERVER_TEST_CASE_H
 
 #include <memory>
 
 #include "../../../../net/notify-message.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
     class MemPool;
 }
@@ -24,11 +24,11 @@ public:
     static void Run();
 
 private:
-    static void recv_msg(std::shared_ptr<minikv::net::NotifyMessage> sspNM);
-    static minikv::net::ISocketService     *s_ss;
-    static minikv::sys::MemPool          *m_mp;
+    static void recv_msg(std::shared_ptr<flyingkv::net::NotifyMessage> sspNM);
+    static flyingkv::net::ISocketService     *s_ss;
+    static flyingkv::sys::MemPool          *m_mp;
 };
 }
 }
 
-#endif //MINIKV_TCP_SERVER_TEST_CASE_H
+#endif //FLYINGKV_TCP_SERVER_TEST_CASE_H

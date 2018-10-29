@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_COMMON_DEF_H
-#define MINIKV_RPC_COMMON_DEF_H
+#ifndef FLYINGKV_RPC_COMMON_DEF_H
+#define FLYINGKV_RPC_COMMON_DEF_H
 
 #include "../net/snd-message.h"
 
@@ -14,7 +14,7 @@ class Message;
 }
 }
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 typedef uint16_t HandlerType;
 
@@ -32,6 +32,6 @@ enum class RpcCode {
     ErrorUnknown         = 5
 };
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_RPC_COMMON_DEF_H
+#endif //FLYINGKV_RPC_COMMON_DEF_H

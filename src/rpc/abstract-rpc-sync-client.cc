@@ -14,7 +14,7 @@
 
 #include "abstract-rpc-sync-client.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 std::shared_ptr<net::NotifyMessage> ARpcSyncClient::sendMessage(std::string &&rpcName,
                                                      std::shared_ptr<google::protobuf::Message> msg,

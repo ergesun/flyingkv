@@ -7,7 +7,7 @@
 
 #include "buffer.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 void Buffer::Refresh(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPoolObject *mpo) {
     if (m_pMpObject) {
@@ -24,4 +24,4 @@ void Buffer::Refresh(uchar *pos, uchar *last, uchar *start, uchar *end, sys::Mem
     check_available();
 }
 } // namespace common
-} // namespace minikv
+} // namespace flyingkv

@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_MSG_CALLBACK_H
-#define MINIKV_NET_CORE_MSG_CALLBACK_H
+#ifndef FLYINGKV_NET_CORE_MSG_CALLBACK_H
+#define FLYINGKV_NET_CORE_MSG_CALLBACK_H
 
 #include <functional>
 #include <memory>
 
 #include "common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 enum class NotifyMessageType {
     Server = 0,
@@ -108,7 +108,7 @@ private:
  */
 typedef std::function<void(std::shared_ptr<NotifyMessage>)> NotifyMessageCallbackHandler;
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
 
-#endif //MINIKV_NET_CORE_MSG_CALLBACK_H
+#endif //FLYINGKV_NET_CORE_MSG_CALLBACK_H

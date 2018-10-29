@@ -3,7 +3,7 @@ syntax="proto3";
 
 import "meta.proto";
 
-package minikv.protocol;
+package flyingkv.protocol;
 
 enum Code {
     OK             = 0;

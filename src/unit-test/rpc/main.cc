@@ -23,7 +23,7 @@
 #include "client/test-rpc-sync-client.h"
 
 using namespace std;
-using namespace minikv;
+using namespace flyingkv;
 
 #define TEST_PORT            43225
 
@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     };
 
     net::NssConfig nc = {
-        .sp = minikv::net::SocketProtocol::Tcp,
+        .sp = flyingkv::net::SocketProtocol::Tcp,
         .sspNat = sspNat,
         .logicPort = TEST_PORT,
         .netMgrType = net::NetStackWorkerMgrType::Unique,
@@ -105,14 +105,14 @@ TEST(RpcTest, ClientServerTest) {
     EXPECT_EQ(g_pClient->Stop(), true);
 }
 
-void dispatch_msg(std::shared_ptr<minikv::net::NotifyMessage> sspNM) {
+void dispatch_msg(std::shared_ptr<flyingkv::net::NotifyMessage> sspNM) {
     if (g_bStopped) {
         return;
     }
 
     switch (sspNM->GetType()) {
-        case minikv::net::NotifyMessageType::Message: {
-            auto *mnm = dynamic_cast<minikv::net::MessageNotifyMessage*>(sspNM.get());
+        case flyingkv::net::NotifyMessageType::Message: {
+            auto *mnm = dynamic_cast<flyingkv::net::MessageNotifyMessage*>(sspNM.get());
             auto rm = mnm->GetContent();
             if (LIKELY(rm)) {
                 auto id = rm->GetId();
@@ -129,12 +129,12 @@ void dispatch_msg(std::shared_ptr<minikv::net::NotifyMessage> sspNM) {
             }
             break;
         }
-        case minikv::net::NotifyMessageType::Worker: {
+        case flyingkv::net::NotifyMessageType::Worker: {
             g_pClient->HandleMessage(sspNM);
             g_pServer->HandleMessage(sspNM);
             break;
         }
-        case minikv::net::NotifyMessageType::Server: {
+        case flyingkv::net::NotifyMessageType::Server: {
             std::cerr << "Messenger port = " << TEST_PORT << " cannot start to work." << std::endl;
         }
     }

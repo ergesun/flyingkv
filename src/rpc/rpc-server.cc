@@ -17,7 +17,7 @@
 #include "rpc-handler.h"
 #include "rpc-server.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 RpcServer::RpcServer(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool) :
     m_pSocketService(ss), m_pRpcMemPool(memPool) {
@@ -150,4 +150,4 @@ void RpcServer::proc_msg(std::shared_ptr<net::NotifyMessage> sspNM) {
     }
 }
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv

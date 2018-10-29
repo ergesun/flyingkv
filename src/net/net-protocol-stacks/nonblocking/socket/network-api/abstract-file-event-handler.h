@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_SOCKETAPI_SOCKET_EVENT_HANDLER_H
-#define MINIKV_NET_CORE_SOCKETAPI_SOCKET_EVENT_HANDLER_H
+#ifndef FLYINGKV_NET_CORE_SOCKETAPI_SOCKET_EVENT_HANDLER_H
+#define FLYINGKV_NET_CORE_SOCKETAPI_SOCKET_EVENT_HANDLER_H
 
 #include "../../../../../sys/gcc-buildin.h"
 #include "../../../../../common/common-def.h"
@@ -14,7 +14,7 @@
 #include "file-descriptor.h"
 #include "../event-drivers/event-worker.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class ANetStackMessageWorker;
 class AFileEventHandler : public common::ReferenceCounter, public IEventHandler {
@@ -65,4 +65,4 @@ private:
 }
 }
 
-#endif //MINIKV_NET_CORE_SOCKETAPI_SOCKET_EVENT_HANDLER_H
+#endif //FLYINGKV_NET_CORE_SOCKETAPI_SOCKET_EVENT_HANDLER_H

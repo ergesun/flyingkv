@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_ACC_CONF_PARSER_H
-#define MINIKV_ACC_CONF_PARSER_H
+#ifndef FLYINGKV_ACC_CONF_PARSER_H
+#define FLYINGKV_ACC_CONF_PARSER_H
 
 #include <string>
 
 #include "../cjson/cJSON.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace acc {
 class IConfParser {
 public:
@@ -23,6 +23,6 @@ public:
     virtual bool Parse(cJSON *blockRoot) = 0;
 };
 } // namespace acc
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_ACC_CONF_PARSER_H
+#endif //FLYINGKV_ACC_CONF_PARSER_H

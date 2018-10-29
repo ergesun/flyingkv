@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_COMMON_COMMON_DEF_H
-#define MINIKV_COMMON_COMMON_DEF_H
+#ifndef FLYINGKV_COMMON_COMMON_DEF_H
+#define FLYINGKV_COMMON_COMMON_DEF_H
 
 #include <string>
 #include <functional>
@@ -94,12 +94,12 @@
 #define LOGETAG LOG(ERROR) << __FUNCTION__ << "."
 #define LOGFTAG LOG(FATAL) << __FUNCTION__ << "."
 
-#define INOUT_LOG minikv::common::FuncInOutLogger __in__out_log__(__FUNCTION__);
+#define INOUT_LOG flyingkv::common::FuncInOutLogger __in__out_log__(__FUNCTION__);
 
 typedef unsigned char uchar;
 #define NANOSEC 1000000000L
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class FuncInOutLogger {
 public:
@@ -170,5 +170,5 @@ private:
 };
 
 } // namespace common
-} // namespace minikv
-#endif //MINIKV_COMMON_COMMON_DEF_H
+} // namespace flyingkv
+#endif //FLYINGKV_COMMON_COMMON_DEF_H

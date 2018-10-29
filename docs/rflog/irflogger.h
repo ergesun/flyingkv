@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SERVER_RFLOG_IRFLOGGER_H
-#define MINIKV_SERVER_RFLOG_IRFLOGGER_H
+#ifndef FLYINGKV_SERVER_RFLOG_IRFLOGGER_H
+#define FLYINGKV_SERVER_RFLOG_IRFLOGGER_H
 
 #include <google/protobuf/repeated_field.h>
 
 using namespace google::protobuf;
 
-namespace minikv {
+namespace flyingkv {
 namespace protocol {
     class RfLogEntry;
 }
@@ -35,6 +35,6 @@ public:
     virtual void Sync() = 0;
 };
 } // namespace rflog
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_SERVER_RFLOG_IRFLOGGER_H
+#endif //FLYINGKV_SERVER_RFLOG_IRFLOGGER_H

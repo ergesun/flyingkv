@@ -11,7 +11,7 @@
 
 using namespace std::placeholders;
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 NBSocketService::NBSocketService(NssConfig nssConfig) :
     ASocketService(nssConfig.sp, nssConfig.sspNat), m_conf(nssConfig) {
@@ -180,4 +180,4 @@ void NBSocketService::on_finish(AFileEventHandler *handler) {
     handler->Release();
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

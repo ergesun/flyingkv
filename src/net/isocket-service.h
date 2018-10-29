@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_INET_SERVICE_H
-#define MINIKV_NET_CORE_INET_SERVICE_H
+#ifndef FLYINGKV_NET_CORE_INET_SERVICE_H
+#define FLYINGKV_NET_CORE_INET_SERVICE_H
 
 #include "../common/common-def.h"
 
 #include "common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class SndMessage;
 class ISocketService {
@@ -45,6 +45,6 @@ public:
     virtual bool Disconnect(const net_peer_info_t &peer) = 0;
 }; // interface ISocketService
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_INET_SERVICE_H
+#endif //FLYINGKV_NET_CORE_INET_SERVICE_H

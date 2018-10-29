@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_NPS_NB_NA_SIMPLE_EVENT_HANDLER_H
-#define MINIKV_NET_CORE_NPS_NB_NA_SIMPLE_EVENT_HANDLER_H
+#ifndef FLYINGKV_NET_CORE_NPS_NB_NA_SIMPLE_EVENT_HANDLER_H
+#define FLYINGKV_NET_CORE_NPS_NB_NA_SIMPLE_EVENT_HANDLER_H
 
 #include "../../abstract-file-event-handler.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class PosixLocalReadEventHandler : public AFileEventHandler {
 public:
@@ -26,6 +26,6 @@ private:
     int m_fd;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_NPS_NB_NA_SIMPLE_EVENT_HANDLER_H
+#endif //FLYINGKV_NET_CORE_NPS_NB_NA_SIMPLE_EVENT_HANDLER_H

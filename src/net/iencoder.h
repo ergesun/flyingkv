@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_ICODEC_H
-#define MINIKV_NET_CORE_ICODEC_H
+#ifndef FLYINGKV_NET_CORE_ICODEC_H
+#define FLYINGKV_NET_CORE_ICODEC_H
 
 #include "../sys/mem-pool.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class Buffer;
 }
@@ -23,6 +23,6 @@ public:
     virtual common::Buffer* Encode() = 0;
 }; // interface IEncoder
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_ICODEC_H
+#endif //FLYINGKV_NET_CORE_ICODEC_H

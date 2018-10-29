@@ -14,7 +14,7 @@ static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<st
         {"simple", 0}
 };
 
-namespace minikv {
+namespace flyingkv {
 namespace checkpoint {
 ICheckpoint* CheckpointFactory::CreateInstance(const std::string &type, std::string &rootDir, common::EntryCreateHandler &&handler) {
     auto rs = g_typeMapper.find(type);

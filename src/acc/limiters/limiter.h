@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_AC_RLC_H
-#define MINIKV_AC_RLC_H
+#ifndef FLYINGKV_AC_RLC_H
+#define FLYINGKV_AC_RLC_H
 
 #include "../../common/ikv-common.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace acc {
 class ILimiter {
 public:
@@ -21,5 +21,5 @@ public:
 }
 }
 
-#endif //MINIKV_AC_RLC_H
+#endif //FLYINGKV_AC_RLC_H
 

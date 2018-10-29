@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_GFLAGS_CONFIG_H
-#define MINIKV_GFLAGS_CONFIG_H
+#ifndef FLYINGKV_GFLAGS_CONFIG_H
+#define FLYINGKV_GFLAGS_CONFIG_H
 
 #include <gflags/gflags.h>
 
@@ -32,9 +32,9 @@ DECLARE_int32(rpc_io_threads_cnt);
  * kv
  */
 DECLARE_string(checkpoint_dir);
-DECLARE_string(checkpoint_type)
+DECLARE_string(checkpoint_type);
 DECLARE_string(wal_dir);
 DECLARE_string(wal_type);
 DECLARE_uint32(max_kv_pending_cnt);
 
-#endif //MINIKV_GFLAGS_CONFIG_H
+#endif //FLYINGKV_GFLAGS_CONFIG_H

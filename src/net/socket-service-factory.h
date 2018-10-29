@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_SOCKET_SERVICE_FACTORY_H
-#define MINIKV_NET_CORE_SOCKET_SERVICE_FACTORY_H
+#ifndef FLYINGKV_NET_CORE_SOCKET_SERVICE_FACTORY_H
+#define FLYINGKV_NET_CORE_SOCKET_SERVICE_FACTORY_H
 
 #include "isocket-service.h"
 #include "notify-message.h"
 #include "net-protocol-stacks/nonblocking/nss-config.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class MemPool;
 }
@@ -25,6 +25,6 @@ public:
     static ISocketService* CreateService(NssConfig nssConfig);
 }; // class SocketServiceFactory
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_SOCKET_SERVICE_FACTORY_H
+#endif //FLYINGKV_NET_CORE_SOCKET_SERVICE_FACTORY_H

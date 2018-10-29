@@ -11,7 +11,7 @@
 
 #include "event-worker.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 EventWorker::EventWorker(uint32_t maxEvents, NonBlockingEventModel m) {
     m_vDriverInternalEvents.resize(maxEvents);
@@ -65,4 +65,4 @@ void EventWorker::Wakeup() {
     fsync(m_notifySendFd);
 }
 }  // namespace net
-}  // namespace minikv
+}  // namespace flyingkv

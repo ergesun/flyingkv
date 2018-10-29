@@ -3,12 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_IWAL_H
-#define MINIKV_IWAL_H
+#ifndef FLYINGKV_IWAL_H
+#define FLYINGKV_IWAL_H
 
 #include <functional>
+#include <vector>
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class IEntry;
 }
@@ -52,4 +53,4 @@ public:
 }
 }
 
-#endif //MINIKV_IWAL_H
+#endif //FLYINGKV_IWAL_H

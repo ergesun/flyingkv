@@ -2,10 +2,10 @@
 // Created by sunchao31 on 17-8-9.
 //
 
-#ifndef MINIKV_ISERVICE_H
-#define MINIKV_ISERVICE_H
+#ifndef FLYINGKV_ISERVICE_H
+#define FLYINGKV_ISERVICE_H
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 /**
  * 所有服务的统一接口类。
@@ -19,6 +19,6 @@ public:
     virtual ~IService() {};
 };
 }
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_ISERVICE_H
+#endif //FLYINGKV_ISERVICE_H

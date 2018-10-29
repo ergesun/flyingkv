@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_COMMON_BUFFER_H
-#define MINIKV_COMMON_BUFFER_H
+#ifndef FLYINGKV_COMMON_BUFFER_H
+#define FLYINGKV_COMMON_BUFFER_H
 
 #include "../sys/gcc-buildin.h"
 #include "../sys/mem-pool.h"
 
 #include "common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 /**
  * Not thread-safe.
@@ -166,6 +166,6 @@ private:
     bool                       m_bAvailable        = false;
 };
 }  // namespace common
-}  // namespace minikv
+}  // namespace flyingkv
 
-#endif //MINIKV_COMMON_BUFFER_H
+#endif //FLYINGKV_COMMON_BUFFER_H

@@ -3,13 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_NSS_CONFIG_H
-#define MINIKV_NET_NSS_CONFIG_H
+#ifndef FLYINGKV_NET_NSS_CONFIG_H
+#define FLYINGKV_NET_NSS_CONFIG_H
 
 #include "../../notify-message.h"
 #include "../inet-stack-worker-manager.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
     class MemPool;
 }
@@ -45,4 +45,4 @@ namespace net {
 }
 }
 
-#endif //MINIKV_NET_NSS_CONFIG_H
+#endif //FLYINGKV_NET_NSS_CONFIG_H

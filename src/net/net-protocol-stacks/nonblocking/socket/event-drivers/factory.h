@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_NB_SOCKET_ED_FACTORY_H
-#define MINIKV_NET_CORE_NB_SOCKET_ED_FACTORY_H
+#ifndef FLYINGKV_NET_CORE_NB_SOCKET_ED_FACTORY_H
+#define FLYINGKV_NET_CORE_NB_SOCKET_ED_FACTORY_H
 
 #include "ievent-driver.h"
 #include "epoll/epoll-event-driver.h"
 #include "../../../../common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class EventDriverFactory {
 public:
@@ -36,6 +36,6 @@ public:
     }
 };
 }  // namespace net
-}  // namespace minikv
+}  // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_NB_SOCKET_ED_FACTORY_H
+#endif //FLYINGKV_NET_CORE_NB_SOCKET_ED_FACTORY_H

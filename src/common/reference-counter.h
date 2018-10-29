@@ -3,10 +3,10 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_COMMON_REFERENCE_COUNTER_H
-#define MINIKV_COMMON_REFERENCE_COUNTER_H
+#ifndef FLYINGKV_COMMON_REFERENCE_COUNTER_H
+#define FLYINGKV_COMMON_REFERENCE_COUNTER_H
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 /**
  * Thread-safe.
@@ -44,6 +44,6 @@ private:
     int32_t        m_iRef = 0;
 }; // class ReferenceCounter
 } // namespace common
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_COMMON_REFERENCE_COUNTER_H
+#endif //FLYINGKV_COMMON_REFERENCE_COUNTER_H

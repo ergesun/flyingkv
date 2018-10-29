@@ -8,7 +8,7 @@
 #include "../common/buffer.h"
 #include "common-utils.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace utils {
 Buffer* CommonUtils::GetNewBuffer(sys::MemPoolObject *mpo, uint32_t totalBufferSize) {
     auto bufferStart = (uchar*)(mpo->Pointer());
@@ -16,4 +16,4 @@ Buffer* CommonUtils::GetNewBuffer(sys::MemPoolObject *mpo, uint32_t totalBufferS
     return new Buffer(nullptr, nullptr, bufferStart, bufferEnd, mpo);
 }
 } // namespace utils
-} // namespace minikv
+} // namespace flyingkv

@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_NB_SOCKET_NA_POSIX_TCP_EVENTMANAGER_H
-#define MINIKV_NET_CORE_NB_SOCKET_NA_POSIX_TCP_EVENTMANAGER_H
+#ifndef FLYINGKV_NET_CORE_NB_SOCKET_NA_POSIX_TCP_EVENTMANAGER_H
+#define FLYINGKV_NET_CORE_NB_SOCKET_NA_POSIX_TCP_EVENTMANAGER_H
 
 #include <thread>
 
@@ -15,7 +15,7 @@
 #include "../../event-drivers/event-worker.h"
 #include "../../../../../../sys/spin-lock.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 typedef std::function<bool(AFileEventHandler*)> ValidHandlerFunc;
 /**
@@ -55,6 +55,6 @@ private:
     NotifyMessageCallbackHandler                             m_msgCallback;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_NB_SOCKET_NA_POSIX_TCP_EVENTMANAGER_H
+#endif //FLYINGKV_NET_CORE_NB_SOCKET_NA_POSIX_TCP_EVENTMANAGER_H

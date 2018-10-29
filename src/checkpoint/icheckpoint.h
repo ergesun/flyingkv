@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_ICHECKPOINT_H
-#define MINIKV_ICHECKPOINT_H
+#ifndef FLYINGKV_ICHECKPOINT_H
+#define FLYINGKV_ICHECKPOINT_H
 
 #include <functional>
 
 #include "ientries-traveller.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class IEntry;
 }
@@ -28,4 +28,4 @@ public:
 }
 }
 
-#endif //MINIKV_ICHECKPOINT_H
+#endif //FLYINGKV_ICHECKPOINT_H

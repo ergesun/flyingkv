@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_IMESSAGE_H
-#define MINIKV_NET_CORE_IMESSAGE_H
+#ifndef FLYINGKV_NET_CORE_IMESSAGE_H
+#define FLYINGKV_NET_CORE_IMESSAGE_H
 
 #include <cstdint>
 #include <time.h>
@@ -43,7 +43,7 @@
     #define MSG_HEADER_SIZE 8  // 8 = sizeof(magic) + sizeof(len)
 #endif
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class Buffer;
 }
@@ -156,14 +156,14 @@ inline bool operator==(const Message::Id &a, const Message::Id &b) {
 #endif
 #endif
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
 #if WITH_MSG_ID
 #if BULK_MSG_ID
 namespace std {
     template<>
-    struct hash<minikv::net::Message::Id> {
-        size_t operator()(const minikv::net::Message::Id &id) const {
+    struct hash<flyingkv::net::Message::Id> {
+        size_t operator()(const flyingkv::net::Message::Id &id) const {
             return (size_t)id.seq;
         }
     };
@@ -171,4 +171,4 @@ namespace std {
 #endif
 #endif
 
-#endif //MINIKV_NET_CORE_IMESSAGE_H
+#endif //FLYINGKV_NET_CORE_IMESSAGE_H

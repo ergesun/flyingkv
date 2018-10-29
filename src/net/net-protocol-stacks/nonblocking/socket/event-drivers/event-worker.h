@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_NB_SOCKET_ED_EVENT_WORKER_H
-#define MINIKV_NET_CORE_NB_SOCKET_ED_EVENT_WORKER_H
+#ifndef FLYINGKV_NET_CORE_NB_SOCKET_ED_EVENT_WORKER_H
+#define FLYINGKV_NET_CORE_NB_SOCKET_ED_EVENT_WORKER_H
 
 #include <set>
 #include <mutex>
@@ -14,7 +14,7 @@
 #include "../../../../common-def.h"
 #include "../../../../../sys/spin-lock.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 /**
  * 事件管理器的封装 -- 使用者的直接类，不要使用IEventDriver。
@@ -115,6 +115,6 @@ private:
     AFileEventHandler               *m_pLocalReadEventHandler;
 };
 }  // namespace net
-}  // namespace minikv
+}  // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_NB_SOCKET_ED_EVENT_WORKER_H
+#endif //FLYINGKV_NET_CORE_NB_SOCKET_ED_EVENT_WORKER_H

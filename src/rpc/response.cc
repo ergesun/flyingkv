@@ -8,7 +8,7 @@
 #include "response.h"
 #include "../utils/protobuf-utils.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 uint32_t RpcResponse::getDerivePayloadLength() {
     auto baseSize = RpcResponseBase::getDerivePayloadLength();
@@ -39,4 +39,4 @@ void RpcResponseBase::encodeDerive(common::Buffer *b) {
     ByteOrderUtils::WriteUInt16(b->GetPos(), m_ht);
 }
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv

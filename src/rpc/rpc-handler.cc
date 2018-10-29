@@ -5,7 +5,7 @@
 
 #include "rpc-handler.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 std::shared_ptr<google::protobuf::Message>
 TypicalRpcHandler::Handle(common::SP_PB_MSG req) {
@@ -16,4 +16,4 @@ TypicalRpcHandler::Handle(common::SP_PB_MSG req) {
     return m_requestCreator();
 }
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv

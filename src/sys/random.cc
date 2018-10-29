@@ -5,7 +5,7 @@
 
 #include "random.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 const int32_t Random::Range::INVALID_RANGE = -1;
 

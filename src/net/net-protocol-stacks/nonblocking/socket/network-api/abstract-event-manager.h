@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_NB_SOCKET_NA_EVENT_MANAGER_H
-#define MINIKV_NET_CORE_NB_SOCKET_NA_EVENT_MANAGER_H
+#ifndef FLYINGKV_NET_CORE_NB_SOCKET_NA_EVENT_MANAGER_H
+#define FLYINGKV_NET_CORE_NB_SOCKET_NA_EVENT_MANAGER_H
 
 #include <cstdint>
 #include <functional>
 
 #include "../../../../common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class MemPool;
 }
@@ -35,6 +35,6 @@ protected:
     uint32_t           m_iMaxEvents;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_NB_SOCKET_NA_EVENT_MANAGER_H
+#endif //FLYINGKV_NET_CORE_NB_SOCKET_NA_EVENT_MANAGER_H

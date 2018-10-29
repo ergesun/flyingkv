@@ -7,7 +7,7 @@
 #include <cstring>
 #include "rw-mutex.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 RwMutex::RwMutex() {
     int err;

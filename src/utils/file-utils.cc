@@ -16,7 +16,7 @@
 using std::ifstream;
 using std::stringstream;
 
-namespace minikv {
+namespace flyingkv {
 namespace utils {
 int FileUtils::CreateDir(const char *dir, __mode_t mode) {
     int err;
@@ -161,4 +161,4 @@ string FileUtils::ReadAllString(const string &file_path) {
     return ss.str();
 }
 } // namespace utils
-} // namespace minikv
+} // namespace flyingkv

@@ -3,12 +3,12 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_PROTOBUF_UTILS_H
-#define MINIKV_PROTOBUF_UTILS_H
+#ifndef FLYINGKV_PROTOBUF_UTILS_H
+#define FLYINGKV_PROTOBUF_UTILS_H
 
 #include <google/protobuf/message.h>
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class Buffer;
 }
@@ -26,4 +26,4 @@ public:
 }
 }
 
-#endif //MINIKV_PROTOBUF_UTILS_H
+#endif //FLYINGKV_PROTOBUF_UTILS_H

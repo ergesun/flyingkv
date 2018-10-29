@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_UTILS_CODEC_UTILS_H
-#define MINIKV_UTILS_CODEC_UTILS_H
+#ifndef FLYINGKV_UTILS_CODEC_UTILS_H
+#define FLYINGKV_UTILS_CODEC_UTILS_H
 
 #include <cstdint>
 
@@ -16,7 +16,7 @@
 #define ByteOrderUtils utils::LittleEndianCodecUtils
 #endif
 
-namespace minikv {
+namespace flyingkv {
 namespace utils {
 class LittleEndianCodecUtils {
 public:
@@ -45,6 +45,6 @@ public:
 }; // class LittleEndianCodecUtils
 
 }  // namespace utils
-}  // namespace minikv
+}  // namespace flyingkv
 
-#endif //MINIKV_UTILS_CODEC_UTILS_H
+#endif //FLYINGKV_UTILS_CODEC_UTILS_H

@@ -96,7 +96,7 @@
             }                                                                                                       \
         }
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 PosixTcpNetStackWorker::PosixTcpNetStackWorker(CreatorType ct, AFileEventHandler *eventHandler,
                                                sys::MemPool *memPool, PosixTcpClientSocket *socket,
@@ -389,4 +389,4 @@ WorkerNotifyMessage* PosixTcpNetStackWorker::get_broken_worker_message(net::net_
     return new WorkerNotifyMessage(WorkerNotifyMessageCode::Error, std::move(peer),  std::move(msg));
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

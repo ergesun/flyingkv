@@ -14,38 +14,38 @@
 
 #include "tcp-server-test-case.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace test {
 net::ISocketService     *TcpServerTest::s_ss = nullptr;
 sys::MemPool            *TcpServerTest::m_mp = nullptr;
 
 void TcpServerTest::Run() {
-    auto nat = new minikv::net::net_addr_t("0.0.0.0", 2210);
-    std::shared_ptr<minikv::net::net_addr_t> ssp_npt(nat);
-    m_mp = new minikv::sys::MemPool();
+    auto nat = new flyingkv::net::net_addr_t("0.0.0.0", 2210);
+    std::shared_ptr<flyingkv::net::net_addr_t> ssp_npt(nat);
+    m_mp = new flyingkv::sys::MemPool();
     timeval connTimeout = {
         .tv_sec = 0,
         .tv_usec = 100 * 1000
     };
     net::NssConfig nc = {
-        .sp = minikv::net::SocketProtocol::Tcp,
+        .sp = flyingkv::net::SocketProtocol::Tcp,
         .sspNat = ssp_npt,
         .logicPort = 2210,
-        .netMgrType = minikv::net::NetStackWorkerMgrType::Unique,
+        .netMgrType = flyingkv::net::NetStackWorkerMgrType::Unique,
         .memPool = m_mp,
         .msgCallbackHandler = std::bind(&TcpServerTest::recv_msg, std::placeholders::_1),
         .connectTimeout = connTimeout
     };
     s_ss = net::SocketServiceFactory::CreateService(nc);
-    if (!s_ss->Start(2, minikv::net::NonBlockingEventModel::Posix)) {
+    if (!s_ss->Start(2, flyingkv::net::NonBlockingEventModel::Posix)) {
         throw std::runtime_error("cannot start SocketService");
     }
 }
 
-void TcpServerTest::recv_msg(std::shared_ptr<minikv::net::NotifyMessage> sspNM) {
+void TcpServerTest::recv_msg(std::shared_ptr<flyingkv::net::NotifyMessage> sspNM) {
     switch (sspNM->GetType()) {
-        case minikv::net::NotifyMessageType::Message: {
-            minikv::net::MessageNotifyMessage *mnm = dynamic_cast<minikv::net::MessageNotifyMessage*>(sspNM.get());
+        case flyingkv::net::NotifyMessageType::Message: {
+            flyingkv::net::MessageNotifyMessage *mnm = dynamic_cast<flyingkv::net::MessageNotifyMessage*>(sspNM.get());
             auto rm = mnm->GetContent();
             if (rm) {
                 auto respBuf = rm->GetDataBuffer();
@@ -69,15 +69,15 @@ void TcpServerTest::recv_msg(std::shared_ptr<minikv::net::NotifyMessage> sspNM) 
             }
             break;
         }
-        case minikv::net::NotifyMessageType::Worker : {
-            auto *wnm = dynamic_cast<minikv::net::WorkerNotifyMessage*>(sspNM.get());
+        case flyingkv::net::NotifyMessageType::Worker : {
+            auto *wnm = dynamic_cast<flyingkv::net::WorkerNotifyMessage*>(sspNM.get());
             if (wnm) {
                 std::cout << "worker notify message , rc = " << (int)wnm->GetCode() << ", message = " << wnm->What() << std::endl;
             }
             break;
         }
-        case minikv::net::NotifyMessageType::Server: {
-            auto *snm = dynamic_cast<minikv::net::ServerNotifyMessage*>(sspNM.get());
+        case flyingkv::net::NotifyMessageType::Server: {
+            auto *snm = dynamic_cast<flyingkv::net::ServerNotifyMessage*>(sspNM.get());
             if (snm) {
                 std::cout << "server notify message , rc = " << (int)snm->GetCode() << ", message = " << snm->What() << std::endl;
             }

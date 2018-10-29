@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_UTILS_COMMON_UTILS_H
-#define MINIKV_UTILS_COMMON_UTILS_H
+#ifndef FLYINGKV_UTILS_COMMON_UTILS_H
+#define FLYINGKV_UTILS_COMMON_UTILS_H
 
 #include <sys/socket.h>
 #include <algorithm>
@@ -17,7 +17,7 @@
 
 #include "../common/common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
     class Buffer;
 }
@@ -80,5 +80,5 @@ public:
     }
 }; // class CommonUtils
 }  // namespace utils
-}  // namespace minikv
-#endif //MINIKV_UTILS_COMMON_UTILS_H
+}  // namespace flyingkv
+#endif //FLYINGKV_UTILS_COMMON_UTILS_H

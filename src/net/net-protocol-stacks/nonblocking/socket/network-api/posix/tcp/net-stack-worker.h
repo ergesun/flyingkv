@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_POSIX_TCP_NET_STACK_WORKER_H
-#define MINIKV_NET_CORE_POSIX_TCP_NET_STACK_WORKER_H
+#ifndef FLYINGKV_NET_CORE_POSIX_TCP_NET_STACK_WORKER_H
+#define FLYINGKV_NET_CORE_POSIX_TCP_NET_STACK_WORKER_H
 
 #include "../../../../../../../common/common-def.h"
 #include "../../net-stack-msg-worker.h"
 #include "stack/connection-socket.h"
 #include "../../abstract-event-manager.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class MemPool;
 }
@@ -92,6 +92,6 @@ private:
     ConnectFunc              m_onLogicConnect;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_POSIX_TCP_NET_STACK_WORKER_H
+#endif //FLYINGKV_NET_CORE_POSIX_TCP_NET_STACK_WORKER_H

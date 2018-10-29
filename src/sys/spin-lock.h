@@ -3,13 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_SYS_SPIN_LOCK_H
-#define MINIKV_SYS_SPIN_LOCK_H
+#ifndef FLYINGKV_SYS_SPIN_LOCK_H
+#define FLYINGKV_SYS_SPIN_LOCK_H
 
 #define UNLOCKED                       0
 #define LOCKED                         1
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 /**
  * 使用时注意先初始化为UNLOCKED，或者你能保证编译器会初始化为0.
@@ -74,5 +74,5 @@ private:
     volatile bool m_bOwnLock = false;
 }; // class SpinLock
 }  // namespace sys
-}  // namespace minikv
-#endif //MINIKV_SYS_SPIN_LOCK_H
+}  // namespace flyingkv
+#endif //FLYINGKV_SYS_SPIN_LOCK_H

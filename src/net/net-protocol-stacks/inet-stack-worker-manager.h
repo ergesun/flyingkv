@@ -3,13 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_ICONNECTIONMANAGER_H
-#define MINIKV_NET_CORE_ICONNECTIONMANAGER_H
+#ifndef FLYINGKV_NET_CORE_ICONNECTIONMANAGER_H
+#define FLYINGKV_NET_CORE_ICONNECTIONMANAGER_H
 
 #include "../../common/common-def.h"
 #include "../common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 enum class NetStackWorkerMgrType {
     Unique   = 0
@@ -52,6 +52,6 @@ public:
     virtual AFileEventHandler* RemoveWorkerEventHandler(const net_peer_info_t &logicNpt) = 0;
 }; // interface INetStackWorkerManager
 }  // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_ICONNECTIONMANAGER_H
+#endif //FLYINGKV_NET_CORE_ICONNECTIONMANAGER_H

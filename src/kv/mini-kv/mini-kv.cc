@@ -11,8 +11,8 @@
 
 #include "mini-kv.h"
 
+namespace flyingkv {
 namespace minikv {
-namespace mnkv {
 MiniKV::MiniKV(std::string &walType, std::string &checkpointType, std::string &walDir,
                std::string &checkpointDir, uint32_t maxPendingCnt) {
     m_pMp = new sys::MemPool();

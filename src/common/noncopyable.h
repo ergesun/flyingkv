@@ -4,10 +4,10 @@
  */
 
 
-#ifndef MINIKV_COMMON_NOCOPY_CLASS_H
-#define MINIKV_COMMON_NOCOPY_CLASS_H
+#ifndef FLYINGKV_COMMON_NOCOPY_CLASS_H
+#define FLYINGKV_COMMON_NOCOPY_CLASS_H
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class Noncopyable {
 protected:
@@ -22,4 +22,4 @@ private:  // emphasize the following members are private
 }
 }
 
-#endif //MINIKV_COMMON_NOCOPY_CLASS_H
+#endif //FLYINGKV_COMMON_NOCOPY_CLASS_H

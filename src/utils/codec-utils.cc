@@ -5,7 +5,7 @@
 
 #include "codec-utils.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace utils {
 void LittleEndianCodecUtils::WriteUInt16(uchar *buf, uint16_t n) {
     buf[1] = (uchar)n;

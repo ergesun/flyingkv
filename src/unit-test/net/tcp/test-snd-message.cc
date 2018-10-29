@@ -7,7 +7,7 @@
 
 #include "test-snd-message.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace test {
 TestSndMessage::TestSndMessage(sys::MemPool *mp, net::net_peer_info_t &&socketInfo, std::string msg)  :
     net::SndMessage(mp, std::move(socketInfo)), m_str(msg) {}

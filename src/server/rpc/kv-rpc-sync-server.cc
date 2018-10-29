@@ -17,7 +17,7 @@
 
 #include "kv-rpc-sync-server.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace server {
 KVRpcServerSync::KVRpcServerSync(common::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadsCnt,
                                  uint16_t port, sys::MemPool *memPool) : m_pHandler(handler) {
@@ -154,4 +154,4 @@ void KVRpcServerSync::onRecvNetMessage(std::shared_ptr<net::NotifyMessage> sspNM
     m_pRpcServer->HandleMessage(sspNM);
 }
 } // namespace server
-} // namespace minikv
+} // namespace flyingkv

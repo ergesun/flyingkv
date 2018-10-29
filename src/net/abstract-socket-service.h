@@ -3,13 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_ABSTRACT_SOCKET_SERVICE_H
-#define MINIKV_NET_CORE_ABSTRACT_SOCKET_SERVICE_H
+#ifndef FLYINGKV_NET_CORE_ABSTRACT_SOCKET_SERVICE_H
+#define FLYINGKV_NET_CORE_ABSTRACT_SOCKET_SERVICE_H
 
 #include "../common/common-def.h"
 #include "isocket-service.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class ASocketService : public ISocketService {
 public:
@@ -26,6 +26,6 @@ protected:
     std::shared_ptr<net_addr_t> m_nlt;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_ABSTRACT_SOCKET_SERVICE_H
+#endif //FLYINGKV_NET_CORE_ABSTRACT_SOCKET_SERVICE_H

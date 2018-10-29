@@ -11,7 +11,7 @@
 
 #include "spin-lock.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 SpinLock::SpinLock(spin_lock_t *const sl) : m_psl(sl) {
     assert(sl);
@@ -80,4 +80,4 @@ void SpinLock::Unlock() {
     m_bOwnLock = false;
 }
 } // namespace common
-} // namespace minikv
+} // namespace flyingkv

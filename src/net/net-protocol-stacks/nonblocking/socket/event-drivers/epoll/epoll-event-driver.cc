@@ -15,7 +15,7 @@
 
 #include "epoll-event-driver.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 EpollEventDriver::~EpollEventDriver() {
     close(m_epfd);
@@ -152,4 +152,4 @@ int EpollEventDriver::EventWait(std::vector<NetEvent> *events, struct timeval *t
     }
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

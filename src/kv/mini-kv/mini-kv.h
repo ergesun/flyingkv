@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_MINI_KV_H
-#define MINIKV_MINI_KV_H
+#ifndef FLYINGKV_MINI_KV_H
+#define FLYINGKV_MINI_KV_H
 
 #include <map>
 
@@ -14,7 +14,7 @@
 #include "../../common/ikv-common.h"
 #include "../../common/blocking-queue.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 class IEntry;
 }
@@ -27,7 +27,7 @@ class IWal;
 namespace checkpoint {
 class ICheckpoint;
 }
-namespace mnkv {
+namespace minikv {
 class EntryComparer
 {
     bool operator()(const protocol::Entry *x, const protocol::Entry *y) const {
@@ -62,4 +62,4 @@ private:
 }
 }
 
-#endif //MINIKV_MINI_KV_H
+#endif //FLYINGKV_MINI_KV_H

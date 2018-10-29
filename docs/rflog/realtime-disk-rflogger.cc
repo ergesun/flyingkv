@@ -17,7 +17,7 @@
 
 #include "realtime-disk-rflogger.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace rflog {
 RtDiskRfLogger::RtDiskRfLogger(std::string &&logFilePath, bool autoSync) :
         m_sLogFilePath(std::move(logFilePath)), m_bAutoSync(autoSync) {
@@ -201,4 +201,4 @@ void RtDiskRfLogger::initialize() {
     LSeekFileWithFatalLOG(m_iFd, 0, SEEK_END, m_sLogFilePath.c_str());
 }
 } // namespace rflog
-} // namespace minikv
+} // namespace flyingkv

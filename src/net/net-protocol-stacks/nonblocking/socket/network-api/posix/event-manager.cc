@@ -9,7 +9,7 @@
 
 using namespace std::placeholders;
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 PosixEventManager::PosixEventManager(SocketProtocol sp, std::shared_ptr<net_addr_t> sspNat, sys::MemPool *memPool, uint32_t maxEvents,
                                      uint32_t connWorkersCnt, ConnectHandler stackConnectHandler, ConnectFunc logicConnectHandler,
@@ -163,4 +163,4 @@ inline void PosixEventManager::process_event(NetEvent *netEvent) {
     }
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

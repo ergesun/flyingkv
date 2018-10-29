@@ -3,13 +3,13 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RF_NODE_RPC_SYNC_CLIENT_H
-#define MINIKV_RF_NODE_RPC_SYNC_CLIENT_H
+#ifndef FLYINGKV_RF_NODE_RPC_SYNC_CLIENT_H
+#define FLYINGKV_RF_NODE_RPC_SYNC_CLIENT_H
 
 #include "../rpc/abstract-rpc-sync-client.h"
 #include "../rpc/common-def.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace protocol {
 class AppendEntriesResponse;
 class RequestVoteResponse;
@@ -37,6 +37,6 @@ private:
     bool register_rpc_handlers();
 };
 } // namespace server
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_RF_NODE_RPC_SYNC_CLIENT_H
+#endif //FLYINGKV_RF_NODE_RPC_SYNC_CLIENT_H

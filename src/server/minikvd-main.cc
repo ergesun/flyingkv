@@ -21,7 +21,7 @@
 
 #include "./rpc/kv-rpc-sync-server.h"
 
-using namespace minikv;
+using namespace flyingkv;
 
 using std::string;
 using std::stringstream;
@@ -61,7 +61,7 @@ void uninit_gflags_glog() {
 
 void startup() {
     std::unique_lock<std::mutex> l(g_m);
-    auto pKV = new mnkv::MiniKV(FLAGS_wal_type, FLAGS_checkpoint_type, FLAGS_wal_dir,
+    auto pKV = new minikv::MiniKV(FLAGS_wal_type, FLAGS_checkpoint_type, FLAGS_wal_dir,
                                 FLAGS_checkpoint_dir, FLAGS_max_kv_pending_cnt);
     g_pKV = pKV;
     if (!g_pKV->Start()) {
@@ -154,12 +154,12 @@ try {
 
     umask(0);
     init_gflags_glog(&argc, &argv);
-    minikv::common::initialize();
+    flyingkv::common::initialize();
     startup();
     register_signal();
 
     waitStop();
-    minikv::common::uninitialize();
+    flyingkv::common::uninitialize();
     uninit_gflags_glog();
 
     return 0;

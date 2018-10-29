@@ -7,7 +7,7 @@
 
 #include "timer.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 Timer::~Timer() {
     if (!m_stop) {
@@ -121,4 +121,4 @@ void Timer::process() {
     }
 }
 }  // namespace common
-}  // namespace minikv
+}  // namespace flyingkv

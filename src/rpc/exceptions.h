@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_EXCEPTIONS_H
-#define MINIKV_RPC_EXCEPTIONS_H
+#ifndef FLYINGKV_RPC_EXCEPTIONS_H
+#define FLYINGKV_RPC_EXCEPTIONS_H
 
 #include <exception>
 #include <cstdint>
 #include <string>
 #include <sstream>
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 class RpcException : public std::exception {
 public:
@@ -140,4 +140,4 @@ public:
 }
 }
 
-#endif //MINIKV_RPC_EXCEPTIONS_H
+#endif //FLYINGKV_RPC_EXCEPTIONS_H

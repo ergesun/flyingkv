@@ -15,7 +15,7 @@
 
 #include "rf-srv-rpc-sync-client.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace server {
 ImplStandardSyncRpcWithNoMsgId(RfSrvInternalRpcClientSync, AppendEntries)
 ImplStandardSyncRpcWithNoMsgId(RfSrvInternalRpcClientSync, RequestVote)
@@ -44,4 +44,4 @@ bool RfSrvInternalRpcClientSync::onStop() {
     return true;
 }
 } // namespace server
-} // namespace minikv
+} // namespace flyingkv

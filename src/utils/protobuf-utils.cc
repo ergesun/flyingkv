@@ -7,7 +7,7 @@
 
 #include "protobuf-utils.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace utils {
 bool ProtoBufUtils::Deserialize(const common::Buffer *from, google::protobuf::Message *to) {
     if (UNLIKELY(!to->ParseFromArray(from->GetPos(), from->AvailableLength()))) {

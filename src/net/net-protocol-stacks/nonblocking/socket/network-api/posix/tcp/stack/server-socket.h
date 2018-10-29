@@ -3,14 +3,14 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_POSIX_TCPSERVERSOCKET_H
-#define MINIKV_NET_CORE_POSIX_TCPSERVERSOCKET_H
+#ifndef FLYINGKV_NET_CORE_POSIX_TCPSERVERSOCKET_H
+#define FLYINGKV_NET_CORE_POSIX_TCPSERVERSOCKET_H
 
 #include <stdexcept>
 
 #include "connection-socket.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class PosixTcpServerSocket : public PosixTcpConnectionSocket {
 public:
@@ -36,6 +36,6 @@ private:
     int         m_max_listen_conns;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_POSIX_TCPSERVERSOCKET_H
+#endif //FLYINGKV_NET_CORE_POSIX_TCPSERVERSOCKET_H

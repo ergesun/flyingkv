@@ -3,15 +3,15 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_POSIX_TCP_CONNECTION_EVENT_HANDLER_H
-#define MINIKV_NET_CORE_POSIX_TCP_CONNECTION_EVENT_HANDLER_H
+#ifndef FLYINGKV_NET_CORE_POSIX_TCP_CONNECTION_EVENT_HANDLER_H
+#define FLYINGKV_NET_CORE_POSIX_TCP_CONNECTION_EVENT_HANDLER_H
 
 #include "../../../../../../../common/common-def.h"
 #include "../../abstract-file-event-handler.h"
 #include "stack/connection-socket.h"
 #include "net-stack-worker.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class MemPool;
 }
@@ -43,6 +43,6 @@ private:
     uint16_t                m_iLogicPort;
 };
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_POSIX_TCP_CONNECTION_EVENT_HANDLER_H
+#endif //FLYINGKV_NET_CORE_POSIX_TCP_CONNECTION_EVENT_HANDLER_H

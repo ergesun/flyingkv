@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_COMMON_DEF_H
-#define MINIKV_NET_CORE_COMMON_DEF_H
+#ifndef FLYINGKV_NET_CORE_COMMON_DEF_H
+#define FLYINGKV_NET_CORE_COMMON_DEF_H
 
 #include <string>
 #include <iostream>
@@ -14,7 +14,7 @@
 
 using std::ostream;
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 enum class NonBlockingEventModel {
     DPDK   = 0,
@@ -104,13 +104,13 @@ inline ostream& operator<<(ostream &os, const net_peer_info_s &peer){
     return os;
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
 // declare hash<net_peer_info_t>
 namespace std {
 template<>
-struct hash<minikv::net::net_peer_info_t> {
-    uint32_t operator()(const minikv::net::net_peer_info_t &npit) const {
+struct hash<flyingkv::net::net_peer_info_t> {
+    uint32_t operator()(const flyingkv::net::net_peer_info_t &npit) const {
         std::stringstream ss;
 
         ss << npit.nat.addr << ":" << npit.nat.port << "-" << (int) (npit.sp);
@@ -125,4 +125,4 @@ struct hash<minikv::net::net_peer_info_t> {
 };
 }
 
-#endif //MINIKV_NET_CORE_COMMON_DEF_H
+#endif //FLYINGKV_NET_CORE_COMMON_DEF_H

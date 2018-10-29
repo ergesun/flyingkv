@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_REQUEST_H
-#define MINIKV_RPC_REQUEST_H
+#ifndef FLYINGKV_RPC_REQUEST_H
+#define FLYINGKV_RPC_REQUEST_H
 
 #include <memory>
 
@@ -16,7 +16,7 @@ class Message;
 }
 }
 
-namespace minikv {
+namespace flyingkv {
 namespace rpc {
 class RpcRequest : public net::SndMessage {
 public:
@@ -37,6 +37,6 @@ private:
     std::shared_ptr<google::protobuf::Message> m_sspMsg;
 };
 } // namespace rpc
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_RPC_REQUEST_H
+#endif //FLYINGKV_RPC_REQUEST_H

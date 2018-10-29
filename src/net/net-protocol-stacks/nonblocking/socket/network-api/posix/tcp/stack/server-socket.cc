@@ -9,7 +9,7 @@
 #include "../../../../../../../../utils/common-utils.h"
 #include "server-socket.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 bool PosixTcpServerSocket::Bind() {
     struct sockaddr_in serv_addr;
@@ -58,4 +58,4 @@ int PosixTcpServerSocket::Accept4(__SOCKADDR_ARG __addr, socklen_t *__addr_len, 
     return accept4(m_fd, __addr, __addr_len, __flags);
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv

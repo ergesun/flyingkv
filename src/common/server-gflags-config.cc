@@ -8,7 +8,7 @@
 /**
  * glog配置
  */
-DEFINE_string(glog_dir, "/tmp/minikv/logs", "glog的保存路径");
+DEFINE_string(glog_dir, "/tmp/flyingkv/logs", "glog的保存路径");
 DEFINE_bool(glog_prefix, true, "设置日志前缀是否应该添加到每行输出");
 DEFINE_int32(max_glog_size, 100, "设置最大日志文件大小（以MB为单位）");
 DEFINE_int32(glogbufsecs, 0, "设置可以缓冲日志的最大秒数，0指实时输出");
@@ -28,8 +28,8 @@ DEFINE_int32(rpc_io_threads_cnt, 0, "设置rpc处理时消息分发的线程数�
 /**
  * kv
  */
-DEFINE_string(checkpoint_dir, "/tmp/minikv/checkpoint-data", "");
+DEFINE_string(checkpoint_dir, "/tmp/flyingkv/checkpoint-data", "");
 DEFINE_string(checkpoint_type, "simple", "case of [simple]");
-DEFINE_string(wal_dir, "/tmp/minikv/wal-data", "");
+DEFINE_string(wal_dir, "/tmp/flyingkv/wal-data", "");
 DEFINE_string(wal_type, "simple", "case of [simple]");
 DEFINE_uint32(max_kv_pending_cnt, 100, "");

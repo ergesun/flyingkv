@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_ABSTRACT_RPC_SYNC_CLIENT_H
-#define MINIKV_RPC_ABSTRACT_RPC_SYNC_CLIENT_H
+#ifndef FLYINGKV_RPC_ABSTRACT_RPC_SYNC_CLIENT_H
+#define FLYINGKV_RPC_ABSTRACT_RPC_SYNC_CLIENT_H
 
 #include <memory>
 
@@ -58,7 +58,7 @@ std::shared_ptr<protocol::RpcName##Response>                                    
     }
 
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class NotifyMessage;
 }
@@ -130,4 +130,4 @@ private:
 }
 }
 
-#endif //MINIKV_RPC_ABSTRACT_RPC_SYNC_CLIENT_H
+#endif //FLYINGKV_RPC_ABSTRACT_RPC_SYNC_CLIENT_H

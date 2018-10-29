@@ -16,7 +16,7 @@
 
 #include "global-vars.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace common {
 int             LOGIC_CPUS_CNT;
 int             PHYSICAL_CPUS_CNT;
@@ -64,4 +64,4 @@ void uninitialize() {
 }
 #endif
 } // namespace common
-} // namespace minikv
+} // namespace flyingkv

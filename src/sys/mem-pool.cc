@@ -14,7 +14,7 @@
 
 #define SYS_MEM_PAGE_SIZE     sysconf(_SC_PAGESIZE)
 
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 char* MemPool::MemObject::Pointer() const {
     return reinterpret_cast<char*>(m_obj_pv);
@@ -717,4 +717,4 @@ std::string MemPool::DumpDebugInfo() {
 #undef ALIGN8
 }
 }  // namespace sys
-}  // namespace minikv
+}  // namespace flyingkv

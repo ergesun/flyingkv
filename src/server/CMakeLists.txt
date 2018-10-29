@@ -1,7 +1,7 @@
 aux_source_directory(.                 SOURCE_FILES)
 aux_source_directory(./rpc             ND_RPC_SRCS)
 
-add_executable(minikvd ${SOURCE_FILES} ${ND_SRCS} ${ND_RPC_SRCS})
+add_executable(flyingkvd ${SOURCE_FILES} ${ND_SRCS} ${ND_RPC_SRCS})
 
 set(LINK_LIBS
         kv
@@ -13,8 +13,8 @@ set(LINK_LIBS
         net
         utils
         common
-        acc
-        cjson
+        #acc
+        #cjson
         sys
         glog
         gflags
@@ -31,5 +31,5 @@ set(DEPEN_LIBS
         rpc
         )
 
-add_dependencies(minikvd ${DEPEN_LIBS})
-target_link_libraries(minikvd ${LINK_LIBS})
+add_dependencies(flyingkvd ${DEPEN_LIBS})
+target_link_libraries(flyingkvd ${LINK_LIBS})

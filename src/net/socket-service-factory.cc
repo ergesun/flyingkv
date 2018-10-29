@@ -7,7 +7,7 @@
 
 #include "socket-service-factory.h"
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 ISocketService* SocketServiceFactory::CreateService(NssConfig nssConfig) {
 #ifdef __linux__
@@ -17,5 +17,5 @@ ISocketService* SocketServiceFactory::CreateService(NssConfig nssConfig) {
 #endif
 }
 } // namespace net
-} // namespace minikv
+} // namespace flyingkv
 

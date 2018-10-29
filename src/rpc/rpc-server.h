@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_RPC_SERVER_H
-#define MINIKV_RPC_SERVER_H
+#ifndef FLYINGKV_RPC_SERVER_H
+#define FLYINGKV_RPC_SERVER_H
 
 #include <cstdint>
 #include <memory>
@@ -19,7 +19,7 @@
 #include "imessage-handler.h"
 
 // TODO(sunchao): fix rpc to use protobuf service. Now we just use protobuf data serialize feature.
-namespace minikv {
+namespace flyingkv {
 namespace sys {
 class MemPool;
 }
@@ -70,4 +70,4 @@ private:
 }
 }
 
-#endif //MINIKV_RPC_SERVER_H
+#endif //FLYINGKV_RPC_SERVER_H

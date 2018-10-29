@@ -3,8 +3,8 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef MINIKV_NET_CORE_NBSOCKETSERVICE_H
-#define MINIKV_NET_CORE_NBSOCKETSERVICE_H
+#ifndef FLYINGKV_NET_CORE_NBSOCKETSERVICE_H
+#define FLYINGKV_NET_CORE_NBSOCKETSERVICE_H
 
 #include <memory>
 #include <cassert>
@@ -19,7 +19,7 @@
 // TODO(sunchao): 可配值
 #define MAX_EVENTS  256
 
-namespace minikv {
+namespace flyingkv {
 namespace net {
 class AEventManager;
 
@@ -76,6 +76,6 @@ private:
     bool                                      m_bStopped      = true;
 }; // class NBSocketService
 }  // namespace net
-} // namespace minikv
+} // namespace flyingkv
 
-#endif //MINIKV_NET_CORE_NBSOCKETSERVICE_H
+#endif //FLYINGKV_NET_CORE_NBSOCKETSERVICE_H
