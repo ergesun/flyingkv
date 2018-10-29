@@ -9,7 +9,7 @@ aux_source_directory(net-protocol-stacks/nonblocking/socket/network-api/posix/tc
 aux_source_directory(net-protocol-stacks/nonblocking/socket/event-drivers NPS_NB_SA_ED_SRCS)
 aux_source_directory(net-protocol-stacks/nonblocking/socket/event-drivers/epoll NPS_NB_SA_ED_EP_SRCS)
 
-add_library(net SHARED
+add_library(net STATIC
         ${NET_ROOT_SRCS}
         ${NPS_MWP_SRCS}
         ${NPS_NB_SRCS}
