@@ -7,7 +7,7 @@
 #define FLYINGKV_TEST_RPC_SERVER_H
 
 #include "../../../common/iservice.h"
-#include "../../../rpc/rpc-server.h"
+#include "../../../rpc/rpc-server-sync.h"
 #include "../../../rpc/common-def.h"
 #include "../../../common/ikv-common.h"
 

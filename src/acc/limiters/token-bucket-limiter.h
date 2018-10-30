@@ -9,23 +9,25 @@
 #include "../../sys/spin-lock.h"
 #include "../../common/common-def.h"
 
-#include "../conf-parser.h"
 #include "../igranter.h"
 
-#include "common-def.h"
+#include "../common-def.h"
+#include "../../3rd/cjson/cJSON.h"
+#include "../config.h"
 
 namespace flyingkv {
 namespace acc {
 class RWT;
-class TokenBucketLimiter : public IGranter, public IConfParser {
+class TokenBucketLimiter : public IGranter {
 PUBLIC
     explicit TokenBucketLimiter(int64_t timeUnit = NANOSEC);
     TokenBucketLimiter(int64_t capacity, uint32_t speed, int64_t timeUnit);
     ~TokenBucketLimiter() override;
 
+    void Init(const TokenBucketLimiterConfig *conf);
     bool GrantUntil(int64_t deadlineTs, common::ReqRespType type) override;
     void GiveBack(common::ReqRespType rt) override;
-    bool Parse(cJSON *blockRoot) override;
+    bool Parse(cJSON *blockRoot);
     std::string GetName() override {
         return m_sName;
     }
@@ -53,7 +55,7 @@ PRIVATE
     RWT              *m_pRWT = nullptr;
     int64_t           m_maxResCnt;  // Max resource value
     int64_t           m_currentResCount;
-    uint32_t          m_speed;
+    int64_t           m_speed;
     const int64_t     m_timeUnit; // Time granularity for one second
     std::string       m_sName;
     bool              m_bSkipped = false;

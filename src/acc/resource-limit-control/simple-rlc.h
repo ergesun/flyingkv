@@ -7,20 +7,21 @@
 #define FLYINGKV_ACC_SIMPLE_RLC_H
 
 #include "../igranter.h"
-#include "../conf-parser.h"
+#include "../config.h"
+#include "../../3rd/cjson/cJSON.h"
 
 namespace flyingkv {
 namespace acc {
-class SimpleRlc : public IGranter, public IConfParser {
+class SimpleRlc : public IGranter {
 PUBLIC
     SimpleRlc() = default;
     ~SimpleRlc() override;
 
+    bool Init(const RlcConfig *conf);
     bool GrantUntil(int64_t deadlineTs, common::ReqRespType type) override;
     void GiveBack(common::ReqRespType rt) override;
-    bool Parse(cJSON *blockRoot) override;
     std::string GetName() override {
-        return "simple acc";
+        return "simple rlc";
     }
 
 PRIVATE

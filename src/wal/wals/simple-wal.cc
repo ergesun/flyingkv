@@ -79,7 +79,8 @@ uint64_t SimpleWal::AppendEntry(common::IEntry *entry) {
     return entryId;
 }
 
-// TODO(sunchao): 如果以后支持大量的log，就要把这个接口改成batch load
+// TODO(sunchao): 1. 如果以后支持大量的log，就要把这个接口改成batch load
+//                2. 添加log idx支持跳过checkpoint已经apply的log。不过目前这样没有bug，因为kv engine这几个操作都是幂等的。
 std::vector<WalEntry> SimpleWal::Load() {
     std::vector<WalEntry> rs;
     if (!utils::FileUtils::Exist(m_sLogFilePath)) {

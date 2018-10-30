@@ -33,10 +33,6 @@ SimpleCheckpoint::SimpleCheckpoint(const std::string &rootDir, common::EntryCrea
     m_sStatusFilePath = m_sRootDir + "/" +SMCP_COMPLETE_FLAG;
 }
 
-SimpleCheckpoint::~SimpleCheckpoint() {
-
-}
-
 // TODO(sunchao): 把load定义一个模式抽象一下？免得和log的load逻辑重复
 bool SimpleCheckpoint::Load(EntryLoadedCallback callback) {
     if (utils::FileUtils::Exist(m_sCpFilePath)) {
@@ -112,7 +108,7 @@ bool SimpleCheckpoint::Load(EntryLoadedCallback callback) {
     return true;
 }
 
-// TODO(sunchao): 有时间优化为batch写
+// TODO(sunchao): 1.有时间优化为batch写 2.添加index meta，参考wal介绍
 bool SimpleCheckpoint::Save(IEntriesTraveller *traveller) {
     if (traveller->Empty()) {
         return true;

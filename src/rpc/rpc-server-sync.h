@@ -33,7 +33,7 @@ class IRpcHandler;
  *    client -> server :  |net common header(Message::HeaderSize() bytes)|[handler id(2bytes)|protobuf msg(n bytes)]|
  *    server -> client :  |net common header(Message::HeaderSize() bytes)|[rpc code(2bytes)|[handler id(2bytes)|protobuf msg(n bytes or 0 if no return value)]|
  */
-class RpcServer : public common::IService, public IMessageHandler {
+class RpcServerSync : public common::IService, public IMessageHandler {
 PUBLIC
     /**
      *
@@ -41,8 +41,8 @@ PUBLIC
      * @param ss
      * @param memPool 如果为空，则内部自己构造。
      */
-    RpcServer(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool = nullptr);
-    ~RpcServer() override;
+    RpcServerSync(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool = nullptr);
+    ~RpcServerSync() override;
 
     bool Start() override;
     bool Stop() override;

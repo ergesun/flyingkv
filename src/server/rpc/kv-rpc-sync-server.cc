@@ -19,7 +19,7 @@
 
 namespace flyingkv {
 namespace server {
-KVRpcServerSync::KVRpcServerSync(common::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadsCnt,
+KVRpcServerSync::KVRpcServerSync(common::IKVOperator *handler, uint16_t workThreadsCnt, uint16_t netIOThreadsCnt,
                                  uint16_t port, sys::MemPool *memPool) : m_pHandler(handler) {
 
     CHECK(handler);
@@ -42,7 +42,7 @@ KVRpcServerSync::KVRpcServerSync(common::IKVHandler *handler, uint16_t workThrea
                       m_pMemPool, std::bind(&KVRpcServerSync::onRecvNetMessage, this, std::placeholders::_1),
                       connTimeout);
     m_pSocketService = net::SocketServiceFactory::CreateService(nc);
-    m_pRpcServer = new rpc::RpcServer(workThreadsCnt, m_pSocketService, memPool);
+    m_pRpcServer = new rpc::RpcServerSync(workThreadsCnt, m_pSocketService, memPool);
 }
 
 KVRpcServerSync::~KVRpcServerSync() {
@@ -103,7 +103,7 @@ common::SP_PB_MSG KVRpcServerSync::on_put(common::SP_PB_MSG sspMsg) {
     auto reqPtr = sspMsg.get();
     sspMsg.reset();
     req.reset(dynamic_cast<protocol::PutRequest*>(reqPtr));
-    return m_pHandler->OnPut(req);
+    return m_pHandler->Put(req);
 }
 
 common::SP_PB_MSG KVRpcServerSync::create_put_request() {
@@ -115,7 +115,7 @@ common::SP_PB_MSG KVRpcServerSync::on_get(common::SP_PB_MSG sspMsg) {
     auto reqPtr = sspMsg.get();
     sspMsg.reset();
     req.reset(dynamic_cast<protocol::GetRequest*>(reqPtr));
-    return m_pHandler->OnGet(req);
+    return m_pHandler->Get(req);
 }
 
 common::SP_PB_MSG KVRpcServerSync::create_get_request() {
@@ -127,7 +127,7 @@ common::SP_PB_MSG KVRpcServerSync::on_delete(common::SP_PB_MSG sspMsg) {
     auto reqPtr = sspMsg.get();
     sspMsg.reset();
     req.reset(dynamic_cast<protocol::DeleteRequest*>(reqPtr));
-    return m_pHandler->OnDelete(req);
+    return m_pHandler->Delete(req);
 }
 
 common::SP_PB_MSG KVRpcServerSync::create_delete_request() {
@@ -139,7 +139,7 @@ common::SP_PB_MSG KVRpcServerSync::on_scan(common::SP_PB_MSG sspMsg) {
     auto reqPtr = sspMsg.get();
     sspMsg.reset();
     req.reset(dynamic_cast<protocol::ScanRequest*>(reqPtr));
-    return m_pHandler->OnScan(req);
+    return m_pHandler->Scan(req);
 }
 
 common::SP_PB_MSG KVRpcServerSync::create_scan_request() {

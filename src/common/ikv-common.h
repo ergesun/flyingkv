@@ -31,15 +31,24 @@ typedef std::shared_ptr<protocol::ScanRequest> KVScanRequest;
 /**
  * rpc通信的消息接收接口。
  */
-class IKVHandler {
+class IKVOperator {
 PUBLIC
-    virtual ~IKVHandler() = default;
-    virtual SP_PB_MSG OnPut(KVPutRequest sspMsg)       = 0;
-    virtual SP_PB_MSG OnGet(KVGetRequest sspMsg)       = 0;
-    virtual SP_PB_MSG OnDelete(KVDeleteRequest sspMsg) = 0;
-    virtual SP_PB_MSG OnScan(KVScanRequest sspMsg)     = 0;
+    virtual ~IKVOperator() = default;
+    virtual SP_PB_MSG Put(KVPutRequest)       = 0;
+    virtual SP_PB_MSG Get(KVGetRequest)       = 0;
+    virtual SP_PB_MSG Delete(KVDeleteRequest) = 0;
+    virtual SP_PB_MSG Scan(KVScanRequest)     = 0;
 };
 } // namespace server
 } // namespace flyingkv
 
+namespace std {
+// 不可以去掉，std::unordered_map会使用它来hash RequestType
+template<>
+struct hash<flyingkv::common::ReqRespType> {
+    uint32_t operator()(const flyingkv::common::ReqRespType &rt) const {
+        return (uint32_t) rt;
+    }
+};
+}
 #endif //FLYINGKV_SN_INODE_INTERNAL_RPC_HANDLER_H

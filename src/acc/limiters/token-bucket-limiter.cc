@@ -8,7 +8,7 @@
 #include "../../sys/cctime.h"
 #include "../../common/common-def.h"
 
-#include "../rwt.h"
+#include "../rwt/rwt.h"
 
 #include "token-bucket-limiter.h"
 
@@ -27,6 +27,15 @@ TokenBucketLimiter::TokenBucketLimiter(int64_t capacity, uint32_t speed, int64_t
 
 TokenBucketLimiter::~TokenBucketLimiter() {
     DELETE_PTR(m_pRWT);
+}
+
+void TokenBucketLimiter::Init(const TokenBucketLimiterConfig *conf) {
+    m_sName = conf->Name;
+    m_bSkipped = conf->Skip;
+    m_maxResCnt = conf->MaxSize;
+    m_speed = conf->Speed;
+    m_pRWT = new RWT();
+    m_pRWT->Init(&conf->Rwt);
 }
 
 bool TokenBucketLimiter::GrantUntil(int64_t deadlineTs, common::ReqRespType type) {

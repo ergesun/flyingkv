@@ -19,3 +19,9 @@
  > 文件全局变量: g_[type][name] -- 同类的成员变量。<br>
  > 函数局部变量: name -- 写法同函数的protected。<br>
  > 函数出入参数: 同局部变量。
+
+## TODO
+1. add async rpc server, so we can support more concurrency requests and add a scheduler use queue to scheduler and control requests.
+2. checkpoint add index meta, wal add log idx to support more complex semantic
+2. fix ut
+3. use yaml?

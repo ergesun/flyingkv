@@ -13,7 +13,7 @@ namespace flyingkv {
 namespace sys {
 class MemPool;
 }
-namespace minikv {
+namespace kv {
 class Entry : public common::IEntry {
 PUBLIC
     explicit Entry(sys::MemPool*);

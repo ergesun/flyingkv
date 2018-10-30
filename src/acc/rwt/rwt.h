@@ -9,24 +9,14 @@
 #include <unordered_map>
 #include <string>
 
-#include "../common/ikv-common.h"
-#include "conf-parser.h"
-
-namespace std {
-// 不可以去掉，std::unordered_map会使用它来hash RequestType
-template<>
-struct hash<flyingkv::common::ReqRespType> {
-    uint32_t operator()(const flyingkv::common::ReqRespType &rt) const {
-        return (uint32_t)rt;
-    }
-};
-}
+#include "../../common/ikv-common.h"
 
 namespace flyingkv {
 namespace acc {
-class RWT : public IConfParser {
+class RwtConfig;
+class RWT {
 PUBLIC
-    bool Parse(cJSON *blockRoot) override;
+    void Init(const RwtConfig *conf);
     uint32_t GetWeight(common::ReqRespType rt);
 
 PRIVATE

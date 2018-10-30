@@ -23,7 +23,7 @@ namespace checkpoint {
 class SimpleCheckpoint : public ICheckpoint {
 PUBLIC
     explicit SimpleCheckpoint(const std::string &rootDir, common::EntryCreateHandler &&ech);
-    ~SimpleCheckpoint() override;
+    ~SimpleCheckpoint() override = default;
 
     bool Load(EntryLoadedCallback callback) override;
     bool Save(IEntriesTraveller *traveller) override;
@@ -35,11 +35,11 @@ PRIVATE
     inline bool create_completed_status();
 
 PRIVATE
-    std::string                           m_sRootDir;
-    std::string                           m_sCpFilePath;
-    std::string                           m_sNewLogFilePath;
-    std::string                           m_sStatusFilePath;
-    common::EntryCreateHandler            m_entryCreator;
+    std::string                 m_sRootDir;
+    std::string                 m_sCpFilePath;
+    std::string                 m_sNewLogFilePath;
+    std::string                 m_sStatusFilePath;
+    common::EntryCreateHandler  m_entryCreator;
 };
 }
 }

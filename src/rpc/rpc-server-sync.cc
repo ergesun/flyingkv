@@ -15,11 +15,11 @@
 
 #include "response.h"
 #include "rpc-handler.h"
-#include "rpc-server.h"
+#include "rpc-server-sync.h"
 
 namespace flyingkv {
 namespace rpc {
-RpcServer::RpcServer(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool) :
+RpcServerSync::RpcServerSync(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool) :
     m_pSocketService(ss), m_pRpcMemPool(memPool) {
     CHECK(ss);
     if (0 == workThreadsCnt) {
@@ -34,7 +34,7 @@ RpcServer::RpcServer(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemP
     m_hmHandlers.reserve(100);
 }
 
-RpcServer::~RpcServer() {
+RpcServerSync::~RpcServerSync() {
     Stop();
     if (m_bOwnMemPool) {
         DELETE_PTR(m_pRpcMemPool);
@@ -45,7 +45,7 @@ RpcServer::~RpcServer() {
     }
 }
 
-bool RpcServer::Start() {
+bool RpcServerSync::Start() {
     if (!m_bStopped || !m_bRegistered) {
         return false;
     }
@@ -57,7 +57,7 @@ bool RpcServer::Start() {
     return true;
 }
 
-bool RpcServer::Stop() {
+bool RpcServerSync::Stop() {
     if (m_bStopped) {
         return true;
     }
@@ -68,7 +68,7 @@ bool RpcServer::Stop() {
     return true;
 }
 
-bool RpcServer::RegisterRpc(uint16_t id, IRpcHandler *handler) {
+bool RpcServerSync::RegisterRpc(uint16_t id, IRpcHandler *handler) {
     if (m_bRegistered) {
         return false;
     }
@@ -79,16 +79,16 @@ bool RpcServer::RegisterRpc(uint16_t id, IRpcHandler *handler) {
     return true;
 }
 
-void RpcServer::FinishRegisterRpc() {
+void RpcServerSync::FinishRegisterRpc() {
     m_bRegistered = true;
     hw_sw_memory_barrier();
 }
 
-void RpcServer::HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) {
-    m_pWorkThreadPool->AddTask(std::bind(&RpcServer::proc_msg, this, std::placeholders::_1), sspNM);
+void RpcServerSync::HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) {
+    m_pWorkThreadPool->AddTask(std::bind(&RpcServerSync::proc_msg, this, std::placeholders::_1), sspNM);
 }
 
-void RpcServer::proc_msg(std::shared_ptr<net::NotifyMessage> sspNM) {
+void RpcServerSync::proc_msg(std::shared_ptr<net::NotifyMessage> sspNM) {
     switch (sspNM->GetType()) {
         case net::NotifyMessageType::Message: {
             auto *mnm = dynamic_cast<net::MessageNotifyMessage*>(sspNM.get());

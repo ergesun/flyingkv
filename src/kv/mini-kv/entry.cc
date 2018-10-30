@@ -10,7 +10,7 @@
 #include "entry.h"
 
 namespace flyingkv {
-namespace minikv {
+namespace kv {
 Entry::Entry(sys::MemPool *mp) : m_pMp(mp) {}
 Entry::Entry(sys::MemPool *mp, protocol::Entry *e) : m_pMp(mp), m_pContent(e) {}
 Entry::~Entry() {

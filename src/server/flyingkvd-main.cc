@@ -61,7 +61,7 @@ void uninit_gflags_glog() {
 
 void startup() {
     std::unique_lock<std::mutex> l(g_m);
-    auto pKV = new minikv::MiniKV(FLAGS_wal_type, FLAGS_checkpoint_type, FLAGS_wal_dir,
+    auto pKV = new kv::MiniKV(FLAGS_wal_type, FLAGS_checkpoint_type, FLAGS_wal_dir,
                                 FLAGS_checkpoint_dir, FLAGS_max_kv_pending_cnt);
     g_pKV = pKV;
     if (!g_pKV->Start()) {

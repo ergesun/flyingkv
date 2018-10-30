@@ -1,4 +1,5 @@
 aux_source_directory(. SRCS)
+aux_source_directory(./rwt RWT_SRCS)
 aux_source_directory(./resource-limit-control RLC_SRCS)
 aux_source_directory(./limiters LIMITER_SRCS)
-add_library(acc STATIC ${SRCS} ${RLC_SRCS} ${LIMITER_SRCS})
+add_library(acc STATIC ${SRCS} ${RWT_SRCS} ${RLC_SRCS} ${LIMITER_SRCS} config.h config.cc)

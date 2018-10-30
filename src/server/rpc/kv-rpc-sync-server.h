@@ -7,18 +7,18 @@
 #define FLYINGKV_SERVER_RF_NODE_H
 
 #include "../../common/iservice.h"
-#include "../../rpc/rpc-server.h"
+#include "../../rpc/rpc-server-sync.h"
 #include "../../rpc/common-def.h"
 
 namespace flyingkv {
 namespace common {
-class IKVHandler;
+class IKVOperator;
 }
 
 namespace server {
 class KVRpcServerSync : public common::IService {
 PUBLIC
-    KVRpcServerSync(common::IKVHandler *handler, uint16_t workThreadsCnt, uint16_t netIOThreadCnt,
+    KVRpcServerSync(common::IKVOperator *handler, uint16_t workThreadsCnt, uint16_t netIOThreadCnt,
                     uint16_t port, sys::MemPool *memPool = nullptr);
     ~KVRpcServerSync() override;
 
@@ -45,8 +45,8 @@ PRIVATE
 PRIVATE
     bool                      m_bStopped        = true;
     uint16_t                  m_iIOThreadsCnt   = 0;
-    rpc::RpcServer           *m_pRpcServer      = nullptr;
-    common::IKVHandler       *m_pHandler        = nullptr;/*关联关系，无需释放*/
+    rpc::RpcServerSync           *m_pRpcServer      = nullptr;
+    common::IKVOperator       *m_pHandler        = nullptr;/*关联关系，无需释放*/
     net::ISocketService      *m_pSocketService  = nullptr;
     bool                      m_bOwnMemPool     = false;
     sys::MemPool             *m_pMemPool        = nullptr;

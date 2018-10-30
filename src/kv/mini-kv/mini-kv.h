@@ -12,7 +12,7 @@
 #include "../../common/iservice.h"
 
 #include "../../common/ikv-common.h"
-#include "../../common/blocking-queue.h"
+#include "../../acc/igranter.h"
 
 namespace flyingkv {
 namespace common {
@@ -27,7 +27,7 @@ class IWal;
 namespace checkpoint {
 class ICheckpoint;
 }
-namespace minikv {
+namespace kv {
 class EntryComparer
 {
     bool operator()(const protocol::Entry *x, const protocol::Entry *y) const {
@@ -35,29 +35,38 @@ class EntryComparer
     }
 };
 
-class MiniKV : public common::IService, public common::IKVHandler {
+class MiniKV : public common::IService, public common::IKVOperator, public checkpoint::IEntriesTraveller {
 PUBLIC
-    MiniKV(std::string &walType, std::string &checkpointType,
-           std::string &walDir, std::string &checkpointDir, uint32_t maxPendingCnt);
+    MiniKV(std::string &walType, std::string &walDir, std::string &checkpointType,
+           std::string &checkpointDir, std::string &accConfPath, std::unordered_map<common::ReqRespType, int64_t> &reqTimeout);
     ~MiniKV() override;
 
     bool Start() override;
     bool Stop() override;
 
-    common::SP_PB_MSG OnPut(common::KVPutRequest)    override;
-    common::SP_PB_MSG OnGet(common::KVGetRequest)    override;
-    common::SP_PB_MSG OnDelete(common::KVDeleteRequest) override;
-    common::SP_PB_MSG OnScan(common::KVScanRequest)   override;
+    // kv operator
+    common::SP_PB_MSG Put(common::KVPutRequest)    override;
+    common::SP_PB_MSG Get(common::KVGetRequest)    override;
+    common::SP_PB_MSG Delete(common::KVDeleteRequest) override;
+    common::SP_PB_MSG Scan(common::KVScanRequest)   override;
+
+    // entries traveller
+    common::IEntry *GetNextEntry() override;
+    bool Empty() override;
 
 PRIVATE
     common::IEntry* create_new_entry();
 
+    void on_checkpoint_load_entry(common::IEntry*);
+    void on_wal_load_entries(std::vector<wal::WalEntry>&);
+
 PRIVATE
-    common::BlockingQueue<common::SP_PB_MSG>  *m_pbqPendingTasks;
     std::map<protocol::Entry*, protocol::Entry*, EntryComparer> m_kvs;
     sys::MemPool                 *m_pMp = nullptr;
     wal::IWal                    *m_pWal = nullptr;
     checkpoint::ICheckpoint      *m_pCheckpoint = nullptr;
+    acc::IGranter                *m_pGranter = nullptr;
+    std::unordered_map<common::ReqRespType, int64_t> m_hmReqTimeoutMs;
 };
 }
 }

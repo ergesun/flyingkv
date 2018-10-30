@@ -3,7 +3,7 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#include "../limiters/common-def.h"
+#include "../common-def.h"
 #include "../limiters/token-bucket-limiter.h"
 
 #include "simple-rlc.h"
@@ -20,38 +20,21 @@ SimpleRlc::~SimpleRlc() {
     }
 }
 
-bool SimpleRlc::Parse(cJSON *blockRoot) {
-    auto skipItem = cJSON_GetObjectItem(blockRoot, "skip");
-    m_bSkipped = (0 != skipItem->valueint);
-    auto limitersItem = cJSON_GetObjectItem(blockRoot, "limiters");
-    auto size = cJSON_GetArraySize(limitersItem);
-    for (int i = 0; i < size; ++i) {
-        auto arrItem = cJSON_GetArrayItem(limitersItem, i);
-        auto typeItem = cJSON_GetObjectItem(arrItem, "type");
-        auto limiterType = (LimiterType)(typeItem->valueint);
+bool SimpleRlc::Init(const RlcConfig *conf) {
+    auto rc = static_cast<SimpleRlcConfig*>(conf);
+    m_bSkipped = rc->Skip;
+    for (auto &lc : rc->Limiters) {
         IGranter *pg = nullptr;
-        switch (limiterType) {
-            case LimiterType::REF_COUNTER: {
-                //pLimiter = new RefCountLimiter();
+        switch (lc->Type) {
+            case LimiterType::REF_COUNTER:
                 break;
-            }
-            case LimiterType::TOKEN_BUCKET: {
-                pg = new TokenBucketLimiter();
-                break;
-            }
-            default: {
-                LOGFFUN << "configure unknown limiter type = " << (int)limiterType;
-                break;
-            }
+            case LimiterType::TOKEN_BUCKET:
+                auto tb = new TokenBucketLimiter();
+                tb->Init(static_cast<TokenBucketLimiterConfig*>(&lc));
+                pg = tb;
         }
 
         if (!pg) {
-            return false;
-        }
-
-        auto parser = dynamic_cast<IConfParser*>(pg);
-        if (!parser->Parse(arrItem)) {
-            DELETE_PTR(pg);
             return false;
         }
 
