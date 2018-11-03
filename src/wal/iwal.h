@@ -32,6 +32,8 @@ struct WalEntry {
     common::IEntry   *Entry;
 };
 
+typedef std::function<void(std::vector<WalEntry>)> WalEntryLoadedCallback;
+
 class IWal {
 PUBLIC
     virtual ~IWal() = default;
@@ -41,14 +43,13 @@ PUBLIC
      * @return entry id
      */
     virtual uint64_t AppendEntry(common::IEntry*) = 0;
-    virtual std::vector<WalEntry> Load() = 0;
+    virtual void Load(const WalEntryLoadedCallback&) = 0;
     /**
      * truncate log entry in range [-, id]
      * @param id
      * @return
      */
     virtual bool TruncateAhead(uint64_t id) = 0;
-    virtual void Reset() = 0;
 };
 }
 }

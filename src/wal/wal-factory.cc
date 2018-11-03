@@ -8,12 +8,12 @@
 #include "../common/common-def.h"
 
 #include "wal-factory.h"
-#include "wals/simple-wal.h"
+#include "wals/log-clean-wal.h"
 
 namespace flyingkv {
 namespace wal {
 static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<std::string, int> {
-        {"simple", 0}
+        {"log-clean", 0}
 };
 
 IWal* WALFactory::CreateInstance(const std::string &type, std::string &rootDir, common::EntryCreateHandler &&handler) {
@@ -23,7 +23,7 @@ IWal* WALFactory::CreateInstance(const std::string &type, std::string &rootDir, 
     }
     switch (rs->second) {
     case 0:
-        return new SimpleWal(rootDir, std::move(handler));
+        return new LogCleanWal(rootDir, std::move(handler));
     default:
         return nullptr;
     }

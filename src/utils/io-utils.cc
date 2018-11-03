@@ -75,14 +75,56 @@ ssize_t IOUtils::ReadFully_V2(int fd, char **buf, size_t size) {
     }
 
     if (-1 == n) {
-        auto err = errno;
-        printf("err = %s\n", strerror(err));
         DELETE_ARR_PTR(*buf);
 
         return -1;
     }
 
     return nread;
+}
+
+ssize_t IOUtils::ReadFully_V3(int fd, char *buf, size_t size) {
+    if (-1 == fd || 0 == size) {
+        return 0;
+    }
+
+    bzero(buf, size);
+    size_t total = size, nRead = 0;
+    ssize_t n;
+
+    while (0 < (n = pread(fd, buf + nRead, total - nRead, nRead))) {
+        nRead += n;
+    }
+
+    if (-1 == n) {
+        return -1;
+    }
+
+    return nRead;
+}
+
+ssize_t IOUtils::ReadFully_V4(int fd, char *buf, size_t size) {
+    if (-1 == fd || 0 == size) {
+        return 0;
+    }
+
+    bzero(buf, size);
+    size_t left_size = size;
+    ssize_t n;
+    while (left_size) {
+        n = read(fd, buf + size - left_size, left_size);
+        if (-1 == n) {
+            return -1;
+        }
+
+        if (0 == n) {
+            return size - left_size;
+        }
+
+        left_size -= n;
+    }
+
+    return size;
 }
 } // namespace utils
 } // namespace flyingkv

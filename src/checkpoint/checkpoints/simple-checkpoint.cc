@@ -24,8 +24,8 @@ SimpleCheckpoint::SimpleCheckpoint(const std::string &rootDir, common::EntryCrea
     }
 
     m_sRootDir = rootDir;
-    if (-1 == utils::FileUtils::CreateDirPath(m_sRootDir.c_str(), 0775)) {
-        LOGFFUN << "create simple checkpoint dir " << m_sRootDir.c_str() << " failed.";
+    if (-1 == utils::FileUtils::CreateDirPath(m_sRootDir, 0775)) {
+        LOGFFUN << "create simple checkpoint dir " << m_sRootDir << " failed.";
     }
 
     m_sCpFilePath = m_sRootDir + "/" + SMCP_PREFIX_NAME;
@@ -177,9 +177,7 @@ int SimpleCheckpoint::create_new_checkpoint() {
     int fd = utils::FileUtils::Open(m_sNewLogFilePath, O_WRONLY, O_CREAT|O_TRUNC, 0644)
     LOGDFUN2("create sm checkpoint file ", m_sNewLogFilePath.c_str());
     if (-1 == fd) {
-        auto err = errno;
-        LOGEFUN << "create sm checkpoint file " << m_sNewLogFilePath.c_str() << " failed with errmsg " << strerror(err);
-        return -1;
+        LOGFFUN << "create sm checkpoint file " << m_sNewLogFilePath.c_str() << " failed with errmsg " << strerror(errno);
     }
 
     // write file header.

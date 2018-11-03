@@ -38,7 +38,7 @@ class EntryComparer
 class MiniKV : public common::IService, public common::IKVOperator, public checkpoint::IEntriesTraveller {
 PUBLIC
     MiniKV(std::string &walType, std::string &walDir, std::string &checkpointType,
-           std::string &checkpointDir, std::string &accConfPath, std::unordered_map<common::ReqRespType, int64_t> &reqTimeout);
+           std::string &checkpointDir, std::string &accConfPath);
     ~MiniKV() override;
 
     bool Start() override;
@@ -66,7 +66,6 @@ PRIVATE
     wal::IWal                    *m_pWal = nullptr;
     checkpoint::ICheckpoint      *m_pCheckpoint = nullptr;
     acc::IGranter                *m_pGranter = nullptr;
-    std::unordered_map<common::ReqRespType, int64_t> m_hmReqTimeoutMs;
 };
 }
 }

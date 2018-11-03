@@ -23,7 +23,7 @@ PUBLIC
      * @param dir
      * @return 成功返回0,失败返回-1
      */
-    static int CreateDir(const char *dir, __mode_t mode);
+    static int CreateDir(const string &dir, __mode_t mode);
 
     /**
      * 递归创建目录路径
@@ -31,28 +31,39 @@ PUBLIC
      * @param access_mode 访问权限 eg:0755
      * @return 成功返回0,失败返回-1
      */
-    static int CreateDirPath(const char *path, __mode_t access_mode);
+    static int CreateDirPath(const string &path, __mode_t access_mode);
 
     /**
      * 删除一个目录
      * @param path
      * @return 成功返回0,否则为errno
      */
-    static int RemoveDirectory(const char *path);
+    static int RemoveDirectory(const string &path);
 
     /**
      * 清空一个目录
      * @param path
      * @return 成功返回0,否则为errno
      */
-    static int CleanDirectory(const char *path);
+    static int CleanDirectory(const string &path);
+
+    /**
+     * 收集目录的子
+     * @param path
+     * @param ft 类型
+     * @param filter 过滤
+     * @param rs 结果
+     * @return
+     */
+    static int CollectFileChildren(const string &path, std::function<bool(const string&)> filter,
+                               std::vector<std::string> &rs);
 
     /**
      * 获取文件的大小(bytes)
      * @param path
      * @return 成功返回自然数(>=0)，失败-1。
      */
-    static off_t GetFileSize(const char *path);
+    static off_t GetFileSize(const string &path);
 
     /**
      * 获取文件的大小(bytes)
@@ -63,10 +74,10 @@ PUBLIC
 
     /**
      * 读取文件的所有字符。
-     * @param file_path
+     * @param fp
      * @return
      */
-    static string ReadAllString(const string &file_path);
+    static string ReadAllString(const string &fp);
 
     static inline void GetStat(const string &path, struct stat *st) {
         stat(path.c_str(), st);

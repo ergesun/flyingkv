@@ -78,6 +78,23 @@ PUBLIC
         trim(s);
         return s;
     }
+
+    template <typename T>
+    static inline T ToInteger(const std::string &s) {
+        std::stringstream ss(s);
+        T rs;
+        ss >> rs;
+
+        return rs;
+    }
+
+    template <typename T>
+    static inline std::string ToString(const T &s) {
+        std::stringstream ss;
+        ss << s;
+
+        return ss.str();
+    }
 }; // class CommonUtils
 }  // namespace utils
 }  // namespace flyingkv

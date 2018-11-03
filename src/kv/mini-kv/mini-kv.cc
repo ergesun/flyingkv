@@ -16,8 +16,8 @@
 namespace flyingkv {
 namespace kv {
 MiniKV::MiniKV(std::string &walType, std::string &walDir, std::string &checkpointType,
-               std::string &checkpointDir, std::string &accConfPath, std::unordered_map<common::ReqRespType, int64_t> &reqTimeout) {
-    m_hmReqTimeoutMs = reqTimeout;
+               std::string &checkpointDir, std::string &accConfPath) {
+
     m_pMp = new sys::MemPool();
     m_pWal = wal::WALFactory::CreateInstance(walType, walDir, std::bind(&MiniKV::create_new_entry, this));
     m_pCheckpoint = checkpoint::CheckpointFactory::CreateInstance(checkpointType, checkpointDir, std::bind(&MiniKV::create_new_entry, this));
@@ -42,7 +42,7 @@ bool MiniKV::Start() {
         LOGFFUN << "load checkpoint failed!";
     }
 
-    auto entries = m_pWal->Load();
+    m_pWal->Load(std::bind(&MiniKV::on_wal_load_entries, this, std::placeholders::_1));
 
 
     return false;

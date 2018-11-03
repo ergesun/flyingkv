@@ -61,8 +61,9 @@ PUBLIC
             m_bAvailable = false;
             return;
         }
-        m_bAvailable = ((m_pLast - m_pPos) > (n - 1));
+
         m_pPos += n;
+        check_available();
     }
 
     /**
