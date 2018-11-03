@@ -97,7 +97,7 @@ int FileUtils::CleanDirectory(const string &path) {
             len = pathLen + strlen(p->d_name) + 2;
             auto *buf = new char[len]{0};
             struct stat statBuf;
-            snprintf(buf, len, "%s/%s", path, p->d_name);
+            snprintf(buf, len, "%s/%s", path.c_str(), p->d_name);
             if (!stat(buf, &statBuf)) {
                 if (S_ISDIR(statBuf.st_mode)) {
                     r2 = RemoveDirectory(buf);
@@ -138,7 +138,7 @@ int FileUtils::CollectFileChildren(const string &path, std::function<bool(const 
             len = pathLen + strlen(p->d_name) + 2;
             auto *buf = new char[len]{0};
             struct stat statBuf;
-            snprintf(buf, len, "%s/%s", path, p->d_name);
+            snprintf(buf, len, "%s/%s", path.c_str(), p->d_name);
             if (0 == (r2 = stat(buf, &statBuf)) && S_ISREG(statBuf.st_mode)) {
                 std::string tmp(buf);
                 if (filter(tmp)) {

@@ -16,7 +16,7 @@ static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<st
 
 namespace flyingkv {
 namespace checkpoint {
-ICheckpoint* CheckpointFactory::CreateInstance(const std::string &type, std::string &rootDir, common::EntryCreateHandler &&handler) {
+ICheckpoint* CheckpointFactory::CreateInstance(const std::string &type, const std::string &rootDir, common::EntryCreateHandler &&handler) {
     auto rs = g_typeMapper.find(type);
     if (rs == g_typeMapper.end()) {
         LOGFFUN << "cannot find checkpoint class type " << type;

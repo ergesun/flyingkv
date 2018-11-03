@@ -29,6 +29,12 @@ DECLARE_int32(rpc_server_threads_cnt);
 DECLARE_int32(rpc_io_threads_cnt);
 
 /**
+ * access control center
+ */
+DECLARE_string(acc_conf_path);
+
+
+/**
  * kv
  */
 DECLARE_string(checkpoint_dir);

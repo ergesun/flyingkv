@@ -27,7 +27,6 @@ PUBLIC
     void Init(const TokenBucketLimiterConfig *conf);
     bool GrantUntil(int64_t deadlineTs, common::ReqRespType type) override;
     void GiveBack(common::ReqRespType rt) override;
-    bool Parse(cJSON *blockRoot);
     std::string GetName() override {
         return m_sName;
     }

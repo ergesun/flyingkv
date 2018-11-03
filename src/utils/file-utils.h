@@ -8,9 +8,10 @@
 
 #include <unistd.h>
 #include <sys/stat.h>
-
+#include <functional>
 #include <string>
 #include <fcntl.h>
+#include <vector>
 
 using std::string;
 

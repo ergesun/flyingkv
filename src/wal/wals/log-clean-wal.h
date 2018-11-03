@@ -71,7 +71,7 @@ struct LogCleanWalSegmentFileInfo {
 
 class LogCleanWal : public IWal {
 PUBLIC
-    LogCleanWal(std::string &rootDir, common::EntryCreateHandler &&handler);
+    LogCleanWal(const std::string &rootDir, common::EntryCreateHandler &&handler);
     ~LogCleanWal() override;
 
     /**

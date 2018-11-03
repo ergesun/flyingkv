@@ -67,7 +67,7 @@ struct SimpleRlcConfig : public RlcConfig {
     void Parse(const cJSON * const object);
 };
 
-RlcConfig* ParseAccConfig(std::string &path);
+RlcConfig* ParseAccConfig(const std::string &path);
 }
 }
 

@@ -10,7 +10,7 @@
 
 namespace flyingkv {
 namespace acc {
-RlcConfig* ParseAccConfig(std::string &path) {
+RlcConfig* ParseAccConfig(const std::string &path) {
     auto confJsonString = utils::FileUtils::ReadAllString(path);
     if (path.empty()) {
         LOGFFUN << "read acc conf file " << path.c_str() << " failed!";

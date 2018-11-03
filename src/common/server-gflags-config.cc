@@ -26,6 +26,11 @@ DEFINE_int32(rpc_server_threads_cnt, 0, "设置用于rpc server处理任务的�
 DEFINE_int32(rpc_io_threads_cnt, 0, "设置rpc处理时消息分发的线程数目。默认0为cpu逻辑核数的2倍。");
 
 /**
+ * acc
+ */
+DEFINE_string(acc_conf_path, "", "访问控制配置文件路径");
+
+/**
  * kv
  */
 DEFINE_string(checkpoint_dir, "/tmp/flyingkv/checkpoint-data", "");

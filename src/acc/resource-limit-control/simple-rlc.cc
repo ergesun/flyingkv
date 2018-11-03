@@ -21,16 +21,17 @@ SimpleRlc::~SimpleRlc() {
 }
 
 bool SimpleRlc::Init(const RlcConfig *conf) {
-    auto rc = static_cast<SimpleRlcConfig*>(conf);
+    auto rc = static_cast<const SimpleRlcConfig*>(conf);
     m_bSkipped = rc->Skip;
-    for (auto &lc : rc->Limiters) {
+    auto ls = rc->Limiters.size();
+    for (size_t i = 0; i < ls; ++i) {
         IGranter *pg = nullptr;
-        switch (lc->Type) {
+        switch (rc->Limiters[i]->Type) {
             case LimiterType::REF_COUNTER:
                 break;
             case LimiterType::TOKEN_BUCKET:
                 auto tb = new TokenBucketLimiter();
-                tb->Init(static_cast<TokenBucketLimiterConfig*>(&lc));
+                tb->Init(static_cast<const TokenBucketLimiterConfig*>(rc->Limiters[i]));
                 pg = tb;
         }
 

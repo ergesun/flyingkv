@@ -13,7 +13,7 @@ namespace flyingkv {
 namespace wal {
 class WALFactory {
 PUBLIC
-    static IWal* CreateInstance(const std::string &type, std::string &rootDir, common::EntryCreateHandler &&handler);
+    static IWal* CreateInstance(const std::string &type, const std::string &rootDir, common::EntryCreateHandler &&handler);
 };
 }
 }

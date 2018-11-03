@@ -24,7 +24,7 @@
 namespace flyingkv {
 using namespace utils;
 namespace wal {
-LogCleanWal::LogCleanWal(std::string &rootDir, common::EntryCreateHandler &&entryCreateHandler) :
+LogCleanWal::LogCleanWal(const std::string &rootDir, common::EntryCreateHandler &&entryCreateHandler) :
         m_sRootDir(rootDir), m_entryCreator(std::move(entryCreateHandler)) {
     if (rootDir.empty()) {
         LOGFFUN << "wal root dir is empty";
@@ -58,7 +58,7 @@ uint64_t LogCleanWal::AppendEntry(common::IEntry *entry) {
     }
 
     auto walEntryStartOffset = m_curSegFileSize;
-    auto rawEntrySize = eb->AvailableLength();
+    auto rawEntrySize = uint32_t(eb->AvailableLength());
     auto walEntrySize = rawEntrySize + LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE;
     if (walEntrySize > LOGCLEAN_WAL_ENTRY_MAX_SIZE) {
         LOGFFUN << "entry size cannot be larger than " << LOGCLEAN_WAL_ENTRY_MAX_SIZE << " bytes";
@@ -107,7 +107,7 @@ void LogCleanWal::Load(const WalEntryLoadedCallback &callback) {
 
     m_minSegmentId = m_vInitSegments[0].Id;
     auto maxIdx = m_vInitSegments.size() - 1;
-    for (int i = 0; i <= maxIdx; ++i) {
+    for (size_t i = 0; i <= maxIdx; ++i) {
         auto segSize = load_segment(m_vInitSegments[i].Path, m_vInitSegments[i].Id, callback);
         if (i == maxIdx) {
             m_curSegFileSize = segSize;
@@ -178,6 +178,7 @@ bool LogCleanWal::TruncateAhead(uint64_t id) {
 
     write_trunc_ok_flag();
     clean_trunc_status();
+    return true;
 }
 
 /**
@@ -239,13 +240,13 @@ uint32_t LogCleanWal::load_segment(const std::string &filePath, uint64_t segId, 
 
     common::FileCloser fc(fd);
     // 1. check if file is empty.
-    auto fileSize = uint32_t(utils::FileUtils::GetFileSize(fd));
+    auto fileSize = utils::FileUtils::GetFileSize(fd);
     if (-1 == fileSize) {
         LOGFFUN << "get file size for " << filePath << " failed with errmsg " << strerror(errno);
     }
     if (0 == fileSize) {
         LOGDFUN3("sm log file ", filePath, " is empty!");
-        return fileSize;
+        return uint32_t(fileSize);
     }
 
     // 2. check if file header is corrupt.
@@ -266,7 +267,7 @@ uint32_t LogCleanWal::load_segment(const std::string &filePath, uint64_t segId, 
     }
     headerMpo->Put();
 
-    auto segmentEntryOffset = LOGCLEAN_WAL_MAGIC_NO_LEN;
+    auto segmentEntryOffset = uint32_t(LOGCLEAN_WAL_MAGIC_NO_LEN);
     // 3. load segment content
 
     sys::MemPool::MemObject *pLastMpo = nullptr;

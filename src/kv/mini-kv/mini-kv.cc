@@ -15,8 +15,8 @@
 
 namespace flyingkv {
 namespace kv {
-MiniKV::MiniKV(std::string &walType, std::string &walDir, std::string &checkpointType,
-               std::string &checkpointDir, std::string &accConfPath) {
+MiniKV::MiniKV(const std::string &walType, const std::string &walDir, const std::string &checkpointType,
+               const std::string &checkpointDir, const std::string &accConfPath) {
 
     m_pMp = new sys::MemPool();
     m_pWal = wal::WALFactory::CreateInstance(walType, walDir, std::bind(&MiniKV::create_new_entry, this));
@@ -85,7 +85,7 @@ void MiniKV::on_checkpoint_load_entry(common::IEntry *entry) {
 
 }
 
-void MiniKV::on_wal_load_entries(std::vector<wal::WalEntry> &entries) {
+void MiniKV::on_wal_load_entries(std::vector<wal::WalEntry> entries) {
 
 }
 }

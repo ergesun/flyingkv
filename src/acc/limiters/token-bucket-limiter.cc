@@ -112,28 +112,6 @@ void TokenBucketLimiter::GiveBack(const common::ReqRespType rt) {
     put_tokens(weight);
 }
 
-bool TokenBucketLimiter::Parse(cJSON *blockRoot) {
-    auto nameItem = cJSON_GetObjectItem(blockRoot, "name");
-    m_sName = nameItem->valuestring;
-    auto skipItem = cJSON_GetObjectItem(blockRoot, "skip");
-    m_bSkipped= (0 != skipItem->valueint);
-    auto mrItem = cJSON_GetObjectItem(blockRoot, "mr");
-    m_maxResCnt = (uint32_t)mrItem->valueint;
-    auto speedItem = cJSON_GetObjectItem(blockRoot, "speed");
-    m_speed = (uint32_t)speedItem->valueint;
-
-    auto rwtItem = cJSON_GetObjectItem(blockRoot, "rwt");
-    m_pRWT = new RWT();
-
-    if (!m_pRWT->Parse(rwtItem)) {
-        DELETE_PTR(m_pRWT);
-        return false;
-    }
-
-    initialize();
-    return true;
-}
-
 // Initialize the private mem variables
 void TokenBucketLimiter::initialize(){
     m_lastUpdateTs = now_timestamps();

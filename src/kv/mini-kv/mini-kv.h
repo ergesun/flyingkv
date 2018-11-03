@@ -10,9 +10,10 @@
 
 #include "../../codegen/meta.pb.h"
 #include "../../common/iservice.h"
-
 #include "../../common/ikv-common.h"
 #include "../../acc/igranter.h"
+#include "../../wal/iwal.h"
+#include "../../checkpoint/ientries-traveller.h"
 
 namespace flyingkv {
 namespace common {
@@ -37,8 +38,8 @@ class EntryComparer
 
 class MiniKV : public common::IService, public common::IKVOperator, public checkpoint::IEntriesTraveller {
 PUBLIC
-    MiniKV(std::string &walType, std::string &walDir, std::string &checkpointType,
-           std::string &checkpointDir, std::string &accConfPath);
+    MiniKV(const std::string &walType, const std::string &walDir, const std::string &checkpointType,
+           const std::string &checkpointDir, const std::string &accConfPath);
     ~MiniKV() override;
 
     bool Start() override;
@@ -58,7 +59,7 @@ PRIVATE
     common::IEntry* create_new_entry();
 
     void on_checkpoint_load_entry(common::IEntry*);
-    void on_wal_load_entries(std::vector<wal::WalEntry>&);
+    void on_wal_load_entries(std::vector<wal::WalEntry>);
 
 PRIVATE
     std::map<protocol::Entry*, protocol::Entry*, EntryComparer> m_kvs;
