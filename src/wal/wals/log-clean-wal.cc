@@ -68,7 +68,7 @@ WalResult LogCleanWal::Init() {
         auto minSegmentId = lsaRs.Segments[0].Id;
         for (uint64_t i = minSegmentId; i <= maxTruncUncompletedSegId; ++i) {
             auto cleanSegFilePath = generate_segment_file_path(i);
-            if (-1 != utils::FileUtils::Unlink(cleanSegFilePath)) {
+            if (-1 == utils::FileUtils::Unlink(cleanSegFilePath)) {
                 auto errmsg = strerror(errno);
                 LCLOGEFUN << " clean segment " << cleanSegFilePath << " error " << errmsg;
                 return WalResult(Code::FileSystemError, errmsg);
@@ -226,7 +226,7 @@ TruncateResult LogCleanWal::Truncate(uint64_t id) {
     }
 
     // 1. 写入truncate信息
-    auto rs = write_trunc_info(id);
+    auto rs = create_trunc_info(id);
     if (Code::OK != rs.Rc) {
         return TruncateResult(rs.Rc, rs.Errmsg);
     }
@@ -282,7 +282,7 @@ TruncateResult LogCleanWal::Truncate(uint64_t id) {
         }
     }
 
-    auto wrs = write_trunc_ok_flag();
+    auto wrs = create_trunc_ok_flag();
     if (Code::OK != wrs.Rc) {
         return TruncateResult(wrs.Rc, wrs.Errmsg);
     }
@@ -499,6 +499,7 @@ std::string LogCleanWal::generate_segment_file_path(uint64_t id) {
     ss << m_sRootDir;
     ss << '/';
     ss << LOGCLEAN_WAL_SEGMENT_PREFIX_NAME;
+    ss << ".";
     ss << id;
 
     return ss.str();
@@ -506,7 +507,7 @@ std::string LogCleanWal::generate_segment_file_path(uint64_t id) {
 
 WalResult LogCleanWal::clean_trunc_status() {
     if (utils::FileUtils::Exist(m_sTruncInfoFilePath)) {
-        if (-1 != unlink(m_sTruncInfoFilePath.c_str())) {
+        if (-1 == unlink(m_sTruncInfoFilePath.c_str())) {
             auto errmsg = strerror(errno);
             LCLOGEFUN << " unlink " << m_sTruncInfoFilePath << "error " << errmsg;
             return WalResult(Code::FileSystemError, errmsg);
@@ -514,9 +515,9 @@ WalResult LogCleanWal::clean_trunc_status() {
     }
 
     if (utils::FileUtils::Exist(m_sTruncOKFlagFilePath)) {
-        if (-1 != unlink(m_sTruncOKFlagFilePath.c_str())) {
+        if (-1 == unlink(m_sTruncOKFlagFilePath.c_str())) {
             auto errmsg = strerror(errno);
-            LCLOGEFUN << " unlink " << m_sTruncOKFlagFilePath << "error " << errmsg;
+            LCLOGEFUN << " unlink " << m_sTruncOKFlagFilePath << " error " << errmsg;
             return WalResult(Code::FileSystemError, errmsg);
         }
     }
@@ -557,7 +558,7 @@ WalResult LogCleanWal::create_new_segment_file() {
     return WalResult(Code::OK);
 }
 
-WalResult LogCleanWal::write_trunc_info(uint64_t segId) {
+WalResult LogCleanWal::create_trunc_info(uint64_t segId) {
     auto fd = utils::FileUtils::Open(m_sTruncInfoFilePath, O_WRONLY, O_CREAT|O_TRUNC, 644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
@@ -576,7 +577,7 @@ WalResult LogCleanWal::write_trunc_info(uint64_t segId) {
     return WalResult(Code::OK);
 }
 
-WalResult LogCleanWal::write_trunc_ok_flag() {
+WalResult LogCleanWal::create_trunc_ok_flag() {
     auto fd = utils::FileUtils::Open(m_sTruncOKFlagFilePath, O_WRONLY, O_CREAT, 644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);

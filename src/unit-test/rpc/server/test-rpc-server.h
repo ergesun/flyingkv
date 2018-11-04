@@ -29,7 +29,7 @@ PRIVATE
     common::SP_PB_MSG create_get_request();
 
 PRIVATE
-    rpc::RpcServer        *m_pRpcServer = nullptr;
+    rpc::RpcServerSync        *m_pRpcServer = nullptr;
 };
 } // namespace test
 } // namespace flyingkv

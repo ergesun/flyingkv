@@ -310,7 +310,7 @@ CheckpointResult SimpleCheckpoint::check_and_recover() {
             return rs;
         }
 
-        if (-1 != unlink(m_sNewCpSaveOkFilePath.c_str())) {
+        if (-1 == unlink(m_sNewCpSaveOkFilePath.c_str())) {
             auto errmsg = strerror(errno);
             SMCPLOGEFUN << " unlink " << m_sNewCpSaveOkFilePath << " error " << errmsg;
             return CheckpointResult(Code::FileSystemError, errmsg);

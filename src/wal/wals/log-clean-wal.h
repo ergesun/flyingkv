@@ -17,9 +17,9 @@
 //         LOGCLEAN_WAL_MAGIC_NO                   s m l g
 #define    LOGCLEAN_WAL_MAGIC_NO                 0x736d6c67
 #define    LOGCLEAN_WAL_MAGIC_NO_LEN             4
-#define    LOGCLEAN_WAL_SEGMENT_PREFIX_NAME      "smlog.segment"
-#define    LOGCLEAN_WAL_TRUNC_OK_NAME            "smlog.trunc.ok"
-#define    LOGCLEAN_WAL_TRUNC_META_NAME          "smlog.truncmeta"
+#define    LOGCLEAN_WAL_SEGMENT_PREFIX_NAME      "lclog.segment"
+#define    LOGCLEAN_WAL_TRUNC_OK_NAME            "lclog.trunc.ok"
+#define    LOGCLEAN_WAL_TRUNC_META_NAME          "lclog.truncmeta"
 
 #define    LOGCLEAN_WAL_VERSION                  1 // TODO(sunchao):可配置？
 #define    LOGCLEAN_WAL_START_POS_LEN            4
@@ -118,8 +118,8 @@ PRIVATE
     std::string generate_segment_file_path(uint64_t id);
     WalResult clean_trunc_status();
     WalResult create_new_segment_file();
-    WalResult write_trunc_info(uint64_t segId);
-    WalResult write_trunc_ok_flag();
+    WalResult create_trunc_info(uint64_t segId);
+    WalResult create_trunc_ok_flag();
     LoadSegmentMaxEntryIdResult load_segment_max_entry_id(const std::string &fp);
 
 PRIVATE

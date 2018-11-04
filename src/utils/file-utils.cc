@@ -24,7 +24,6 @@ int FileUtils::CreateDir(const string &dir, __mode_t mode) {
     // 检查生成文件夹
     if (0 == stat(dir.c_str(), &dir_stat)) { // 如果dir文件(夹)存在
         if (!S_ISDIR(dir_stat.st_mode)) { // 如果不是文件夹
-            LOGEFUN << "CreateDir " << dir << " failed because there is a file named it.";
             return -1;
         }
     } else { // 如果dir文件(夹)不存在，则创建文件夹
@@ -33,7 +32,6 @@ int FileUtils::CreateDir(const string &dir, __mode_t mode) {
             if (EEXIST == err) {
                 return 0;
             } else {
-                LOGEFUN << "mkdir " << dir << " failed with errmsg = " << strerror(err);
                 return -1;
             }
         }
@@ -164,8 +162,6 @@ ssize_t FileUtils::GetFileSize(const string &path) {
     struct stat s;
     bzero(&s, sizeof(struct stat));
     if (-1 == stat(path.c_str(), &s)) {
-        int err = errno;
-        LOGEFUN << "stat path " << path << " err with errmsg = " << strerror(err);
         return -1;
     }
 
@@ -180,8 +176,6 @@ off_t FileUtils::GetFileSize(int fd) {
     struct stat s;
     bzero(&s, sizeof(struct stat));
     if (-1 == fstat(fd, &s)) {
-        int err = errno;
-        LOGEFUN << "stat fd " << fd << " err with errmsg = " << strerror(err);
         return -1;
     }
 

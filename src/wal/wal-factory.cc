@@ -19,7 +19,8 @@ static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<st
 IWal* WALFactory::CreateInstance(const std::string &type, const std::string &rootDir, common::EntryCreateHandler &&handler) {
     auto rs = g_typeMapper.find(type);
     if (rs == g_typeMapper.end()) {
-        LOGFFUN << "cannot find wal class type " << type;
+        LOGEFUN << "cannot find wal class type " << type;
+        return nullptr;
     }
     switch (rs->second) {
     case 0:

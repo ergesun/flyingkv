@@ -16,7 +16,8 @@ static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<st
 common::IKVOperator* KVFactory::CreateInstance(const EngineConstructorParams &param) {
     auto rs = g_typeMapper.find(param.Type);
     if (rs == g_typeMapper.end()) {
-        LOGFFUN << "cannot find kv class type " << param.Type;
+        LOGEFUN << "cannot find kv class type " << param.Type;
+        return nullptr;
     }
     switch (rs->second) {
         case 0:

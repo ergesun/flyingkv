@@ -19,7 +19,8 @@ namespace checkpoint {
 ICheckpoint* CheckpointFactory::CreateInstance(const std::string &type, const std::string &rootDir, common::EntryCreateHandler &&handler) {
     auto rs = g_typeMapper.find(type);
     if (rs == g_typeMapper.end()) {
-        LOGFFUN << "cannot find checkpoint class type " << type;
+        LOGEFUN << "cannot find checkpoint class type " << type;
+        return nullptr;
     }
     switch (rs->second) {
         case 0:

@@ -32,11 +32,10 @@ fi
 
 echo "REAL_UT_ROOT_DIR_PATH = ${REAL_UT_ROOT_DIR_PATH}"
 
-for ut in `ls ${REAL_UT_ROOT_DIR_PATH}`
+for ut in `find ${REAL_UT_ROOT_DIR_PATH} -maxdepth 1 -type f`
 do
-    ut_exe=`ls ${REAL_UT_ROOT_DIR_PATH}/$ut`
-    echo_yellow "running case ${ut_exe}"
-    ${ut_exe}
+    echo_yellow "running case ${ut}"
+    ${ut}
 done
 
 echo_yellow "run all uts over."

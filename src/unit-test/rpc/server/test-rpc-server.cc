@@ -17,7 +17,7 @@
 namespace flyingkv {
 namespace test {
 TestRpcServer::TestRpcServer(uint16_t workThreadsCnt, net::ISocketService *ss, sys::MemPool *memPool) {
-    m_pRpcServer = new rpc::RpcServer(workThreadsCnt, ss, memPool);
+    m_pRpcServer = new rpc::RpcServerSync(workThreadsCnt, ss, memPool);
 }
 
 TestRpcServer::~TestRpcServer() {
