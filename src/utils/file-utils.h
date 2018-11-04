@@ -124,6 +124,8 @@ PUBLIC
     static inline int Open(const string &path, int mode, int create, int access) {
         return open(path.c_str(), mode|create, access);
     }
+
+    static int Unlink(const string &path);
 };
 }
 }

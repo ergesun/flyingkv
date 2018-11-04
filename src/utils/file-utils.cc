@@ -199,5 +199,13 @@ string FileUtils::ReadAllString(const string &fp) {
     ss << fs.rdbuf();
     return ss.str();
 }
+
+int FileUtils::Unlink(const string &path) {
+    if (!Exist(path)) {
+        return 0;
+    }
+
+    return unlink(path.c_str());
+}
 } // namespace utils
 } // namespace flyingkv

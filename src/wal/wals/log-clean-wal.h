@@ -11,6 +11,9 @@
 #include "../iwal.h"
 #include "../../sys/gcc-buildin.h"
 
+#define    LOGCLEAN_WAL_NAME                    "log-clean"
+#define    LCLOGEFUN                            LOGEFUN << LOGCLEAN_WAL_NAME
+
 //         LOGCLEAN_WAL_MAGIC_NO                   s m l g
 #define    LOGCLEAN_WAL_MAGIC_NO                 0x736d6c67
 #define    LOGCLEAN_WAL_MAGIC_NO_LEN             4
@@ -74,17 +77,34 @@ PUBLIC
     LogCleanWal(const std::string &rootDir, common::EntryCreateHandler &&handler);
     ~LogCleanWal() override;
 
+    WalResult Init() override;
     /**
      * 向version最大的日志文件追加
      * @param entry
      * @return
      */
-    uint64_t AppendEntry(common::IEntry *entry) override;
-    void Load(const WalEntryLoadedCallback&) override;
-    bool TruncateAhead(uint64_t id) override;
+    AppendEntryResult AppendEntry(common::IEntry *entry) override;
+    LoadResult Load(const WalEntryLoadedCallback&) override;
+    TruncateResult Truncate(uint64_t id) override;
 
 PRIVATE
-    std::vector<LogCleanWalSegmentFileInfo> init();
+    struct LoadSegmentResult : public WalResult {
+        uint32_t FileSize;
+
+        explicit LoadSegmentResult(uint32_t fs) : WalResult(Code::OK), FileSize(fs) {}
+        LoadSegmentResult(Code rc, const std::string &errmsg) : WalResult(rc, errmsg), FileSize(0) {}
+    };
+
+    struct ListSegmentsResult : public WalResult {
+        std::vector<LogCleanWalSegmentFileInfo> Segments;
+
+        explicit ListSegmentsResult(std::vector<LogCleanWalSegmentFileInfo> &&segments) : WalResult(Code::OK), Segments(std::move(segments)) {}
+        ListSegmentsResult(Code rc, const std::string &errmsg) : WalResult(rc, errmsg) {}
+    };
+
+    typedef AppendEntryResult LoadSegmentMaxEntryIdResult;
+
+PRIVATE
     /**
      *
      * @param filePath
@@ -92,15 +112,15 @@ PRIVATE
      * @param callback
      * @return file size
      */
-    uint32_t load_segment(const std::string &filePath, uint64_t segId, const WalEntryLoadedCallback &callback);
-    std::vector<LogCleanWalSegmentFileInfo> list_segments_asc();
+    LoadSegmentResult load_segment(const std::string &filePath, uint64_t segId, const WalEntryLoadedCallback &callback);
+    ListSegmentsResult list_segments_asc();
     uint64_t get_uncompleted_trunc_segments_max_id();
     std::string generate_segment_file_path(uint64_t id);
-    void clean_trunc_status();
-    void create_new_segment_file();
-    void write_trunc_info(uint64_t segId);
-    void write_trunc_ok_flag();
-    uint64_t load_segment_max_entry_id(const std::string &fp);
+    WalResult clean_trunc_status();
+    WalResult create_new_segment_file();
+    WalResult write_trunc_info(uint64_t segId);
+    WalResult write_trunc_ok_flag();
+    LoadSegmentMaxEntryIdResult load_segment_max_entry_id(const std::string &fp);
 
 PRIVATE
     std::string                               m_sRootDir;

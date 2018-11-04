@@ -9,11 +9,32 @@
 #include <functional>
 #include <vector>
 
+#include "errors.h"
+
 namespace flyingkv {
 namespace common {
 class IEntry;
 }
 namespace wal {
+struct WalResult {
+    Code    Rc;
+    string  Errmsg;
+
+    explicit WalResult(Code rc) : Rc(rc) {}
+    WalResult(Code rc, const string &errmsg) : Rc(rc), Errmsg(errmsg) {}
+};
+
+struct AppendEntryResult : public WalResult {
+    uint64_t   EntryId;
+
+    explicit AppendEntryResult(uint64_t entryId) : WalResult(Code::OK), EntryId(entryId) {}
+    AppendEntryResult(Code rc, const string &errmsg) : WalResult(rc, errmsg) {}
+};
+
+typedef WalResult LoadResult;
+
+typedef WalResult TruncateResult;
+
 struct WalEntry {
     WalEntry() = delete;
     WalEntry(uint64_t id, common::IEntry *e) : Id(id), Entry(e) {}
@@ -38,18 +59,19 @@ class IWal {
 PUBLIC
     virtual ~IWal() = default;
 
+    virtual WalResult Init() = 0;
     /**
      *
      * @return entry id
      */
-    virtual uint64_t AppendEntry(common::IEntry*) = 0;
-    virtual void Load(const WalEntryLoadedCallback&) = 0;
+    virtual AppendEntryResult AppendEntry(common::IEntry*) = 0;
+    virtual LoadResult Load(const WalEntryLoadedCallback&) = 0;
     /**
      * truncate log entry in range [-, id]
      * @param id
      * @return
      */
-    virtual bool TruncateAhead(uint64_t id) = 0;
+    virtual TruncateResult Truncate(uint64_t id) = 0;
 };
 }
 }

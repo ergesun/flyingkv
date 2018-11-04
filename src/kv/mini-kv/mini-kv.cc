@@ -42,6 +42,11 @@ bool MiniKV::Start() {
         LOGFFUN << "load checkpoint failed!";
     }
 
+    auto walInitRs = m_pWal->Init();
+    if (wal::Code::OK != walInitRs.Rc) {
+        return false;
+    }
+
     m_pWal->Load(std::bind(&MiniKV::on_wal_load_entries, this, std::placeholders::_1));
 
 
