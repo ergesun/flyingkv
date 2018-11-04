@@ -42,6 +42,9 @@ LogCleanWal::~LogCleanWal() {
  * 清理未完成的trunc，初始化segment相关信息
  */
 WalResult LogCleanWal::Init() {
+    common::ObjReleaseHandler<bool> handler(&m_bInited, [](bool *inited) {
+       *inited = true;
+    });
     if (-1 == utils::FileUtils::CreateDirPath(m_sRootDir, 0775)) {
         auto errmsg = strerror(errno);
         LCLOGEFUN << " create wal dir " << m_sRootDir.c_str() << " error " << errmsg;
@@ -114,6 +117,10 @@ WalResult LogCleanWal::Init() {
 
 // TODO(sunchao): 抽象一个编码函数，对应不同的log version。目前这个只能编码version=1
 AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
+    if (UNLIKELY(!m_bInited)) {
+        LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
+        return AppendEntryResult(Code::Uninit, UninitializedError);
+    }
     if (UNLIKELY(!m_bLoaded)) {
         LOGEFUN << LOGCLEAN_WAL_NAME << UnloadedError;
         return AppendEntryResult(Code::Unloaded, UnloadedError);
@@ -172,6 +179,11 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
 }
 
 LoadResult LogCleanWal::Load(const WalEntryLoadedCallback &callback) {
+    if (UNLIKELY(!m_bInited)) {
+        LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
+        return LoadResult(Code::Uninit, UninitializedError);
+    }
+
     if (m_vInitSegments.empty()) {
         return LoadResult(Code::OK);
     }
@@ -192,6 +204,11 @@ LoadResult LogCleanWal::Load(const WalEntryLoadedCallback &callback) {
 }
 
 TruncateResult LogCleanWal::Truncate(uint64_t id) {
+    if (UNLIKELY(!m_bInited)) {
+        LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
+        return TruncateResult(Code::Uninit, UninitializedError);
+    }
+
     if (UNLIKELY(!m_bLoaded)) {
         LCLOGEFUN << " has not been loaded.";
         return TruncateResult(Code::Unloaded, UnloadedError);
@@ -278,7 +295,8 @@ TruncateResult LogCleanWal::Truncate(uint64_t id) {
     return TruncateResult(Code::OK);
 }
 
-// TODO(sunchao): 抽象一个解析函数，对应不同的log version。目前这个只能解析version=1
+// TODO(sunchao): 1. 抽象一个解析函数，对应不同的log version。目前这个只能解析version=1
+//                2. 优化为io和计算分离，2线程并发做？
 LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &filePath, uint64_t segId, const WalEntryLoadedCallback &callback) {
     auto fd = utils::FileUtils::Open(filePath, O_RDONLY, 0, 0);
     if (-1 == fd) {
@@ -337,17 +355,20 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
             memcpy(buffer, lastBuffer + lastOffset, lastLeftSize);
             lastBuffer = nullptr;
             pLastMpo->Put();
+            pLastMpo = nullptr;
             lastLeftSize = 0;
         }
 
         nRead = utils::IOUtils::ReadFully_V4(fd, (char*)buffer + lastLeftSize, LOGCLEAN_WAL_READ_BATCH_SIZE);
         if (-1 == nRead) {
+            mpo->Put();
             auto errmsg = strerror(errno);
             LOGEFUN << " read segment " << filePath << " error " << errmsg;
             return LoadSegmentResult(Code::FileSystemError, errmsg);
         }
 
         if (0 == nRead) {
+            mpo->Put();
             if (0 != lastLeftSize) {
                 LCLOGEFUN << " segment file " << filePath << "corrupt";
                 return LoadSegmentResult(Code::FileCorrupt, FileCorruptError);
@@ -382,6 +403,7 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
             auto startPosOffset = LOGCLEAN_WAL_SIZE_LEN + LOGCLEAN_WAL_VERSION_LEN + LOGCLEAN_WAL_ENTRY_ID_LEN + len;
             auto startPos = ByteOrderUtils::ReadUInt32(buffer + offset + startPosOffset);
             if (startPos != segmentEntryOffset) {
+                mpo->Put();
                 LCLOGEFUN << " parse sm segment entry in " << filePath << " failed at offset " << offset;
                 return LoadSegmentResult(Code::FileCorrupt, FileCorruptError);
             }
@@ -394,6 +416,7 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
             b.Refresh(contentStartPtr, contentEndPtr, contentStartPtr, contentEndPtr, nullptr);
             auto entry = m_entryCreator();
             if (!entry->Decode(b)) {
+                mpo->Put();
                 LCLOGEFUN << " decode entry at offset " << offset << " failed!";
                 return LoadSegmentResult(Code::DecodeEntryError, DecodeEntryError);
             }

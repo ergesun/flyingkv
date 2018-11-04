@@ -3,37 +3,31 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef FLYINGKV_WAL_ERRORS_H
-#define FLYINGKV_WAL_ERRORS_H
+#ifndef FLYINGKV_CHECKPOINT_ERRORS_H
+#define FLYINGKV_CHECKPOINT_ERRORS_H
 
 #include <string>
 
 using std::string;
 
 namespace flyingkv {
-namespace wal {
+namespace checkpoint {
 enum class Code {
     OK   = 0,
-    Uninit,
-    Unloaded,
+    Uninited,
     FileCorrupt,
-    FileMameCorrupt,
     FileSystemError,
     EncodeEntryError,
     DecodeEntryError,
-    EntryBytesSizeOverflow,
-    InvalidEntryId
+    MissingFile
 };
 
 const char* const FileCorruptError = " file corrupt";
-const char* const FileNameCorruptError = " file name corrupt";
 const char* const UninitializedError    = " has not been initialized";
-const char* const UnloadedError    = " has not been loaded";
 const char* const EncodeEntryError = " encode entry error";
 const char* const DecodeEntryError = " decode entry error";
-const char* const EntryBytesSizeOverflowError = " entry encoded bytes larger than max limit size";
-const char* const InvalidEntryIdError = " invalid entry id";
+const char* const MissingFileError       = " file is missing";
 }
 }
 
-#endif //FLYINGKV_WAL_ERRORS_H
+#endif //FLYINGKV_CHECKPOINT_ERRORS_H

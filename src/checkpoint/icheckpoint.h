@@ -7,7 +7,9 @@
 #define FLYINGKV_ICHECKPOINT_H
 
 #include <functional>
+#include <vector>
 
+#include "errors.h"
 #include "ientries-traveller.h"
 
 namespace flyingkv {
@@ -16,14 +18,30 @@ class IEntry;
 }
 
 namespace checkpoint {
-typedef std::function<void(common::IEntry*)> EntryLoadedCallback;
+typedef std::function<void(std::vector<common::IEntry*>)> EntryLoadedCallback;
+
+struct CheckpointResult {
+    Code    Rc;
+    string  Errmsg;
+
+    explicit CheckpointResult(Code rc) : Rc(rc) {}
+    CheckpointResult(Code rc, const string &errmsg) : Rc(rc), Errmsg(errmsg) {}
+};
+
+struct LoadCheckpointResult : public CheckpointResult {
+    uint64_t MaxId;
+
+    explicit LoadCheckpointResult(uint64_t maxId) : CheckpointResult(Code::OK), MaxId(maxId) {}
+    LoadCheckpointResult(Code rc, const string &errmsg) : CheckpointResult(rc, errmsg) {}
+};
 
 class ICheckpoint {
 PUBLIC
     virtual ~ICheckpoint() = default;
 
-    virtual bool Load(EntryLoadedCallback) = 0;
-    virtual bool Save(IEntriesTraveller*) = 0;
+    virtual CheckpointResult Init() = 0;
+    virtual LoadCheckpointResult Load(EntryLoadedCallback) = 0;
+    virtual CheckpointResult Save(IEntriesTraveller*) = 0;
 };
 }
 }

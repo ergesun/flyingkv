@@ -55,10 +55,12 @@ PUBLIC
     common::IEntry *GetNextEntry() override;
     bool Empty() override;
 
+    uint64_t MaxId() override;
+
 PRIVATE
     common::IEntry* create_new_entry();
 
-    void on_checkpoint_load_entry(common::IEntry*);
+    void on_checkpoint_load_entry(std::vector<common::IEntry*> entries);
     void on_wal_load_entries(std::vector<wal::WalEntry>);
 
 PRIVATE

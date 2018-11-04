@@ -79,6 +79,12 @@ PUBLIC
         return s;
     }
 
+    /**
+     *
+     * @tparam T
+     * @param s
+     * @return 失败了为0 (正常'0'转也是0, 需要自己根据业务判断，或者不用这个接口)
+     */
     template <typename T>
     static inline T ToInteger(const std::string &s) {
         std::stringstream ss(s);

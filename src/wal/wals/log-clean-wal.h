@@ -133,6 +133,7 @@ PRIVATE
     uint32_t                                  m_curSegFileSize       = 0;
     common::EntryCreateHandler                m_entryCreator;
     bool                                      m_bLoaded          = false;
+    bool                                      m_bInited          = false;
     // 增长时无需考虑溢出，能活到那么久么。。。如果真活到那么久，由于日志有version，可以到时候扩展为64位的，甚至扩展为时间戳
     uint64_t                                  m_currentSegmentId = 0;
     uint64_t                                  m_minSegmentId     = 0;

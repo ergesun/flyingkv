@@ -38,8 +38,14 @@ MiniKV::~MiniKV() {
 }
 
 bool MiniKV::Start() {
-    if (!m_pCheckpoint->Load(std::bind(&MiniKV::on_checkpoint_load_entry, this, std::placeholders::_1))) {
-        LOGFFUN << "load checkpoint failed!";
+    auto cpInitRs = m_pCheckpoint->Init();
+    if (checkpoint::Code::OK != cpInitRs.Rc) {
+        return false;
+    }
+
+    auto cpLoadRs = m_pCheckpoint->Load(std::bind(&MiniKV::on_checkpoint_load_entry, this, std::placeholders::_1));
+    if (checkpoint::Code::OK != cpLoadRs.Rc) {
+        return false;
     }
 
     auto walInitRs = m_pWal->Init();
@@ -47,10 +53,9 @@ bool MiniKV::Start() {
         return false;
     }
 
-    m_pWal->Load(std::bind(&MiniKV::on_wal_load_entries, this, std::placeholders::_1));
+    auto walLoadRs = m_pWal->Load(std::bind(&MiniKV::on_wal_load_entries, this, std::placeholders::_1));
 
-
-    return false;
+    return wal::Code::OK == walLoadRs.Rc;
 }
 
 bool MiniKV::Stop() {
@@ -82,11 +87,15 @@ bool MiniKV::Empty() {
     return false;
 }
 
+uint64_t MiniKV::MaxId() {
+    return 0;
+}
+
 common::IEntry* MiniKV::create_new_entry() {
     return new Entry(m_pMp);
 }
 
-void MiniKV::on_checkpoint_load_entry(common::IEntry *entry) {
+void MiniKV::on_checkpoint_load_entry(std::vector<common::IEntry*> entries) {
 
 }
 
