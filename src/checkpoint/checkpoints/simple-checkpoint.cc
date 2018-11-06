@@ -470,8 +470,10 @@ CheckpointResult SimpleCheckpoint::save_new_checkpoint(IEntriesTraveller *travel
         wb.MoveHeadBack(SMCP_VERSION_LEN);
 
         // content
-        memcpy(eb->GetPos(), wb.GetPos(), size_t(rawEntrySize));
-        wb.MoveHeadBack(rawEntrySize);
+        if (eb->Valid()) {
+            memcpy(wb.GetPos(), eb->GetPos(), size_t(rawEntrySize));
+            wb.MoveHeadBack(rawEntrySize);
+        }
 
         // entry offset
         ByteOrderUtils::WriteUInt32(wb.GetPos(), offset);

@@ -183,15 +183,15 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
 
     // version
     *(wb.GetPos()) = LOGCLEAN_WAL_VERSION;
-    wb.MoveHeadBack(LOGCLEAN_WAL_SIZE_LEN);
+    wb.MoveHeadBack(LOGCLEAN_WAL_VERSION_LEN);
 
     // log id
-    ByteOrderUtils::WriteUInt64(wb.GetPos(), uint32_t(m_currentEntryIdx));
+    ByteOrderUtils::WriteUInt64(wb.GetPos(), m_currentEntryIdx);
     wb.MoveHeadBack(LOGCLEAN_WAL_ENTRY_ID_LEN);
 
     // content
     if (eb->Valid()) {
-        memcpy(eb->GetPos(), wb.GetPos(), size_t(rawEntrySize));
+        memcpy(wb.GetPos(), eb->GetPos(), size_t(rawEntrySize));
         wb.MoveHeadBack(rawEntrySize);
     }
 
@@ -401,7 +401,7 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
         while (offset < availableBufferSize) {
             auto leftSize = availableBufferSize - offset;
             // 剩下的不够一个entry了
-            if (leftSize < (LOGCLEAN_WAL_SIZE_LEN + LOGCLEAN_WAL_VERSION_LEN + LOGCLEAN_WAL_ENTRY_ID_LEN)) {
+            if (leftSize < LOGCLEAN_WAL_ENTRY_HEADER_LEN) {
                 lastBuffer = buffer;
                 pLastMpo = mpo;
                 lastLeftSize = uint32_t(leftSize);
@@ -418,7 +418,7 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
                 break;
             }
 
-            auto startPosOffset = LOGCLEAN_WAL_SIZE_LEN + LOGCLEAN_WAL_VERSION_LEN + LOGCLEAN_WAL_ENTRY_ID_LEN + len;
+            auto startPosOffset = LOGCLEAN_WAL_ENTRY_HEADER_LEN + len;
             auto startPos = ByteOrderUtils::ReadUInt32(buffer + offset + startPosOffset);
             if (startPos != segmentEntryOffset) {
                 mpo->Put();

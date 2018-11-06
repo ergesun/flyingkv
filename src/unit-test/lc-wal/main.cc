@@ -14,6 +14,7 @@
 #include "../../utils/file-utils.h"
 #include "../../utils/io-utils.h"
 #include "../../common/global-vars.h"
+#include "../../utils/codec-utils.h"
 
 using namespace flyingkv;
 using namespace flyingkv::wal;
@@ -168,6 +169,77 @@ TEST(LCWALTest, AppendEntryTest) {
     rs = pWal->AppendEntry(entry);
     EXPECT_EQ(rs.Rc, Code::OK);
     delete entry;
+
+    entry = handler->CreateNewEntryWithContent("defgh");
+    rs = pWal->AppendEntry(entry);
+    EXPECT_EQ(rs.Rc, Code::OK);
+
+    // check contents
+    auto segmentFp = pWal->m_currentSegFilePath;
+    auto fd = utils::FileUtils::Open(segmentFp, O_RDONLY, 0, 0);
+    auto fileSize = utils::FileUtils::GetFileSize(fd);
+    auto expectFileSize = LOGCLEAN_WAL_MAGIC_NO_LEN + LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE * 3 + 3 + 5;
+    uint32_t offset = 0;
+    /// 1. check file size
+    EXPECT_EQ(fileSize, expectFileSize);
+    auto buf = new uchar[fileSize];
+    utils::IOUtils::ReadFully_V4(fd, (char*)buf, size_t(fileSize));
+    /// 2. check file header
+    auto magicNo = ByteOrderUtils::ReadUInt32(buf);
+    EXPECT_EQ(magicNo, LOGCLEAN_WAL_MAGIC_NO);
+    offset += LOGCLEAN_WAL_MAGIC_NO_LEN;
+    /// 3. check entries
+    //// 3.1 1st empty entry
+    auto entryLen = ByteOrderUtils::ReadUInt32(buf + offset);
+    EXPECT_EQ(entryLen, 0);
+    auto startPos = ByteOrderUtils::ReadUInt32(buf + offset + (LOGCLEAN_WAL_ENTRY_HEADER_LEN));
+    EXPECT_EQ(startPos, offset);
+    offset += LOGCLEAN_WAL_SIZE_LEN;
+    auto version = *(buf + offset);
+    EXPECT_EQ(version, 1);
+    offset += LOGCLEAN_WAL_VERSION_LEN;
+    auto entryId = ByteOrderUtils::ReadUInt64(buf + offset);
+    EXPECT_EQ(entryId, 1);
+    offset += LOGCLEAN_WAL_ENTRY_ID_LEN + LOGCLEAN_WAL_START_POS_LEN;
+
+    //// 3.2 second entry
+    entryLen = ByteOrderUtils::ReadUInt32(buf + offset);
+    EXPECT_EQ(entryLen, 3);
+    startPos = ByteOrderUtils::ReadUInt32(buf + offset + entryLen + LOGCLEAN_WAL_ENTRY_HEADER_LEN);
+    EXPECT_EQ(startPos, offset);
+    offset += LOGCLEAN_WAL_SIZE_LEN;
+    version = *(buf + offset);
+    EXPECT_EQ(version, 1);
+    offset += LOGCLEAN_WAL_VERSION_LEN;
+    entryId = ByteOrderUtils::ReadUInt64(buf + offset);
+    EXPECT_EQ(entryId, 2);
+    offset += LOGCLEAN_WAL_ENTRY_ID_LEN;
+    auto strtmp = new char[4];
+    memcpy(strtmp, buf + offset, 3);
+    strtmp[3] = 0;
+    EXPECT_STREQ(strtmp, "abc");
+    DELETE_ARR_PTR(strtmp);
+    offset += 3 + LOGCLEAN_WAL_START_POS_LEN;
+
+    //// 3.3 third entry
+    entryLen = ByteOrderUtils::ReadUInt32(buf + offset);
+    EXPECT_EQ(entryLen, 5);
+    startPos = ByteOrderUtils::ReadUInt32(buf + offset + entryLen + LOGCLEAN_WAL_ENTRY_HEADER_LEN);
+    EXPECT_EQ(startPos, offset);
+    offset += LOGCLEAN_WAL_SIZE_LEN;
+    version = *(buf + offset);
+    EXPECT_EQ(version, 1);
+    offset += LOGCLEAN_WAL_VERSION_LEN;
+    entryId = ByteOrderUtils::ReadUInt64(buf + offset);
+    EXPECT_EQ(entryId, 3);
+    offset += LOGCLEAN_WAL_ENTRY_ID_LEN;
+    strtmp = new char[6];
+    memcpy(strtmp, buf + offset, 5);
+    strtmp[5] = 0;
+    EXPECT_STREQ(strtmp, "defgh");
+
+    DELETE_ARR_PTR(buf);
+    close(fd);
 }
 
 TEST(LCWALTest, LoadTest) {
