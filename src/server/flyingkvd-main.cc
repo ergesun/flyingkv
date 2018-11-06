@@ -20,6 +20,7 @@
 #include "../kv/mini-kv/mini-kv.h"
 
 #include "./rpc/kv-rpc-sync-server.h"
+#include "../kv/config.h"
 
 using namespace flyingkv;
 
@@ -62,8 +63,8 @@ void uninit_gflags_glog() {
 void startup() {
     std::unique_lock<std::mutex> l(g_m);
     // TODO(sunchao): use factory
-    auto pKV = new kv::MiniKV(FLAGS_wal_type, FLAGS_checkpoint_type, FLAGS_wal_dir,
-                                FLAGS_checkpoint_dir, FLAGS_acc_conf_path);
+    kv::KVConfig kvConf = {};
+    auto pKV = new kv::MiniKV(&kvConf);
     g_pKV = pKV;
     if (!g_pKV->Start()) {
         LOGFFUN << "start kv service is failure.";

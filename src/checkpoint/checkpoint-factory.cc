@@ -8,23 +8,23 @@
 #include "../common/common-def.h"
 
 #include "checkpoint-factory.h"
-#include "checkpoints/simple-checkpoint.h"
+#include "checkpoints/entry-order-checkpoint.h"
 
 static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<std::string, int> {
-        {"simple", 0}
+        {"entry-order", 0}
 };
 
 namespace flyingkv {
 namespace checkpoint {
-ICheckpoint* CheckpointFactory::CreateInstance(const std::string &type, const std::string &rootDir, common::EntryCreateHandler &&handler) {
-    auto rs = g_typeMapper.find(type);
+ICheckpoint* CheckpointFactory::CreateInstance(const CheckpointConfig *pc) {
+    auto rs = g_typeMapper.find(pc->Type);
     if (rs == g_typeMapper.end()) {
-        LOGEFUN << "cannot find checkpoint class type " << type;
+        LOGEFUN << "cannot find checkpoint class type " << pc->Type;
         return nullptr;
     }
     switch (rs->second) {
         case 0:
-            return new SimpleCheckpoint(rootDir, std::move(handler));
+            return new EntryOrderCheckpoint(static_cast<const EntryOrderCheckpointConfig*>(pc));
         default:
             return nullptr;
     }

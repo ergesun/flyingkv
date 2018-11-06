@@ -37,10 +37,15 @@ DECLARE_string(acc_conf_path);
 /**
  * kv
  */
-DECLARE_string(checkpoint_dir);
-DECLARE_string(checkpoint_type);
+DECLARE_string(kv_type);
 DECLARE_string(wal_dir);
 DECLARE_string(wal_type);
-DECLARE_uint32(max_kv_pending_cnt);
+DECLARE_uint32(wal_entry_write_version);
+DECLARE_uint32(wal_max_segment_size);
+DECLARE_uint32(wal_batch_read_size);
+DECLARE_string(cp_dir);
+DECLARE_string(cp_type);
+DECLARE_uint32(cp_entry_write_version);
+DECLARE_uint32(cp_batch_read_size);
 
 #endif //FLYINGKV_GFLAGS_CONFIG_H

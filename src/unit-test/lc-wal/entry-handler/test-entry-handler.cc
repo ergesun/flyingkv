@@ -14,11 +14,17 @@
 namespace flyingkv {
 namespace waltest {
 common::IEntry *TestEntryHandler::CreateNewEntry() {
-    return new TestEntry();
+    auto te = new TestEntry();
+    te->SetCanDecode(m_bCanDecode);
+
+    return te;
 }
 
 common::IEntry* TestEntryHandler::CreateNewEntryWithContent(std::string &&content) {
-    return new TestEntry(std::move(content));
+    auto te = new TestEntry(std::move(content));
+    te->SetCanDecode(m_bCanDecode);
+
+    return te;
 }
 
 void TestEntryHandler::OnLoad(std::vector<wal::WalEntry> entries) {

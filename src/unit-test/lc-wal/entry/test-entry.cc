@@ -30,7 +30,20 @@ bool TestEntry::Encode(std::shared_ptr<common::Buffer> &ptr) {
 }
 
 bool TestEntry::Decode(const common::Buffer &buffer) {
-    return false;
+    if (!m_bCanDecode) {
+        return false;
+    }
+
+    if (!buffer.Valid()) {
+        return true;
+    }
+
+    auto str = new char[buffer.AvailableLength() + 1];
+    memcpy(str, buffer.m_pPos, size_t(buffer.AvailableLength()));
+
+    m_pContent = str;
+    DELETE_ARR_PTR(str);
+    return true;
 }
 }
 }

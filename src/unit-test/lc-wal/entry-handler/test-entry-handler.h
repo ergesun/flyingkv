@@ -17,8 +17,13 @@ PUBLIC
     common::IEntry* CreateNewEntryWithContent(std::string &&content);
     void OnLoad(std::vector<wal::WalEntry>);
 
+    void SetNewEntryCanDecode(bool canDecode) {
+        m_bCanDecode = canDecode;
+    }
+
 PRIVATE
     std::vector<wal::WalEntry>  m_vLoadEntries;
+    bool                        m_bCanDecode = true;
 };
 }
 }

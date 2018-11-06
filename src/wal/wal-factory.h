@@ -6,14 +6,16 @@
 #ifndef FLYINGKV_WAL_FACTORY_H
 #define FLYINGKV_WAL_FACTORY_H
 
-#include "iwal.h"
 #include "../common/ientry.h"
+
+#include "iwal.h"
 
 namespace flyingkv {
 namespace wal {
+class WalConfig;
 class WALFactory {
 PUBLIC
-    static IWal* CreateInstance(const std::string &type, const std::string &rootDir, common::EntryCreateHandler &&handler);
+    static IWal* CreateInstance(const WalConfig *pc);
 };
 }
 }

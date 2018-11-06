@@ -16,15 +16,15 @@ static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<st
         {"log-clean", 0}
 };
 
-IWal* WALFactory::CreateInstance(const std::string &type, const std::string &rootDir, common::EntryCreateHandler &&handler) {
-    auto rs = g_typeMapper.find(type);
+IWal* WALFactory::CreateInstance(const WalConfig *pc) {
+    auto rs = g_typeMapper.find(pc->Type);
     if (rs == g_typeMapper.end()) {
-        LOGEFUN << "cannot find wal class type " << type;
+        LOGEFUN << "cannot find wal class type " << pc->Type;
         return nullptr;
     }
     switch (rs->second) {
     case 0:
-        return new LogCleanWal(rootDir, std::move(handler));
+        return new LogCleanWal(static_cast<const LogCleanWalConfig*>(pc));
     default:
         return nullptr;
     }

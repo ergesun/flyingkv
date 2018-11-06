@@ -14,9 +14,10 @@
 
 namespace flyingkv {
 namespace checkpoint {
+class CheckpointConfig;
 class CheckpointFactory {
 PUBLIC
-    static ICheckpoint* CreateInstance(const std::string &type, const std::string &rootDir, common::EntryCreateHandler &&handle);
+    static ICheckpoint* CreateInstance(const CheckpointConfig *pc);
 };
 }
 }

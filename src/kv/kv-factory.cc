@@ -4,6 +4,7 @@
  */
 
 #include "mini-kv/mini-kv.h"
+#include "config.h"
 
 #include "kv-factory.h"
 
@@ -13,15 +14,15 @@ static std::unordered_map<std::string, int> g_typeMapper = std::unordered_map<st
     {"mini", 0}
 };
 
-common::IKVOperator* KVFactory::CreateInstance(const EngineConstructorParams &param) {
-    auto rs = g_typeMapper.find(param.Type);
+common::IKVOperator* KVFactory::CreateInstance(const KVConfig *pc) {
+    auto rs = g_typeMapper.find(pc->Type);
     if (rs == g_typeMapper.end()) {
-        LOGEFUN << "cannot find kv class type " << param.Type;
+        LOGEFUN << "cannot find kv class type " << pc->Type;
         return nullptr;
     }
     switch (rs->second) {
         case 0:
-            return new MiniKV(param.WalType, param.WalDir, param.CheckpointType, param.CheckpointDir, param.AccConfPath);
+            return new MiniKV(pc);
         default:
             return nullptr;
     }

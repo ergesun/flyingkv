@@ -24,11 +24,22 @@
 namespace flyingkv {
 using namespace utils;
 namespace wal {
-LogCleanWal::LogCleanWal(const std::string &rootDir, common::EntryCreateHandler &&entryCreateHandler) :
-        m_sRootDir(rootDir), m_entryCreator(std::move(entryCreateHandler)) {
-    m_sRootDir = rootDir;
-    m_sTruncInfoFilePath = rootDir + "/" + LOGCLEAN_WAL_TRUNC_META_NAME;
-    m_sTruncOKFlagFilePath = rootDir + "/" + LOGCLEAN_WAL_TRUNC_OK_NAME;
+LogCleanWal::LogCleanWal(const LogCleanWalConfig *pc) :
+        m_sRootDir(pc->RootDirPath), m_entryCreator(pc->ECH), m_writeEntryVersion(pc->WriteEntryVersion),
+        m_segmentMaxSize(pc->MaxSegmentSize), m_batchReadSize(pc->ReadBatchSize) {
+    if (m_segmentMaxSize < LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE) {
+        LOGFFUN << LOGCLEAN_WAL_NAME << " conf segment max size is too small, it at least cannot be smaller than "
+                << LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE;
+    }
+
+    if (m_batchReadSize < LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE) {
+        LOGFFUN << LOGCLEAN_WAL_NAME << " conf batch read size is too small, it at least cannot be smaller than "
+                << LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE;
+    }
+
+    m_sTruncInfoFilePath = m_sRootDir + "/" + LOGCLEAN_WAL_TRUNC_META_NAME;
+    m_sTruncOKFlagFilePath = m_sRootDir + "/" + LOGCLEAN_WAL_TRUNC_OK_NAME;
+    m_maxEntrySize = m_batchReadSize - LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE;
 }
 
 LogCleanWal::~LogCleanWal() {
@@ -167,8 +178,8 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     auto walEntryStartOffset = m_curSegFileSize;
     auto rawEntrySize = uint32_t(eb->AvailableLength());
     auto walEntrySize = rawEntrySize + LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE;
-    if (walEntrySize > LOGCLEAN_WAL_ENTRY_MAX_SIZE) {
-        LCLOGEFUN << " entry size cannot be larger than " << LOGCLEAN_WAL_ENTRY_MAX_SIZE << " bytes";
+    if (walEntrySize > m_maxEntrySize) {
+        LCLOGEFUN << " entry size cannot be larger than " << m_maxEntrySize << " bytes";
         return AppendEntryResult(Code::EntryBytesSizeOverflow, EntryBytesSizeOverflowError);
     }
 
@@ -182,7 +193,7 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     wb.MoveHeadBack(LOGCLEAN_WAL_SIZE_LEN);
 
     // version
-    *(wb.GetPos()) = LOGCLEAN_WAL_VERSION;
+    *(wb.GetPos()) = m_writeEntryVersion;
     wb.MoveHeadBack(LOGCLEAN_WAL_VERSION_LEN);
 
     // log id
@@ -211,7 +222,7 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     m_curSegFileSize += walEntrySize;
     m_mpEntriesIdSegId[m_currentEntryIdx] = m_currentSegmentId;
     ++m_currentEntryIdx;
-    if (m_curSegFileSize >= LOGCLEAN_WAL_SEGMENT_MAX_SIZE) {
+    if (m_curSegFileSize >= m_segmentMaxSize) {
         auto rs = create_new_segment_file();
         if (rs.Rc != Code::OK) {
             return AppendEntryResult(rs.Rc, rs.Errmsg);
@@ -365,11 +376,11 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
     uint32_t lastLeftSize = 0;
     bool ok = true;
     while (ok) {
-        auto readSize = LOGCLEAN_WAL_READ_BATCH_SIZE + lastLeftSize;
+        auto readSize = m_batchReadSize + lastLeftSize;
         auto mpo = common::g_pMemPool->Get(readSize);
         auto buffer = (uchar*)(mpo->Pointer());
         if (lastBuffer) {
-            auto lastOffset = LOGCLEAN_WAL_READ_BATCH_SIZE - lastLeftSize;
+            auto lastOffset = m_batchReadSize - lastLeftSize;
             memcpy(buffer, lastBuffer + lastOffset, lastLeftSize);
             lastBuffer = nullptr;
             pLastMpo->Put();
@@ -377,7 +388,7 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
             lastLeftSize = 0;
         }
 
-        nRead = utils::IOUtils::ReadFully_V4(fd, (char*)buffer + lastLeftSize, LOGCLEAN_WAL_READ_BATCH_SIZE);
+        nRead = utils::IOUtils::ReadFully_V4(fd, (char*)buffer + lastLeftSize, m_batchReadSize);
         if (-1 == nRead) {
             mpo->Put();
             auto errmsg = strerror(errno);
@@ -395,7 +406,7 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
         }
 
         std::vector<WalEntry> entries;
-        ok = (nRead == LOGCLEAN_WAL_READ_BATCH_SIZE);
+        ok = (nRead == m_batchReadSize);
         auto availableBufferSize = nRead + lastLeftSize;
         uint32_t offset = 0;
         while (offset < availableBufferSize) {

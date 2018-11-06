@@ -11,11 +11,13 @@
 #include "../../codegen/meta.pb.h"
 #include "../../common/iservice.h"
 #include "../../common/ikv-common.h"
-#include "../../acc/igranter.h"
 #include "../../wal/iwal.h"
 #include "../../checkpoint/ientries-traveller.h"
 
 namespace flyingkv {
+namespace acc {
+class IGranter;
+}
 namespace common {
 class IEntry;
 }
@@ -29,6 +31,7 @@ namespace checkpoint {
 class ICheckpoint;
 }
 namespace kv {
+class KVConfig;
 class EntryComparer
 {
     bool operator()(const protocol::Entry *x, const protocol::Entry *y) const {
@@ -38,8 +41,7 @@ class EntryComparer
 
 class MiniKV : public common::IService, public common::IKVOperator, public checkpoint::IEntriesTraveller {
 PUBLIC
-    MiniKV(const std::string &walType, const std::string &walDir, const std::string &checkpointType,
-           const std::string &checkpointDir, const std::string &accConfPath);
+    MiniKV(const KVConfig *pc);
     ~MiniKV() override;
 
     bool Start() override;

@@ -3,35 +3,33 @@
  * a Creative Commons Attribution 3.0 Unported License(https://creativecommons.org/licenses/by/3.0/).
  */
 
-#ifndef FLYINGKV_SIMPLE_CHECKPOINT_H
-#define FLYINGKV_SIMPLE_CHECKPOINT_H
+#ifndef FLYINGKV_ENTRY_ORDER_CHECKPOINT_H
+#define FLYINGKV_ENTRY_ORDER_CHECKPOINT_H
 
 #include <string>
 
 #include "../icheckpoint.h"
 #include "../../common/ientry.h"
+#include "../config.h"
 
-#define    SMCP_NAME            "simple checkpoint"
-#define    SMCPLOGEFUN           LOGEFUN << SMCP_NAME
-//         SMCP_MAGIC_NO          s m c p
-#define    SMCP_MAGIC_NO        0x736d6370
-#define    SMCP_MAGIC_NO_LEN    4
-#define    SMCP_PREFIX_NAME     "smcp"
-#define    SMCP_SAVE_START_FLAG "smcp.start"
-#define    SMCP_COMPLETE_FLAG   "smcp.ok"
-#define    SMCP_META_SUFFIX     ".meta"
-#define    SMCP_NEW_FILE_SUFFIX ".new"
+#define    EOCP_NAME            "entry-order checkpoint"
+#define    EOCPLOGEFUN           LOGEFUN << EOCP_NAME
+//         EOCP_MAGIC_NO          s m c p
+#define    EOCP_MAGIC_NO        0x736d6370
+#define    EOCP_MAGIC_NO_LEN    4
+#define    EOCP_PREFIX_NAME     "smcp"
+#define    EOCP_SAVE_START_FLAG "smcp.start"
+#define    EOCP_COMPLETE_FLAG   "smcp.ok"
+#define    EOCP_META_SUFFIX     ".meta"
+#define    EOCP_NEW_FILE_SUFFIX ".new"
 
-#define    SMCP_VERSION                  1 // TODO(sunchao):可配置？
-#define    SMCP_START_POS_LEN            4
-#define    SMCP_SIZE_LEN                 4
-#define    SMCP_VERSION_LEN              1
-#define    SMCP_ENTRY_HEADER_LEN         13 // SMLOG_SIZE_LEN + SMLOG_VERSION_LEN
-#define    SMCP_CONTENT_OFFSET           13 // SMLOG_SIZE_LEN + SMLOG_VERSION_LEN
-#define    SMCP_ENTRY_EXTRA_FIELDS_SIZE  17 // contentLen(4) + version(1) + startPos(4)
-#define    SMCP_INVALID_ENTRY_ID         0
-
-const uint32_t SMCP_READ_BATCH_SIZE  = 1024 * 1024 * 10;  // 10MiB
+#define    EOCP_START_POS_LEN            4
+#define    EOCP_SIZE_LEN                 4
+#define    EOCP_VERSION_LEN              1
+#define    EOCP_ENTRY_HEADER_LEN         13 // EOCP_SIZE_LEN + EOCP_VERSION_LEN
+#define    EOCP_CONTENT_OFFSET           13 // EOCP_SIZE_LEN + EOCP_VERSION_LEN
+#define    EOCP_ENTRY_EXTRA_FIELDS_SIZE  17 // contentLen(4) + version(1) + startPos(4)
+#define    EOCP_INVALID_ENTRY_ID         0
 
 namespace flyingkv {
 namespace checkpoint {
@@ -49,10 +47,10 @@ namespace checkpoint {
  *   10. rm ok flag file
  */
 
-class SimpleCheckpoint : public ICheckpoint {
+class EntryOrderCheckpoint : public ICheckpoint {
 PUBLIC
-    explicit SimpleCheckpoint(const std::string &rootDir, common::EntryCreateHandler &&ech);
-    ~SimpleCheckpoint() override = default;
+    explicit EntryOrderCheckpoint(const EntryOrderCheckpointConfig *pc);
+    ~EntryOrderCheckpoint() override = default;
 
     CheckpointResult Init() override;
     LoadCheckpointResult Load(EntryLoadedCallback callback) override;
@@ -62,8 +60,8 @@ PRIVATE
     struct LoadMetaResult : public CheckpointResult {
         uint64_t   EntryId;
 
+        explicit LoadMetaResult(uint64_t entryId) : CheckpointResult(Code::OK, ""), EntryId(entryId) {}
         LoadMetaResult(Code code, const std::string &errmsg) : CheckpointResult(code, errmsg) {}
-        LoadMetaResult(uint64_t entryId) : CheckpointResult(Code::OK, ""), EntryId(entryId) {}
     };
 
 PRIVATE
@@ -88,8 +86,10 @@ PRIVATE
     std::string                 m_sNewStartFlagFilePath;
     std::string                 m_sNewCpSaveOkFilePath;
     common::EntryCreateHandler  m_entryCreator;
+    uint8_t                     m_writeEntryVersion;
+    uint32_t                    m_batchReadSize;
 };
 }
 }
 
-#endif //FLYINGKV_SIMPLE_CHECKPOINT_H
+#endif //FLYINGKV_ENTRY_ORDER_CHECKPOINT_H

@@ -10,6 +10,7 @@
 
 #include "../iwal.h"
 #include "../../sys/gcc-buildin.h"
+#include "../config.h"
 
 #define    LOGCLEAN_WAL_NAME                    "log-clean"
 #define    LCLOGEFUN                            LOGEFUN << LOGCLEAN_WAL_NAME
@@ -21,7 +22,7 @@
 #define    LOGCLEAN_WAL_TRUNC_OK_NAME            "lclog.trunc.ok"
 #define    LOGCLEAN_WAL_TRUNC_META_NAME          "lclog.truncmeta"
 
-#define    LOGCLEAN_WAL_VERSION                  1 // TODO(sunchao):可配置？
+//#define    LOGCLEAN_WAL_VERSION                  1 // TODO(sunchao):可配置？
 #define    LOGCLEAN_WAL_START_POS_LEN            4
 #define    LOGCLEAN_WAL_SIZE_LEN                 4
 #define    LOGCLEAN_WAL_VERSION_LEN              1
@@ -35,9 +36,9 @@
 #define    LOGCLEAN_WAL_MIN_ENTRY_ID             1
 
 // TODO(sunchao): 可配置？
-const uint32_t  LOGCLEAN_WAL_SEGMENT_MAX_SIZE = 1024 * 1024 * 100; // 100MiB
-const uint32_t  LOGCLEAN_WAL_READ_BATCH_SIZE  = 1024 * 1024 * 10;  // 10MiB
-const uint32_t  LOGCLEAN_WAL_ENTRY_MAX_SIZE   =  LOGCLEAN_WAL_SEGMENT_MAX_SIZE - LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE;
+//const uint32_t  LOGCLEAN_WAL_SEGMENT_MAX_SIZE = 1024 * 1024 * 100; // 100MiB
+//const uint32_t  LOGCLEAN_WAL_READ_BATCH_SIZE  = 1024 * 1024 * 10;  // 10MiB
+//const uint32_t  LOGCLEAN_WAL_ENTRY_MAX_SIZE   =  LOGCLEAN_WAL_SEGMENT_MAX_SIZE - LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE;
 
 namespace flyingkv {
 namespace common {
@@ -74,7 +75,7 @@ struct LogCleanWalSegmentFileInfo {
 
 class LogCleanWal : public IWal {
 PUBLIC
-    LogCleanWal(const std::string &rootDir, common::EntryCreateHandler &&handler);
+    explicit LogCleanWal(const LogCleanWalConfig *pc);
     ~LogCleanWal() override;
 
     WalResult Init() override;
@@ -140,6 +141,11 @@ PRIVATE
     std::string                               m_sTruncOKFlagFilePath;
     std::string                               m_sTruncInfoFilePath;
     std::vector<LogCleanWalSegmentFileInfo>   m_vInitSegments;
+    uint8_t                                   m_writeEntryVersion;
+    uint32_t                                  m_segmentMaxSize;
+    uint32_t                                  m_batchReadSize;
+    uint32_t                                  m_maxEntrySize;
+
 };
 }
 }

@@ -8,13 +8,12 @@
 
 #include "../common/ikv-common.h"
 
-#include "common.h"
-
 namespace flyingkv {
 namespace kv {
+class KVConfig;
 class KVFactory {
 PUBLIC
-    common::IKVOperator* CreateInstance(const EngineConstructorParams &param);
+    common::IKVOperator* CreateInstance(const KVConfig *pc);
 };
 }
 }

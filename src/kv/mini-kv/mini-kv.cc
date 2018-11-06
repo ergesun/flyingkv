@@ -7,21 +7,28 @@
 #include "../../wal/wal-factory.h"
 #include "../../checkpoint/checkpoint-factory.h"
 #include "../../acc/config.h"
-
-#include "entry.h"
-
-#include "mini-kv.h"
 #include "../../acc/resource-limit-control/simple-rlc.h"
+#include "../../checkpoint/config.h"
+#include "../../wal/config.h"
+
+#include "../config.h"
+#include "entry.h"
+#include "mini-kv.h"
 
 namespace flyingkv {
 namespace kv {
-MiniKV::MiniKV(const std::string &walType, const std::string &walDir, const std::string &checkpointType,
-               const std::string &checkpointDir, const std::string &accConfPath) {
-
+MiniKV::MiniKV(const KVConfig *pc) {
     m_pMp = new sys::MemPool();
-    m_pWal = wal::WALFactory::CreateInstance(walType, walDir, std::bind(&MiniKV::create_new_entry, this));
-    m_pCheckpoint = checkpoint::CheckpointFactory::CreateInstance(checkpointType, checkpointDir, std::bind(&MiniKV::create_new_entry, this));
-    auto accConf = acc::ParseAccConfig(accConfPath);
+    auto pWalConf = new wal::LogCleanWalConfig(pc->WalType, pc->WalRootDirPath, std::bind(&MiniKV::create_new_entry, this),
+                    pc->WalWriteEntryVersion, pc->WalMaxSegmentSize, pc->WalReadBatchSize);
+    m_pWal = wal::WALFactory::CreateInstance(pWalConf);
+    delete pWalConf;
+    auto pCheckpointConf = new checkpoint::EntryOrderCheckpointConfig(pc->CheckpointType, pc->CheckpointRootDirPath,
+                                                                      std::bind(&MiniKV::create_new_entry, this),
+                                                pc->CheckpointWriteEntryVersion, pc->CheckpointReadBatchSize);
+    m_pCheckpoint = checkpoint::CheckpointFactory::CreateInstance(pCheckpointConf);
+    delete pCheckpointConf;
+    auto accConf = acc::ParseAccConfig(pc->AccConfPath);
     auto rlc = new acc::SimpleRlc();
     if (!rlc->Init(accConf)) {
         LOGFFUN << "acc init failed.";

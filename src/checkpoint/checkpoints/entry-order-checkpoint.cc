@@ -11,32 +11,31 @@
 
 #include "../ientries-traveller.h"
 
-#include "simple-checkpoint.h"
+#include "entry-order-checkpoint.h"
 #include "../../common/buffer.h"
 #include "../../common/global-vars.h"
 #include "../../utils/common-utils.h"
 
 namespace flyingkv {
 namespace checkpoint {
-SimpleCheckpoint::SimpleCheckpoint(const std::string &rootDir, common::EntryCreateHandler &&ech) :
-        m_sRootDir(rootDir), m_entryCreator(std::move(ech)) {
-
-    m_sRootDir = rootDir;
-    m_sCpFilePath = m_sRootDir + "/" + SMCP_PREFIX_NAME;
-    m_sNewCpFilePath = m_sCpFilePath + SMCP_NEW_FILE_SUFFIX;
-    m_sNewCpSaveOkFilePath = m_sRootDir + "/" + SMCP_COMPLETE_FLAG;
-    m_sCpMetaFilePath = m_sRootDir + "/" + SMCP_META_SUFFIX;
-    m_sNewCpMetaFilePath = m_sCpMetaFilePath + SMCP_NEW_FILE_SUFFIX;
-    m_sNewStartFlagFilePath = m_sRootDir + "/" + SMCP_SAVE_START_FLAG;
+EntryOrderCheckpoint::EntryOrderCheckpoint(const EntryOrderCheckpointConfig *pc) :
+        m_sRootDir(pc->RootDirPath), m_entryCreator(pc->ECH), m_writeEntryVersion(pc->WriteEntryVersion),
+        m_batchReadSize(pc->BatchReadSize) {
+    m_sCpFilePath = m_sRootDir + "/" + EOCP_PREFIX_NAME;
+    m_sNewCpFilePath = m_sCpFilePath + EOCP_NEW_FILE_SUFFIX;
+    m_sNewCpSaveOkFilePath = m_sRootDir + "/" + EOCP_COMPLETE_FLAG;
+    m_sCpMetaFilePath = m_sRootDir + "/" + EOCP_META_SUFFIX;
+    m_sNewCpMetaFilePath = m_sCpMetaFilePath + EOCP_NEW_FILE_SUFFIX;
+    m_sNewStartFlagFilePath = m_sRootDir + "/" + EOCP_SAVE_START_FLAG;
 }
 
-CheckpointResult SimpleCheckpoint::Init() {
+CheckpointResult EntryOrderCheckpoint::Init() {
     common::ObjReleaseHandler<bool> handler(&m_bInited, [](bool *inited) {
         *inited = true;
     });
     if (-1 == utils::FileUtils::CreateDirPath(m_sRootDir, 0775)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " create dir " << m_sRootDir << " failed.";
+        EOCPLOGEFUN << " create dir " << m_sRootDir << " failed.";
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
@@ -45,9 +44,9 @@ CheckpointResult SimpleCheckpoint::Init() {
 
 // TODO(sunchao): 1. 把load定义一个模式抽象一下？免得和log的load逻辑重复
 //                2. 同wal, io和计算异步？
-LoadCheckpointResult SimpleCheckpoint::Load(EntryLoadedCallback callback) {
+LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
     if (UNLIKELY(!m_bInited)) {
-        LOGEFUN << SMCP_NAME << UninitializedError;
+        LOGEFUN << EOCP_NAME << UninitializedError;
         return LoadCheckpointResult(Code::Uninited, UninitializedError);
     }
     auto metaRs = load_meta();
@@ -56,23 +55,23 @@ LoadCheckpointResult SimpleCheckpoint::Load(EntryLoadedCallback callback) {
     }
     if (0 == metaRs.EntryId) {    // 不存在checkpoint
         if (!utils::FileUtils::Exist(m_sCpFilePath)) {
-            LOGIFUN << SMCP_NAME << " no checkpoint";
-            return LoadCheckpointResult(SMCP_INVALID_ENTRY_ID);
+            LOGIFUN << EOCP_NAME << " no checkpoint";
+            return LoadCheckpointResult(EOCP_INVALID_ENTRY_ID);
         } else {
-            SMCPLOGEFUN << " checkpoint meta file missing";
+            EOCPLOGEFUN << " checkpoint meta file missing";
             return LoadCheckpointResult(Code::MissingFile, MissingFileError);
         }
     }
 
     if (!utils::FileUtils::Exist(m_sCpFilePath)) {
-        SMCPLOGEFUN << " checkpoint file missing";
+        EOCPLOGEFUN << " checkpoint file missing";
         return LoadCheckpointResult(Code::MissingFile, MissingFileError);
     }
 
     auto fd = utils::FileUtils::Open(m_sCpFilePath, O_RDONLY, 0, 0);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " open checkpoint file " << m_sCpFilePath << " error" << errmsg;
+        EOCPLOGEFUN << " open checkpoint file " << m_sCpFilePath << " error" << errmsg;
         return LoadCheckpointResult(Code::FileSystemError, errmsg);
     }
 
@@ -81,48 +80,48 @@ LoadCheckpointResult SimpleCheckpoint::Load(EntryLoadedCallback callback) {
     auto fileSize = utils::FileUtils::GetFileSize(fd);
     if (-1 == fileSize) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " get file size for " << m_sCpFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " get file size for " << m_sCpFilePath << " error " << errmsg;
         return LoadCheckpointResult(Code::FileCorrupt, errmsg);
     }
     if (0 == fileSize) {
-        LOGDFUN4(SMCP_NAME, " file ", m_sCpFilePath, " is empty!");
-        return LoadCheckpointResult(SMCP_INVALID_ENTRY_ID);
+        LOGDFUN4(EOCP_NAME, " file ", m_sCpFilePath, " is empty!");
+        return LoadCheckpointResult(EOCP_INVALID_ENTRY_ID);
     }
 
     // 2. check if file header is corrupt.
-    if (fileSize < SMCP_MAGIC_NO_LEN) {
-        SMCPLOGEFUN << " file " << m_sCpFilePath << " header is corrupt!";
+    if (fileSize < EOCP_MAGIC_NO_LEN) {
+        EOCPLOGEFUN << " file " << m_sCpFilePath << " header is corrupt!";
         return LoadCheckpointResult(Code::FileCorrupt, FileCorruptError);
     }
 
-    auto headerMpo = common::g_pMemPool->Get(SMCP_MAGIC_NO_LEN);
+    auto headerMpo = common::g_pMemPool->Get(EOCP_MAGIC_NO_LEN);
     auto headerBuffer = (uchar*)(headerMpo->Pointer());
-    auto nRead = utils::IOUtils::ReadFully_V4(fd, (char*)headerBuffer, SMCP_MAGIC_NO_LEN);
+    auto nRead = utils::IOUtils::ReadFully_V4(fd, (char*)headerBuffer, EOCP_MAGIC_NO_LEN);
     if (-1 == nRead) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " read " << m_sCpFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " read " << m_sCpFilePath << " error " << errmsg;
         return LoadCheckpointResult(Code::FileSystemError, errmsg);
     }
 
     uint32_t magicNo = ByteOrderUtils::ReadUInt32(headerBuffer);
-    if (SMCP_MAGIC_NO != magicNo) {
-        SMCPLOGEFUN << m_sCpFilePath << " header is corrupt!";
+    if (EOCP_MAGIC_NO != magicNo) {
+        EOCPLOGEFUN << m_sCpFilePath << " header is corrupt!";
         return LoadCheckpointResult(Code::FileCorrupt, FileCorruptError);
     }
     headerMpo->Put();
 
     // 3. load checkpoint content
-    auto cpEntryOffset = uint32_t(SMCP_MAGIC_NO_LEN);
+    auto cpEntryOffset = uint32_t(EOCP_MAGIC_NO_LEN);
     sys::MemPool::MemObject *pLastMpo = nullptr;
     uchar *lastBuffer = nullptr;
     uint32_t lastLeftSize = 0;
     bool ok = true;
     while (ok) {
-        auto readSize = SMCP_READ_BATCH_SIZE + lastLeftSize;
+        auto readSize = m_batchReadSize + lastLeftSize;
         auto mpo = common::g_pMemPool->Get(readSize);
         auto buffer = (uchar*)(mpo->Pointer());
         if (lastBuffer) {
-            auto lastOffset = SMCP_READ_BATCH_SIZE - lastLeftSize;
+            auto lastOffset = m_batchReadSize - lastLeftSize;
             memcpy(buffer, lastBuffer + lastOffset, lastLeftSize);
             lastBuffer = nullptr;
             pLastMpo->Put();
@@ -130,31 +129,31 @@ LoadCheckpointResult SimpleCheckpoint::Load(EntryLoadedCallback callback) {
             lastLeftSize = 0;
         }
 
-        nRead = utils::IOUtils::ReadFully_V4(fd, (char*)buffer + lastLeftSize, SMCP_READ_BATCH_SIZE);
+        nRead = utils::IOUtils::ReadFully_V4(fd, (char*)buffer + lastLeftSize, m_batchReadSize);
         if (-1 == nRead) {
             mpo->Put();
             auto errmsg = strerror(errno);
-            SMCPLOGEFUN << " read checkpoint " << m_sCpFilePath << " error " << errmsg;
+            EOCPLOGEFUN << " read checkpoint " << m_sCpFilePath << " error " << errmsg;
             return LoadCheckpointResult(Code::FileSystemError, errmsg);
         }
 
         if (0 == nRead) {
             mpo->Put();
             if (0 != lastLeftSize) {
-                SMCPLOGEFUN << " checkpoint file " << m_sCpFilePath << "corrupt";
+                EOCPLOGEFUN << " checkpoint file " << m_sCpFilePath << "corrupt";
                 return LoadCheckpointResult(Code::FileCorrupt, FileCorruptError);
             }
             return LoadCheckpointResult(metaRs.EntryId);
         }
 
         std::vector<common::IEntry*> entries;
-        ok = (nRead == SMCP_READ_BATCH_SIZE);
+        ok = (nRead == m_batchReadSize);
         auto availableBufferSize = nRead + lastLeftSize;
         uint32_t offset = 0;
         while (offset < availableBufferSize) {
             auto leftSize = availableBufferSize - offset;
             // 剩下的不够一个entry了
-            if (leftSize < (SMCP_SIZE_LEN + SMCP_VERSION_LEN)) {
+            if (leftSize < (EOCP_SIZE_LEN + EOCP_VERSION_LEN)) {
                 lastBuffer = buffer;
                 pLastMpo = mpo;
                 lastLeftSize = uint32_t(leftSize);
@@ -162,7 +161,7 @@ LoadCheckpointResult SimpleCheckpoint::Load(EntryLoadedCallback callback) {
             }
 
             auto len = ByteOrderUtils::ReadUInt32(buffer + offset);
-            auto walEntryLen = SMCP_ENTRY_EXTRA_FIELDS_SIZE + len;
+            auto walEntryLen = EOCP_ENTRY_EXTRA_FIELDS_SIZE + len;
             // 剩下的不够一个entry了
             if (leftSize < walEntryLen) {
                 lastBuffer = buffer;
@@ -171,28 +170,28 @@ LoadCheckpointResult SimpleCheckpoint::Load(EntryLoadedCallback callback) {
                 break;
             }
 
-            auto startPosOffset = SMCP_SIZE_LEN + SMCP_VERSION_LEN + len;
+            auto startPosOffset = EOCP_SIZE_LEN + EOCP_VERSION_LEN + len;
             auto startPos = ByteOrderUtils::ReadUInt32(buffer + offset + startPosOffset);
             if (startPos != cpEntryOffset) {
                 mpo->Put();
-                SMCPLOGEFUN << " parse checkpoint entry in " << m_sCpFilePath << " failed at offset " << offset;
+                EOCPLOGEFUN << " parse checkpoint entry in " << m_sCpFilePath << " failed at offset " << offset;
                 return LoadCheckpointResult(Code::FileCorrupt, FileCorruptError);
             }
 
             // auto version = *(buffer + offset + SMCP_SIZE_LEN);
-            auto contentStartPtr = buffer + offset + SMCP_CONTENT_OFFSET;
+            auto contentStartPtr = buffer + offset + EOCP_CONTENT_OFFSET;
             auto contentEndPtr = buffer + len - 1;
             common::Buffer b;
             b.Refresh(contentStartPtr, contentEndPtr, contentStartPtr, contentEndPtr, nullptr);
             auto entry = m_entryCreator();
             if (!entry->Decode(b)) {
                 mpo->Put();
-                SMCPLOGEFUN << " decode entry at offset " << offset << " failed!";
+                EOCPLOGEFUN << " decode entry at offset " << offset << " failed!";
                 return LoadCheckpointResult(Code::DecodeEntryError, DecodeEntryError);
             }
 
             entries.push_back(entry);
-            auto forwardOffset = len + SMCP_ENTRY_EXTRA_FIELDS_SIZE;
+            auto forwardOffset = len + EOCP_ENTRY_EXTRA_FIELDS_SIZE;
             offset += forwardOffset;
             cpEntryOffset += forwardOffset;
         }
@@ -207,9 +206,9 @@ LoadCheckpointResult SimpleCheckpoint::Load(EntryLoadedCallback callback) {
 }
 
 // TODO(sunchao): 1.有时间优化为batch写 2. io和计算异步？
-CheckpointResult SimpleCheckpoint::Save(IEntriesTraveller *traveller) {
+CheckpointResult EntryOrderCheckpoint::Save(IEntriesTraveller *traveller) {
     if (UNLIKELY(!m_bInited)) {
-        LOGEFUN << SMCP_NAME << UninitializedError;
+        LOGEFUN << EOCP_NAME << UninitializedError;
         return CheckpointResult(Code::Uninited, UninitializedError);
     }
     if (traveller->Empty()) {
@@ -239,7 +238,7 @@ CheckpointResult SimpleCheckpoint::Save(IEntriesTraveller *traveller) {
     // rm start flag
     if (-1 == utils::FileUtils::Unlink(m_sNewStartFlagFilePath)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " unlink start flag file " << m_sNewStartFlagFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " unlink start flag file " << m_sNewStartFlagFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
@@ -252,20 +251,20 @@ CheckpointResult SimpleCheckpoint::Save(IEntriesTraveller *traveller) {
     // clean ok flag
     if (-1 == utils::FileUtils::Unlink(m_sNewCpSaveOkFilePath)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " unlink ok flag file " << m_sNewCpSaveOkFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " unlink ok flag file " << m_sNewCpSaveOkFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     return CheckpointResult(Code::OK);
 }
 
-CheckpointResult SimpleCheckpoint::init_new_checkpoint(uint64_t id) {
+CheckpointResult EntryOrderCheckpoint::init_new_checkpoint(uint64_t id) {
     LOGDFUN1("init new checkpoint");
     // create start flag
     auto fd = utils::FileUtils::Open(m_sNewStartFlagFilePath, O_WRONLY, O_CREAT, 0644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " create start flag file " << m_sNewStartFlagFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " create start flag file " << m_sNewStartFlagFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
@@ -278,20 +277,20 @@ CheckpointResult SimpleCheckpoint::init_new_checkpoint(uint64_t id) {
     return create_new_checkpoint_file();
 }
 
-bool SimpleCheckpoint::is_completed() {
+bool EntryOrderCheckpoint::is_completed() {
     return !utils::FileUtils::Exist(m_sNewStartFlagFilePath) && !utils::FileUtils::Exist(m_sNewCpSaveOkFilePath);
 }
 
-CheckpointResult SimpleCheckpoint::create_ok_flag() {
+CheckpointResult EntryOrderCheckpoint::create_ok_flag() {
     int fd = utils::FileUtils::Open(m_sNewCpSaveOkFilePath, O_WRONLY, O_CREAT|O_TRUNC, 0644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " create ok file " << m_sNewCpSaveOkFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " create ok file " << m_sNewCpSaveOkFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     } else {
         if (-1 == close(fd)) {
             auto errmsg = strerror(errno);
-            SMCPLOGEFUN << " close ok file " << m_sNewCpSaveOkFilePath << " error " << errmsg;
+            EOCPLOGEFUN << " close ok file " << m_sNewCpSaveOkFilePath << " error " << errmsg;
             return CheckpointResult(Code::FileSystemError, errmsg);
         }
 
@@ -299,7 +298,7 @@ CheckpointResult SimpleCheckpoint::create_ok_flag() {
     }
 }
 
-CheckpointResult SimpleCheckpoint::check_and_recover() {
+CheckpointResult EntryOrderCheckpoint::check_and_recover() {
     if (is_completed()) {
         return CheckpointResult(Code::OK);
     }
@@ -313,7 +312,7 @@ CheckpointResult SimpleCheckpoint::check_and_recover() {
 
         if (-1 == unlink(m_sNewCpSaveOkFilePath.c_str())) {
             auto errmsg = strerror(errno);
-            SMCPLOGEFUN << " unlink " << m_sNewCpSaveOkFilePath << " error " << errmsg;
+            EOCPLOGEFUN << " unlink " << m_sNewCpSaveOkFilePath << " error " << errmsg;
             return CheckpointResult(Code::FileSystemError, errmsg);
         }
 
@@ -324,84 +323,84 @@ CheckpointResult SimpleCheckpoint::check_and_recover() {
     return clean_new_cp_tmp();
 }
 
-CheckpointResult SimpleCheckpoint::clean_new_cp_tmp() {
+CheckpointResult EntryOrderCheckpoint::clean_new_cp_tmp() {
     if (-1 == utils::FileUtils::Unlink(m_sNewCpMetaFilePath)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " unlink " << m_sNewCpMetaFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " unlink " << m_sNewCpMetaFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     if (-1 == utils::FileUtils::Unlink(m_sNewCpFilePath)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " unlink " << m_sNewCpFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " unlink " << m_sNewCpFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     if (-1 == utils::FileUtils::Unlink(m_sNewStartFlagFilePath)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " unlink " << m_sNewStartFlagFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " unlink " << m_sNewStartFlagFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     if (-1 == utils::FileUtils::Unlink(m_sNewCpSaveOkFilePath)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " unlink " << m_sNewCpSaveOkFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " unlink " << m_sNewCpSaveOkFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     return CheckpointResult(Code::OK);
 }
 
-CheckpointResult SimpleCheckpoint::replace_old_checkpoint() {
+CheckpointResult EntryOrderCheckpoint::replace_old_checkpoint() {
     if (-1 == utils::FileUtils::Unlink(m_sCpMetaFilePath)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " unlink file " << m_sCpMetaFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " unlink file " << m_sCpMetaFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     if (-1 == utils::FileUtils::Unlink(m_sCpFilePath)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " unlink file " << m_sCpFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " unlink file " << m_sCpFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     if (-1 == rename(m_sNewCpMetaFilePath.c_str(), m_sCpMetaFilePath.c_str())) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " rename file " << m_sNewCpMetaFilePath << " to " << m_sCpMetaFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " rename file " << m_sNewCpMetaFilePath << " to " << m_sCpMetaFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     if (-1 == rename(m_sNewCpFilePath.c_str(), m_sCpFilePath.c_str())) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " rename file " << m_sNewCpFilePath << " to " << m_sCpFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " rename file " << m_sNewCpFilePath << " to " << m_sCpFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     return CheckpointResult(Code::OK);
 }
 
-SimpleCheckpoint::LoadMetaResult SimpleCheckpoint::load_meta() {
+EntryOrderCheckpoint::LoadMetaResult EntryOrderCheckpoint::load_meta() {
     if (!utils::FileUtils::Exist(m_sCpMetaFilePath)) {
-        return LoadMetaResult(SMCP_INVALID_ENTRY_ID);
+        return LoadMetaResult(EOCP_INVALID_ENTRY_ID);
     }
 
     auto entryIdStr = utils::FileUtils::ReadAllString(m_sCpMetaFilePath);
     uint64_t entryId;
     auto rs = utils::CommonUtils::ToUint46_t(entryIdStr, entryId);
     if (!rs) {
-        SMCPLOGEFUN << " load entry id from " << m_sCpMetaFilePath << " error";
+        EOCPLOGEFUN << " load entry id from " << m_sCpMetaFilePath << " error";
         return LoadMetaResult(Code::FileCorrupt, FileCorruptError);
     }
 
     return LoadMetaResult(entryId);
 }
 
-CheckpointResult SimpleCheckpoint::create_new_meta_file(uint64_t id) {
+CheckpointResult EntryOrderCheckpoint::create_new_meta_file(uint64_t id) {
     LOGDFUN2("create sm checkpoint meta file ", m_sNewCpMetaFilePath.c_str());
     int fd = utils::FileUtils::Open(m_sNewCpMetaFilePath, O_WRONLY, O_CREAT|O_TRUNC, 0644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << "create new meta file " << m_sNewCpMetaFilePath.c_str() << " error " << errmsg;
+        EOCPLOGEFUN << "create new meta file " << m_sNewCpMetaFilePath.c_str() << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
@@ -409,14 +408,14 @@ CheckpointResult SimpleCheckpoint::create_new_meta_file(uint64_t id) {
     auto idStr = utils::CommonUtils::ToString(id);
     if (-1 == utils::IOUtils::WriteFully(fd, idStr.c_str(), idStr.size())) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " write new meta file " << m_sNewCpMetaFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " write new meta file " << m_sNewCpMetaFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     return CheckpointResult(Code::OK);
 }
 
-CheckpointResult SimpleCheckpoint::create_new_checkpoint_file() {
+CheckpointResult EntryOrderCheckpoint::create_new_checkpoint_file() {
     int fd = utils::FileUtils::Open(m_sNewCpFilePath, O_WRONLY, O_CREAT|O_TRUNC, 0644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
@@ -426,36 +425,36 @@ CheckpointResult SimpleCheckpoint::create_new_checkpoint_file() {
 
     common::FileCloser fc(fd);
     // write file header.
-    uchar header[SMCP_MAGIC_NO_LEN];
-    ByteOrderUtils::WriteUInt32(header, SMCP_MAGIC_NO);
-    if (-1 == utils::IOUtils::WriteFully(fd, (char*)header, SMCP_MAGIC_NO_LEN)) {
+    uchar header[EOCP_MAGIC_NO_LEN];
+    ByteOrderUtils::WriteUInt32(header, EOCP_MAGIC_NO);
+    if (-1 == utils::IOUtils::WriteFully(fd, (char*)header, EOCP_MAGIC_NO_LEN)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " write file " << m_sNewCpFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " write file " << m_sNewCpFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
     return CheckpointResult(Code::OK);
 }
 
-CheckpointResult SimpleCheckpoint::save_new_checkpoint(IEntriesTraveller *traveller) {
+CheckpointResult EntryOrderCheckpoint::save_new_checkpoint(IEntriesTraveller *traveller) {
     auto fd = utils::FileUtils::Open(m_sNewCpFilePath, O_WRONLY, 0, 0);
     common::FileCloser fc(fd);
     common::IEntry *entry = nullptr;
-    uint32_t offset = SMCP_MAGIC_NO_LEN;
-    if (-1 == lseek(fd, SMCP_MAGIC_NO_LEN, SEEK_SET)) {
+    uint32_t offset = EOCP_MAGIC_NO_LEN;
+    if (-1 == lseek(fd, EOCP_MAGIC_NO_LEN, SEEK_SET)) {
         auto errmsg = strerror(errno);
-        SMCPLOGEFUN << " lseek file " << m_sNewCpFilePath << " error " << errmsg;
+        EOCPLOGEFUN << " lseek file " << m_sNewCpFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
     while ((entry = traveller->GetNextEntry())) {
         std::shared_ptr<common::Buffer> eb;
         if (UNLIKELY(!entry->Encode(eb))) {
-            SMCPLOGEFUN << " encode entry error";
+            EOCPLOGEFUN << " encode entry error";
             return CheckpointResult(Code::EncodeEntryError, EncodeEntryError);
         }
 
         auto rawEntrySize = uint32_t(eb->AvailableLength());
-        auto walEntrySize = rawEntrySize + SMCP_ENTRY_EXTRA_FIELDS_SIZE;
+        auto walEntrySize = rawEntrySize + EOCP_ENTRY_EXTRA_FIELDS_SIZE;
         // mpo will be Putted in Buffer 'b'.
         auto mpo = common::g_pMemPool->Get(walEntrySize);
         auto bufferStart = (uchar*)(mpo->Pointer());
@@ -463,11 +462,11 @@ CheckpointResult SimpleCheckpoint::save_new_checkpoint(IEntriesTraveller *travel
         wb.Refresh(bufferStart, bufferStart + walEntrySize - 1, bufferStart, bufferStart + walEntrySize - 1, mpo);
         // size
         ByteOrderUtils::WriteUInt32(wb.GetPos(), rawEntrySize);
-        wb.MoveHeadBack(SMCP_SIZE_LEN);
+        wb.MoveHeadBack(EOCP_SIZE_LEN);
 
         // version
-        *wb.GetPos() = SMCP_VERSION;
-        wb.MoveHeadBack(SMCP_VERSION_LEN);
+        *wb.GetPos() = m_writeEntryVersion;
+        wb.MoveHeadBack(EOCP_VERSION_LEN);
 
         // content
         if (eb->Valid()) {
@@ -479,12 +478,12 @@ CheckpointResult SimpleCheckpoint::save_new_checkpoint(IEntriesTraveller *travel
         ByteOrderUtils::WriteUInt32(wb.GetPos(), offset);
         if (-1 == utils::IOUtils::WriteFully(fd, (char*)(wb.GetStart()), walEntrySize)) {
             auto errmsg = strerror(errno);
-            SMCPLOGEFUN << "write file " << m_sNewCpFilePath << " error " << errmsg;
+            EOCPLOGEFUN << "write file " << m_sNewCpFilePath << " error " << errmsg;
             return CheckpointResult(Code::FileSystemError, errmsg);
         }
         if (-1 == fdatasync(fd)) {
             auto errmsg = strerror(errno);
-            SMCPLOGEFUN << " fdatasync file " << m_sNewCpFilePath << " error " << errmsg;
+            EOCPLOGEFUN << " fdatasync file " << m_sNewCpFilePath << " error " << errmsg;
             return CheckpointResult(Code::FileSystemError, errmsg);
         }
         offset += walEntrySize;
