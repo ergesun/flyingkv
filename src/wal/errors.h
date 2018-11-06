@@ -14,7 +14,7 @@ namespace flyingkv {
 namespace wal {
 enum class Code {
     OK   = 0,
-    Uninit,
+    Uninited,
     Unloaded,
     FileCorrupt,
     FileMameCorrupt,

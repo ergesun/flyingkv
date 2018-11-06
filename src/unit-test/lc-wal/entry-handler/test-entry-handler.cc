@@ -7,12 +7,22 @@
 
 #include "../../../common/buffer.h"
 
+#include "../entry/test-entry.h"
+
 #include "test-entry-handler.h"
 
 namespace flyingkv {
 namespace waltest {
 common::IEntry *TestEntryHandler::CreateNewEntry() {
-    return nullptr;
+    return new TestEntry();
+}
+
+common::IEntry* TestEntryHandler::CreateNewEntryWithContent(std::string &&content) {
+    return new TestEntry(std::move(content));
+}
+
+void TestEntryHandler::OnLoad(std::vector<wal::WalEntry> entries) {
+    m_vLoadEntries.insert(m_vLoadEntries.end(), entries.begin(), entries.end());
 }
 }
 }

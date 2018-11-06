@@ -89,7 +89,11 @@ WalResult LogCleanWal::Init() {
     }
     if (lsaRs.Segments.empty()) {
         m_minSegmentId = 1; // 初始值
-        m_currentSegmentId = 1;
+        m_currentSegmentId = LOGCLEAN_WAL_INVALID_ENTRY_ID;
+        rs = create_new_segment_file();
+        if (rs.Rc != Code::OK) {
+            return rs;
+        }
     } else {
         m_minSegmentId = lsaRs.Segments[0].Id;
         m_currentSegmentId = lsaRs.Segments[lsaRs.Segments.size() - 1].Id;
@@ -97,7 +101,7 @@ WalResult LogCleanWal::Init() {
 
     m_vInitSegments.swap(lsaRs.Segments);
     auto curSegmentFilePath = generate_segment_file_path(m_currentSegmentId);
-    auto fd = utils::FileUtils::Open(curSegmentFilePath, O_RDONLY, O_CREAT, 0644);
+    auto fd = utils::FileUtils::Open(curSegmentFilePath, O_WRONLY, O_CREAT, 0644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
         LCLOGEFUN << "open file " << curSegmentFilePath << " error " << errmsg;
@@ -115,19 +119,48 @@ WalResult LogCleanWal::Init() {
     return WalResult(Code::OK);
 }
 
+LoadResult LogCleanWal::Load(const WalEntryLoadedCallback &callback) {
+    if (UNLIKELY(!m_bInited)) {
+        LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
+        return LoadResult(Code::Uninited, UninitializedError);
+    }
+
+    common::ObjReleaseHandler<bool> handler(&m_bLoaded, [](bool *loaded) {
+        *loaded = true;
+    });
+
+    if (m_vInitSegments.empty()) {
+        return LoadResult(Code::OK);
+    }
+
+    m_minSegmentId = m_vInitSegments[0].Id;
+    auto maxIdx = m_vInitSegments.size() - 1;
+    for (size_t i = 0; i <= maxIdx; ++i) {
+        auto rs = load_segment(m_vInitSegments[i].Path, m_vInitSegments[i].Id, callback);
+        if (Code::OK != rs.Rc) {
+            return LoadResult(rs.Rc, rs.Errmsg);
+        }
+        if (i == maxIdx) {
+            m_curSegFileSize = rs.FileSize;
+        }
+    }
+
+    return LoadResult(Code::OK);
+}
+
 // TODO(sunchao): 抽象一个编码函数，对应不同的log version。目前这个只能编码version=1
 AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     if (UNLIKELY(!m_bInited)) {
-        LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
-        return AppendEntryResult(Code::Uninit, UninitializedError);
+        LCLOGEFUN << UninitializedError;
+        return AppendEntryResult(Code::Uninited, UninitializedError);
     }
     if (UNLIKELY(!m_bLoaded)) {
-        LOGEFUN << LOGCLEAN_WAL_NAME << UnloadedError;
+        LCLOGEFUN << UnloadedError;
         return AppendEntryResult(Code::Unloaded, UnloadedError);
     }
     std::shared_ptr<common::Buffer> eb;
     if (UNLIKELY(!entry->Encode(eb))) {
-        LOGEFUN << LOGCLEAN_WAL_NAME << EncodeEntryError;
+        LCLOGEFUN << EncodeEntryError;
         return AppendEntryResult(Code::EncodeEntryError, EncodeEntryError);
     }
 
@@ -135,7 +168,7 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     auto rawEntrySize = uint32_t(eb->AvailableLength());
     auto walEntrySize = rawEntrySize + LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE;
     if (walEntrySize > LOGCLEAN_WAL_ENTRY_MAX_SIZE) {
-        LOGEFUN << "entry size cannot be larger than " << LOGCLEAN_WAL_ENTRY_MAX_SIZE << " bytes";
+        LCLOGEFUN << " entry size cannot be larger than " << LOGCLEAN_WAL_ENTRY_MAX_SIZE << " bytes";
         return AppendEntryResult(Code::EntryBytesSizeOverflow, EntryBytesSizeOverflowError);
     }
 
@@ -157,14 +190,24 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     wb.MoveHeadBack(LOGCLEAN_WAL_ENTRY_ID_LEN);
 
     // content
-    memcpy(eb->GetPos(), wb.GetPos(), size_t(rawEntrySize));
-    wb.MoveHeadBack(rawEntrySize);
+    if (eb->Valid()) {
+        memcpy(eb->GetPos(), wb.GetPos(), size_t(rawEntrySize));
+        wb.MoveHeadBack(rawEntrySize);
+    }
 
     // offset
     ByteOrderUtils::WriteUInt32(wb.GetPos(), walEntryStartOffset);
+    if (-1 == utils::IOUtils::WriteFully(m_currentSegFd, (char*)(wb.GetStart()), size_t(walEntrySize))) {
+        auto errmsg = strerror(errno);
+        LCLOGEFUN << " write file " << m_currentSegFilePath << " error " << errmsg;
+        return AppendEntryResult(Code::FileSystemError, errmsg);
+    }
 
-    WriteFileFullyWithFatalLOG(m_currentSegFd, (char*)(wb.GetStart()), size_t(walEntrySize), m_currentSegFilePath);
-    FDataSyncFileWithFatalLOG(m_currentSegFd, m_currentSegFilePath);
+    if (-1 == fdatasync(m_currentSegFd)) {
+        auto errmsg = strerror(errno);
+        LCLOGEFUN << " fdatasync file " << m_currentSegFilePath << " error " << errmsg;
+        return AppendEntryResult(Code::FileSystemError, errmsg);
+    }
     m_curSegFileSize += walEntrySize;
     m_mpEntriesIdSegId[m_currentEntryIdx] = m_currentSegmentId;
     ++m_currentEntryIdx;
@@ -178,35 +221,10 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     return AppendEntryResult(m_currentEntryIdx);
 }
 
-LoadResult LogCleanWal::Load(const WalEntryLoadedCallback &callback) {
-    if (UNLIKELY(!m_bInited)) {
-        LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
-        return LoadResult(Code::Uninit, UninitializedError);
-    }
-
-    if (m_vInitSegments.empty()) {
-        return LoadResult(Code::OK);
-    }
-
-    m_minSegmentId = m_vInitSegments[0].Id;
-    auto maxIdx = m_vInitSegments.size() - 1;
-    for (size_t i = 0; i <= maxIdx; ++i) {
-        auto rs = load_segment(m_vInitSegments[i].Path, m_vInitSegments[i].Id, callback);
-        if (Code::OK != rs.Rc) {
-            return LoadResult(rs.Rc, rs.Errmsg);
-        }
-        if (i == maxIdx) {
-            m_curSegFileSize = rs.FileSize;
-        }
-    }
-
-    return LoadResult(Code::OK);
-}
-
 TruncateResult LogCleanWal::Truncate(uint64_t id) {
     if (UNLIKELY(!m_bInited)) {
         LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
-        return TruncateResult(Code::Uninit, UninitializedError);
+        return TruncateResult(Code::Uninited, UninitializedError);
     }
 
     if (UNLIKELY(!m_bLoaded)) {
@@ -458,8 +476,10 @@ LogCleanWal::ListSegmentsResult LogCleanWal::list_segments_asc() {
     std::vector<LogCleanWalSegmentFileInfo> rs;
     for (auto &c : children) {
         auto idPos = c.rfind('.') + 1;
-        auto id = utils::CommonUtils::ToInteger<uint64_t>(c.substr(idPos));
-        if (0 == id) {
+        auto idStr = c.substr(idPos);
+        uint64_t id;
+        auto ok = utils::CommonUtils::ToUint46_t(idStr, id);
+        if (!ok) {
             LCLOGEFUN << " parse segment file " << c << " id error.";
             return ListSegmentsResult(Code::FileMameCorrupt, FileNameCorruptError);
         }
@@ -490,8 +510,13 @@ uint64_t LogCleanWal::get_uncompleted_trunc_segments_max_id() {
     if (idStr.empty()) {
         return LOGCLEAN_WAL_INVALID_SEGMENT_ID;
     }
+    uint64_t entryId;
+    auto rs = utils::CommonUtils::ToUint46_t(idStr, entryId);
+    if (!rs) {
+        return LOGCLEAN_WAL_INVALID_SEGMENT_ID;
+    }
 
-    return utils::CommonUtils::ToInteger<uint64_t>(idStr);
+    return entryId;
 }
 
 std::string LogCleanWal::generate_segment_file_path(uint64_t id) {
@@ -536,7 +561,7 @@ WalResult LogCleanWal::create_new_segment_file() {
 
     ++m_currentSegmentId;
     auto fp = generate_segment_file_path(m_currentSegmentId);
-    m_currentSegFd = utils::FileUtils::Open(fp, O_WRONLY, O_CREAT, 644);
+    m_currentSegFd = utils::FileUtils::Open(fp, O_WRONLY, O_CREAT, 0644);
     m_currentSegFilePath = std::move(fp);
     if (-1 == m_currentSegFd) {
         auto errmsg = strerror(errno);
@@ -547,10 +572,9 @@ WalResult LogCleanWal::create_new_segment_file() {
     // write file header.
     uchar header[LOGCLEAN_WAL_MAGIC_NO_LEN];
     ByteOrderUtils::WriteUInt32(header, LOGCLEAN_WAL_MAGIC_NO);
-    WriteFileFullyWithFatalLOG(m_currentSegFd, (char*)header, LOGCLEAN_WAL_MAGIC_NO_LEN, m_currentSegFilePath);
     if (-1 == utils::IOUtils::WriteFully(m_currentSegFd, (char*)header, LOGCLEAN_WAL_MAGIC_NO_LEN)) {
         auto errmsg = strerror(errno);
-        LCLOGEFUN << " write file " << m_currentSegFilePath << " failed with errmsg " << errmsg;
+        LCLOGEFUN << " write file " << m_currentSegFilePath << " error " << errmsg;
         return WalResult(Code::FileSystemError, errmsg);
     }
 
@@ -559,7 +583,7 @@ WalResult LogCleanWal::create_new_segment_file() {
 }
 
 WalResult LogCleanWal::create_trunc_info(uint64_t segId) {
-    auto fd = utils::FileUtils::Open(m_sTruncInfoFilePath, O_WRONLY, O_CREAT|O_TRUNC, 644);
+    auto fd = utils::FileUtils::Open(m_sTruncInfoFilePath, O_WRONLY, O_CREAT|O_TRUNC, 0644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
         LCLOGEFUN << " open file " << m_sTruncInfoFilePath << " error " << errmsg;
@@ -578,7 +602,7 @@ WalResult LogCleanWal::create_trunc_info(uint64_t segId) {
 }
 
 WalResult LogCleanWal::create_trunc_ok_flag() {
-    auto fd = utils::FileUtils::Open(m_sTruncOKFlagFilePath, O_WRONLY, O_CREAT, 644);
+    auto fd = utils::FileUtils::Open(m_sTruncOKFlagFilePath, O_WRONLY, O_CREAT, 0644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
         LCLOGEFUN << " open file " << m_sTruncOKFlagFilePath << " error " << errmsg;

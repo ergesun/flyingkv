@@ -94,6 +94,27 @@ PUBLIC
         return rs;
     }
 
+    /**
+     *
+     * @param s
+     * @
+     * @return
+     */
+    static inline bool ToUint46_t(const std::string &s, uint64_t &val) {
+        char *endptr = nullptr;
+        val = strtoul(s.c_str(), &endptr, 10);
+        if ((errno == ERANGE && (val == ULONG_MAX || val == 0))
+            || (errno != 0 && val == 0)) {
+            return false;
+        }
+
+        if (endptr == s.c_str()) {
+            return false;
+        }
+
+        return *endptr == '\0';
+    }
+
     template <typename T>
     static inline std::string ToString(const T &s) {
         std::stringstream ss;

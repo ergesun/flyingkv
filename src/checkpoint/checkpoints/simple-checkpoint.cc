@@ -262,13 +262,14 @@ CheckpointResult SimpleCheckpoint::Save(IEntriesTraveller *traveller) {
 CheckpointResult SimpleCheckpoint::init_new_checkpoint(uint64_t id) {
     LOGDFUN1("init new checkpoint");
     // create start flag
-    auto fd = utils::FileUtils::Open(m_sNewStartFlagFilePath, O_RDONLY, O_CREAT, 644);
+    auto fd = utils::FileUtils::Open(m_sNewStartFlagFilePath, O_WRONLY, O_CREAT, 0644);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
         SMCPLOGEFUN << " create start flag file " << m_sNewStartFlagFilePath << " error " << errmsg;
         return CheckpointResult(Code::FileSystemError, errmsg);
     }
 
+    close(fd);
     auto rs = create_new_meta_file(id);
     if (Code::OK != rs.Rc) {
         return rs;
@@ -385,8 +386,9 @@ SimpleCheckpoint::LoadMetaResult SimpleCheckpoint::load_meta() {
     }
 
     auto entryIdStr = utils::FileUtils::ReadAllString(m_sCpMetaFilePath);
-    auto entryId = utils::CommonUtils::ToInteger<uint64_t>(entryIdStr);
-    if (SMCP_INVALID_ENTRY_ID == entryId) {
+    uint64_t entryId;
+    auto rs = utils::CommonUtils::ToUint46_t(entryIdStr, entryId);
+    if (!rs) {
         SMCPLOGEFUN << " load entry id from " << m_sCpMetaFilePath << " error";
         return LoadMetaResult(Code::FileCorrupt, FileCorruptError);
     }

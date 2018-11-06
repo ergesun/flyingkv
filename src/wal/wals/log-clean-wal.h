@@ -78,13 +78,13 @@ PUBLIC
     ~LogCleanWal() override;
 
     WalResult Init() override;
+    LoadResult Load(const WalEntryLoadedCallback&) override;
     /**
      * 向version最大的日志文件追加
      * @param entry
      * @return
      */
     AppendEntryResult AppendEntry(common::IEntry *entry) override;
-    LoadResult Load(const WalEntryLoadedCallback&) override;
     TruncateResult Truncate(uint64_t id) override;
 
 PRIVATE

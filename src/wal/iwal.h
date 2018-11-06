@@ -49,6 +49,13 @@ struct WalEntry {
         we.Entry = nullptr;
     }
 
+    WalEntry& operator=(const WalEntry &a) noexcept {
+        this->Id = a.Id;
+        this->Entry = a.Entry;
+
+        return *this;
+    }
+
     uint64_t          Id;
     common::IEntry   *Entry;
 };
@@ -60,12 +67,12 @@ PUBLIC
     virtual ~IWal() = default;
 
     virtual WalResult Init() = 0;
+    virtual LoadResult Load(const WalEntryLoadedCallback&) = 0;
     /**
      *
      * @return entry id
      */
     virtual AppendEntryResult AppendEntry(common::IEntry*) = 0;
-    virtual LoadResult Load(const WalEntryLoadedCallback&) = 0;
     /**
      * truncate log entry in range [-, id]
      * @param id
