@@ -88,6 +88,8 @@ PUBLIC
     AppendEntryResult AppendEntry(common::IEntry *entry) override;
     TruncateResult Truncate(uint64_t id) override;
 
+    SizeResult Size() override;
+
 PRIVATE
     struct LoadSegmentResult : public WalResult {
         uint32_t FileSize;

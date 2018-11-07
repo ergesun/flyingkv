@@ -20,19 +20,48 @@ struct WalResult {
     Code    Rc;
     string  Errmsg;
 
+    WalResult() = default;
     explicit WalResult(Code rc) : Rc(rc) {}
     WalResult(Code rc, const string &errmsg) : Rc(rc), Errmsg(errmsg) {}
+
+    WalResult(const WalResult &b) {
+        this->Rc = b.Rc;
+        this->Errmsg = b.Errmsg;
+    }
 };
 
 struct AppendEntryResult : public WalResult {
     uint64_t   EntryId;
 
+    AppendEntryResult() = default;
     explicit AppendEntryResult(uint64_t entryId) : WalResult(Code::OK), EntryId(entryId) {}
     AppendEntryResult(Code rc, const string &errmsg) : WalResult(rc, errmsg) {}
+
+    AppendEntryResult(const AppendEntryResult& b) {
+        WalResult::Rc = b.Rc;
+        WalResult::Errmsg = b.Errmsg;
+        this->EntryId = b.EntryId;
+    };
+    AppendEntryResult& operator=(AppendEntryResult &&aer) {
+        this->Rc = aer.Rc;
+        this->Errmsg = std::move(aer.Errmsg);
+        this->EntryId = aer.EntryId;
+
+        return *this;
+    }
+};
+
+struct SizeResult : public WalResult {
+    uint64_t   Size;
+
+    SizeResult() = default;
+    explicit SizeResult(uint64_t size) : WalResult(Code::OK), Size(size) {}
+    SizeResult(Code rc, const string &errmsg) : WalResult(rc, errmsg) {}
+
+    SizeResult(SizeResult &&sr) : WalResult(sr.Rc, std::move(sr.Errmsg)), Size(sr.Size) {}
 };
 
 typedef WalResult LoadResult;
-
 typedef WalResult TruncateResult;
 
 struct WalEntry {
@@ -79,6 +108,7 @@ PUBLIC
      * @return
      */
     virtual TruncateResult Truncate(uint64_t id) = 0;
+    virtual SizeResult Size() = 0;
 };
 }
 }

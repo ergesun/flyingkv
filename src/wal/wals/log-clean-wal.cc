@@ -444,7 +444,7 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
             auto contentEndPtr = contentStartPtr + len - 1;
             common::Buffer b;
             b.Refresh(contentStartPtr, contentEndPtr, contentStartPtr, contentEndPtr, nullptr, false);
-            auto entry = m_entryCreator();
+            auto entry = m_entryCreator(b);
             if (!entry->Decode(b)) {
                 mpo->Put();
                 LCLOGEFUN << " decode entry at offset " << offset << " failed!";
@@ -690,6 +690,31 @@ LogCleanWal::LoadSegmentMaxEntryIdResult LogCleanWal::load_segment_max_entry_id(
 
     // entry被破坏，直接返回SMLOG_INVALID_ENTRY_ID.
     return LoadSegmentMaxEntryIdResult(Code::FileCorrupt, FileCorruptError);
+}
+
+SizeResult LogCleanWal::Size() {
+    auto listRs = list_segments_asc();
+    if (listRs.Rc != Code::OK) {
+        return SizeResult(listRs.Rc, listRs.Errmsg);
+    }
+
+    if (listRs.Segments.empty()) {
+        return SizeResult(0);
+    }
+
+    uint64_t size = 0;
+    for (auto &s : listRs.Segments) {
+        auto sSize = utils::FileUtils::GetFileSize(s.Path);
+        if (-1 == sSize) {
+            auto errmsg = strerror(errno);
+            LCLOGEFUN << " access file " << s.Path << " error " << errmsg;
+            return SizeResult(Code::FileSystemError, errmsg);
+        }
+
+        size += sSize;
+    }
+
+    return SizeResult(size);
 }
 }
 }

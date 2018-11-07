@@ -5,6 +5,11 @@ import "meta.proto";
 
 package flyingkv.protocol;
 
+enum SortOrder {
+    Asc     = 0;
+    Desc    = 1;
+}
+
 enum Code {
     OK             = 0;
     ArgsErr        = 1;
@@ -42,10 +47,10 @@ message DeleteResponse {
 
 // TODO:add skip、prefix filter condition
 message ScanRequest {
-    bytes     startKey        = 1;
-    bool      containStartKey = 2;
-    bool      Desc            = 3; // sort order: true is desc, false is asc
-    int32     limit           = 4;
+    bytes      startKey        = 1;
+    bool       containStartKey = 2;
+    SortOrder  order           = 3;
+    uint32     limit           = 5;
 }
 
 message ScanResponse {

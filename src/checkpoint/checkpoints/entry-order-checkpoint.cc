@@ -53,15 +53,6 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
     if (Code::OK != metaRs.Rc) {
         return LoadCheckpointResult(metaRs.Rc, metaRs.Errmsg);
     }
-    if (0 == metaRs.EntryId) {    // 不存在checkpoint
-        if (!utils::FileUtils::Exist(m_sCpFilePath)) {
-            LOGIFUN << EOCP_NAME << " no checkpoint";
-            return LoadCheckpointResult(EOCP_INVALID_ENTRY_ID);
-        } else {
-            EOCPLOGEFUN << " checkpoint meta file missing";
-            return LoadCheckpointResult(Code::MissingFile, MissingFileError);
-        }
-    }
 
     if (!utils::FileUtils::Exist(m_sCpFilePath)) {
         EOCPLOGEFUN << " checkpoint file missing";
@@ -186,7 +177,7 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
             auto contentEndPtr = contentStartPtr + len - 1;
             common::Buffer b;
             b.Refresh(contentStartPtr, contentEndPtr, contentStartPtr, contentEndPtr, nullptr, false);
-            auto entry = m_entryCreator();
+            auto entry = m_entryCreator(b);
             if (!entry->Decode(b)) {
                 mpo->Put();
                 EOCPLOGEFUN << " decode entry at offset " << offset << " failed!";
@@ -230,7 +221,7 @@ CheckpointResult EntryOrderCheckpoint::Save(IEntriesTraveller *traveller) {
     }
 
     // save entries
-        save_new_checkpoint(traveller);
+    save_new_checkpoint(traveller);
 
     // create ok flag
     rs = create_ok_flag();

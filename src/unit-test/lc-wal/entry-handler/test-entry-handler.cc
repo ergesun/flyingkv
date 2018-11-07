@@ -13,7 +13,7 @@
 
 namespace flyingkv {
 namespace waltest {
-common::IEntry *TestEntryHandler::CreateNewEntry() {
+common::IEntry *TestEntryHandler::CreateNewEntry(const common::Buffer& b) {
     auto te = new TestEntry();
     te->SetCanDecode(m_bCanDecode);
 

@@ -13,7 +13,7 @@ namespace flyingkv {
 namespace waltest {
 class TestEntryHandler {
 PUBLIC
-    common::IEntry* CreateNewEntry();
+    common::IEntry* CreateNewEntry(const common::Buffer& b);
     common::IEntry* CreateNewEntryWithContent(std::string &&content);
     void OnLoad(std::vector<wal::WalEntry>);
 

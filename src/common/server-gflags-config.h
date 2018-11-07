@@ -38,6 +38,8 @@ DECLARE_string(acc_conf_path);
  * kv
  */
 DECLARE_string(kv_type);
+DECLARE_uint32(kv_check_wal_size_tick);
+DECLARE_uint32(kv_do_checkpoint_wal_size);
 DECLARE_string(wal_dir);
 DECLARE_string(wal_type);
 DECLARE_uint32(wal_entry_write_version);

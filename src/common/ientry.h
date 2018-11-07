@@ -16,10 +16,10 @@ PUBLIC
     virtual ~IEntry() = default;
 
     virtual bool Encode(std::shared_ptr<Buffer>&) = 0;
-    virtual bool Decode(const Buffer&) = 0;
+    virtual bool Decode(Buffer&) = 0;
 };
 
-typedef std::function<common::IEntry*(void)> EntryCreateHandler;
+typedef std::function<common::IEntry*(const Buffer&)> EntryCreateHandler;
 }
 }
 

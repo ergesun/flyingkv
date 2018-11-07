@@ -15,6 +15,7 @@
 #include "../../utils/io-utils.h"
 #include "../../common/global-vars.h"
 #include "../../utils/codec-utils.h"
+#include "../../common/buffer.h"
 
 using namespace flyingkv;
 using namespace flyingkv::wal;
@@ -40,12 +41,12 @@ int main(int argc, char **argv) {
 
 TEST(LCWALTest, ArgsTest) {
     auto handler = new TestEntryHandler();
-    auto pWalConf = new wal::LogCleanWalConfig(INVALID_WAL_TYPE, INVALID_WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler),
+    auto pWalConf = new wal::LogCleanWalConfig(INVALID_WAL_TYPE, INVALID_WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler, std::placeholders::_1),
                                                TEST_ENTRY_VERSION, DEFAULT_SEGMENTS_SIZE, DEFAULT_BATCH_READ_SIZE);
     IWal *pWal = WALFactory::CreateInstance(pWalConf);
     EXPECT_EQ(pWal, nullptr);
     delete pWalConf;
-    pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, INVALID_WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler),
+    pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, INVALID_WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler, std::placeholders::_1),
                                                TEST_ENTRY_VERSION, DEFAULT_SEGMENTS_SIZE, DEFAULT_BATCH_READ_SIZE);
     pWal = WALFactory::CreateInstance(pWalConf);
     EXPECT_NE(pWal, nullptr);
@@ -57,14 +58,14 @@ TEST(LCWALTest, InitTest) {
     auto handler = new TestEntryHandler();
 
     // - invalid root
-    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, INVALID_WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler),
+    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, INVALID_WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler, std::placeholders::_1),
                                                TEST_ENTRY_VERSION, DEFAULT_SEGMENTS_SIZE, DEFAULT_BATCH_READ_SIZE);
     IWal *pWal = WALFactory::CreateInstance(pWalConf);
     auto rs = pWal->Init();
     EXPECT_EQ(rs.Rc, Code::FileSystemError);
     delete pWalConf;
 
-    pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler),
+    pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler, std::placeholders::_1),
                                                TEST_ENTRY_VERSION, DEFAULT_SEGMENTS_SIZE, DEFAULT_BATCH_READ_SIZE);
     pWal = WALFactory::CreateInstance(pWalConf);
     auto plcWal = dynamic_cast<LogCleanWal*>(pWal);
@@ -149,7 +150,7 @@ TEST(LCWALTest, AppendEntryTest) {
     auto handler = new TestEntryHandler();
     auto loadHandler = std::bind(&TestEntryHandler::OnLoad, handler, std::placeholders::_1);
     utils::FileUtils::RemoveDirectory(WAL_ROOT);
-    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler),
+    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler, std::placeholders::_1),
                                                TEST_ENTRY_VERSION, DEFAULT_SEGMENTS_SIZE, DEFAULT_BATCH_READ_SIZE);
     auto pWal = dynamic_cast<LogCleanWal*>(WALFactory::CreateInstance(pWalConf));
     delete pWalConf;
@@ -168,8 +169,9 @@ TEST(LCWALTest, AppendEntryTest) {
     EXPECT_EQ(rs.Rc, Code::EntryBytesSizeOverflow);
     delete testEntry;
 
+    common::Buffer tb;
     // cannot encoded
-    auto entry = handler->CreateNewEntry();
+    auto entry = handler->CreateNewEntry(tb);
     testEntry = dynamic_cast<TestEntry*>(entry);
     testEntry->SetCanEncode(false);
     rs = pWal->AppendEntry(testEntry);
@@ -177,7 +179,7 @@ TEST(LCWALTest, AppendEntryTest) {
     delete entry;
 
     // no content entry
-    entry = handler->CreateNewEntry();
+    entry = handler->CreateNewEntry(tb);
     rs = pWal->AppendEntry(entry);
     EXPECT_EQ(rs.Rc, Code::OK);
     delete entry;
@@ -267,7 +269,7 @@ TEST(LCWALTest, LoadTest) {
     auto handler = new TestEntryHandler();
     auto loadHandler = std::bind(&TestEntryHandler::OnLoad, handler, std::placeholders::_1);
     utils::FileUtils::RemoveDirectory(WAL_ROOT);
-    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler),
+    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler, std::placeholders::_1),
                                                TEST_ENTRY_VERSION, DEFAULT_SEGMENTS_SIZE, DEFAULT_BATCH_READ_SIZE);
     auto pWal = dynamic_cast<LogCleanWal*>(WALFactory::CreateInstance(pWalConf));
     // uninitialized
@@ -281,7 +283,8 @@ TEST(LCWALTest, LoadTest) {
 
     // 2. has entries
     /// 2.1 insert some entries
-    auto entry = handler->CreateNewEntry();
+    common::Buffer tb;
+    auto entry = handler->CreateNewEntry(tb);
     auto ars = pWal->AppendEntry(entry);
     EXPECT_EQ(ars.Rc, Code::OK);
     delete entry;
@@ -334,13 +337,14 @@ TEST(LCWALTest, TruncateTest) {
     auto handler = new TestEntryHandler();
     auto loadHandler = std::bind(&TestEntryHandler::OnLoad, handler, std::placeholders::_1);
     utils::FileUtils::RemoveDirectory(WAL_ROOT);
-    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler),
+    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler, std::placeholders::_1),
                                                TEST_ENTRY_VERSION, DEFAULT_SEGMENTS_SIZE, DEFAULT_BATCH_READ_SIZE);
     auto pWal = dynamic_cast<LogCleanWal*>(WALFactory::CreateInstance(pWalConf));
     pWal->Init();
     pWal->Load(loadHandler);
+    common::Buffer tb;
     /// 2.1 insert some entries
-    auto entry = handler->CreateNewEntry();
+    auto entry = handler->CreateNewEntry(tb);
     auto ars = pWal->AppendEntry(entry);
     EXPECT_EQ(ars.Rc, Code::OK);
     delete entry;

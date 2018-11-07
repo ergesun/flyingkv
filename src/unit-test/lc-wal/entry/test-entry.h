@@ -18,7 +18,7 @@ PUBLIC
     explicit TestEntry(std::string &&content) : m_pContent(std::move(content)) {}
 
     bool Encode(std::shared_ptr<common::Buffer> &ptr) override;
-    bool Decode(const common::Buffer &buffer) override;
+    bool Decode(common::Buffer &buffer) override;
 
     void SetCanEncode(bool ok) {
         m_bCanEncode = ok;

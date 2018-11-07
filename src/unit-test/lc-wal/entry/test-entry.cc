@@ -29,7 +29,7 @@ bool TestEntry::Encode(std::shared_ptr<common::Buffer> &ptr) {
     return true;
 }
 
-bool TestEntry::Decode(const common::Buffer &buffer) {
+bool TestEntry::Decode(common::Buffer &buffer) {
     if (!m_bCanDecode) {
         return false;
     }
