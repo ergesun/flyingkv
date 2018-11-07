@@ -294,15 +294,36 @@ TEST(LCWALTest, LoadTest) {
 
     delete pWal;
     /// 2.2 load
-    //pWal = dynamic_cast<LogCleanWal*>(WALFactory::CreateInstance(pWalConf));
-    //pWal->Init();
-    //rs = pWal->Load(loadHandler);
-    //EXPECT_EQ(rs.Rc, Code::OK);
-    //EXPECT_EQ(handler->m_vLoadEntries.size(), 3);
+    pWal = dynamic_cast<LogCleanWal*>(WALFactory::CreateInstance(pWalConf));
+    pWal->Init();
+    rs = pWal->Load(loadHandler);
+    EXPECT_EQ(rs.Rc, Code::OK);
+    EXPECT_EQ(handler->m_vLoadEntries.size(), 3);
+
+    // 2.3 small batch
+    pWalConf->ReadBatchSize = LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE + 5;
+    auto pWal2 = dynamic_cast<LogCleanWal*>(WALFactory::CreateInstance(pWalConf));
+    pWal2->Init();
+    rs = pWal2->Load(loadHandler);
+    EXPECT_EQ(rs.Rc, Code::OK);
+    delete pWal2;
+
+    // 3. destroy last entry start offset
+    auto fd = utils::FileUtils::Open(pWal->m_vInitSegments[0].Path, O_WRONLY, 0, 0);
+    auto fileSize  = utils::FileUtils::GetFileSize(fd);
+    lseek(fd, 1, SEEK_END);
+    utils::IOUtils::WriteFully(fd, "abcdfsfsdfdsfdsfdsfsdafdsafdafsdfsdfdfdfsdfsdfddddsfsdafdsfdsfdsfsadfsdfdsfdsfsdfsdf", 3);
+    rs = pWal->Load(loadHandler);
+    EXPECT_EQ(rs.Rc, Code::FileCorrupt);
+
+    ftruncate(fd, fileSize - 5);
+    rs = pWal->Load(loadHandler);
+    EXPECT_EQ(rs.Rc, Code::FileCorrupt);
+    delete pWal;
 
     delete pWalConf;
 }
 
-void prepare_env() {
+TEST(LCWALTest, TruncateTest) {
 
 }

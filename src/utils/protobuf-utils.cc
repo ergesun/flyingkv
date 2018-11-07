@@ -27,7 +27,7 @@ bool ProtoBufUtils::Serialize(const google::protobuf::Message *from, common::Buf
     if (!from->SerializeToArray(start, len)) {
         return false;
     }
-    to->Refresh(start, start + len - 1, start, start + mo->Size() - 1, mo);
+    to->Refresh(start, start + len - 1, start, start + mo->Size() - 1, mo, true);
     return true;
 }
 

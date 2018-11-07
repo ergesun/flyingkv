@@ -187,7 +187,7 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     auto mpo = common::g_pMemPool->Get(walEntrySize);
     auto bufferStart = (uchar*)(mpo->Pointer());
     common::Buffer wb;
-    wb.Refresh(bufferStart, bufferStart + walEntrySize - 1, bufferStart, bufferStart + walEntrySize - 1, mpo);
+    wb.Refresh(bufferStart, bufferStart + walEntrySize - 1, bufferStart, bufferStart + walEntrySize - 1, mpo, true);
     // size
     ByteOrderUtils::WriteUInt32(wb.GetPos(), rawEntrySize);
     wb.MoveHeadBack(LOGCLEAN_WAL_SIZE_LEN);
@@ -335,19 +335,14 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
     }
 
     common::FileCloser fc(fd);
-    // 1. check if file is empty.
     auto fileSize = utils::FileUtils::GetFileSize(fd);
     if (-1 == fileSize) {
         auto errmsg = strerror(errno);
         LCLOGEFUN << " get file size for " << filePath << " error " << errmsg;
         return LoadSegmentResult(Code::FileCorrupt, errmsg);
     }
-    if (0 == fileSize) {
-        LOGDFUN4(LOGCLEAN_WAL_NAME, " file ", filePath, " is empty!");
-        return LoadSegmentResult(0);
-    }
 
-    // 2. check if file header is corrupt.
+    // check if file header is corrupt.
     if (fileSize < LOGCLEAN_WAL_MAGIC_NO_LEN) {
         LCLOGEFUN << " file " << filePath << " header is corrupt!";
         return LoadSegmentResult(Code::FileCorrupt, FileCorruptError);
@@ -369,23 +364,23 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
     }
     headerMpo->Put();
 
-    // 3. load segment content
+    // load segment content
     auto segmentEntryOffset = uint32_t(LOGCLEAN_WAL_MAGIC_NO_LEN);
     sys::MemPool::MemObject *pLastMpo = nullptr;
     uchar *lastBuffer = nullptr;
     uint32_t lastLeftSize = 0;
+    uint32_t lastOffset = 0;
     bool ok = true;
     while (ok) {
         auto readSize = m_batchReadSize + lastLeftSize;
         auto mpo = common::g_pMemPool->Get(readSize);
         auto buffer = (uchar*)(mpo->Pointer());
         if (lastBuffer) {
-            auto lastOffset = m_batchReadSize - lastLeftSize;
             memcpy(buffer, lastBuffer + lastOffset, lastLeftSize);
+            lastOffset = 0;
             lastBuffer = nullptr;
             pLastMpo->Put();
             pLastMpo = nullptr;
-            lastLeftSize = 0;
         }
 
         nRead = utils::IOUtils::ReadFully_V4(fd, (char*)buffer + lastLeftSize, m_batchReadSize);
@@ -408,24 +403,34 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
         std::vector<WalEntry> entries;
         ok = (nRead == m_batchReadSize);
         auto availableBufferSize = nRead + lastLeftSize;
+        lastLeftSize = 0; // 遗留的buffer + 新读取的buffer开始处理了，上一次遗留的size就无用了。
         uint32_t offset = 0;
         while (offset < availableBufferSize) {
             auto leftSize = availableBufferSize - offset;
-            // 剩下的不够一个entry了
+            uint32_t len = 0;
+            uint32_t walEntryLen = 0;
+            bool notEnoughOneEntry = false;
             if (leftSize < LOGCLEAN_WAL_ENTRY_HEADER_LEN) {
-                lastBuffer = buffer;
-                pLastMpo = mpo;
-                lastLeftSize = uint32_t(leftSize);
-                break;
+                notEnoughOneEntry = true;
+            } else {
+                len = ByteOrderUtils::ReadUInt32(buffer + offset);
+                walEntryLen = LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE + len;
+                // 剩下的不够一个entry了
+                if (leftSize < walEntryLen) {
+                    notEnoughOneEntry = true;
+                }
             }
 
-            auto len = ByteOrderUtils::ReadUInt32(buffer + offset);
-            auto walEntryLen = LOGCLEAN_WAL_ENTRY_EXTRA_FIELDS_SIZE + len;
-            // 剩下的不够一个entry了
-            if (leftSize < walEntryLen) {
+            if (notEnoughOneEntry) { // 剩下的不够一个entry了
+                if (!ok) { // 文件读尽了
+                    mpo->Put();
+                    LCLOGEFUN << " parse segment entry in " << filePath << " failed at offset " << offset;
+                    return LoadSegmentResult(Code::FileCorrupt, FileCorruptError);
+                }
                 lastBuffer = buffer;
                 pLastMpo = mpo;
                 lastLeftSize = uint32_t(leftSize);
+                lastOffset = offset;
                 break;
             }
 
@@ -433,16 +438,16 @@ LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &file
             auto startPos = ByteOrderUtils::ReadUInt32(buffer + offset + startPosOffset);
             if (startPos != segmentEntryOffset) {
                 mpo->Put();
-                LCLOGEFUN << " parse sm segment entry in " << filePath << " failed at offset " << offset;
+                LCLOGEFUN << " parse segment entry in " << filePath << " failed at offset " << offset;
                 return LoadSegmentResult(Code::FileCorrupt, FileCorruptError);
             }
 
             // auto version = *(buffer + offset + LOGCLEAN_WAL_SIZE_LEN);
             auto entryId = ByteOrderUtils::ReadUInt64(buffer + offset + LOGCLEAN_WAL_ENTRY_ID_OFFSET);
             auto contentStartPtr = buffer + offset + LOGCLEAN_WAL_CONTENT_OFFSET;
-            auto contentEndPtr = buffer + len - 1;
+            auto contentEndPtr = contentStartPtr + len - 1;
             common::Buffer b;
-            b.Refresh(contentStartPtr, contentEndPtr, contentStartPtr, contentEndPtr, nullptr);
+            b.Refresh(contentStartPtr, contentEndPtr, contentStartPtr, contentEndPtr, nullptr, false);
             auto entry = m_entryCreator();
             if (!entry->Decode(b)) {
                 mpo->Put();
@@ -638,7 +643,8 @@ LogCleanWal::LoadSegmentMaxEntryIdResult LogCleanWal::load_segment_max_entry_id(
     }
 
     common::FileCloser fc(fd);
-    if (-1 == lseek((fd), 3, SEEK_END)) {
+    auto fileSize = utils::FileUtils::GetFileSize(fd);
+    if (-1 == lseek((fd), fileSize - LOGCLEAN_WAL_START_POS_LEN, SEEK_SET)) {
         auto errmsg = strerror(errno);
         LCLOGEFUN << " lseek file " << fp << " failed with errmsg " << errmsg;
         return LoadSegmentMaxEntryIdResult(Code::FileSystemError, errmsg);

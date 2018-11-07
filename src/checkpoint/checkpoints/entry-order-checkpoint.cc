@@ -76,19 +76,14 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
     }
 
     common::FileCloser fc(fd);
-    // 1. check if file is empty.
     auto fileSize = utils::FileUtils::GetFileSize(fd);
     if (-1 == fileSize) {
         auto errmsg = strerror(errno);
         EOCPLOGEFUN << " get file size for " << m_sCpFilePath << " error " << errmsg;
         return LoadCheckpointResult(Code::FileCorrupt, errmsg);
     }
-    if (0 == fileSize) {
-        LOGDFUN4(EOCP_NAME, " file ", m_sCpFilePath, " is empty!");
-        return LoadCheckpointResult(EOCP_INVALID_ENTRY_ID);
-    }
 
-    // 2. check if file header is corrupt.
+    // check if file header is corrupt.
     if (fileSize < EOCP_MAGIC_NO_LEN) {
         EOCPLOGEFUN << " file " << m_sCpFilePath << " header is corrupt!";
         return LoadCheckpointResult(Code::FileCorrupt, FileCorruptError);
@@ -110,23 +105,23 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
     }
     headerMpo->Put();
 
-    // 3. load checkpoint content
+    // load checkpoint content
     auto cpEntryOffset = uint32_t(EOCP_MAGIC_NO_LEN);
     sys::MemPool::MemObject *pLastMpo = nullptr;
     uchar *lastBuffer = nullptr;
     uint32_t lastLeftSize = 0;
+    uint32_t lastOffset = 0;
     bool ok = true;
     while (ok) {
         auto readSize = m_batchReadSize + lastLeftSize;
         auto mpo = common::g_pMemPool->Get(readSize);
         auto buffer = (uchar*)(mpo->Pointer());
         if (lastBuffer) {
-            auto lastOffset = m_batchReadSize - lastLeftSize;
             memcpy(buffer, lastBuffer + lastOffset, lastLeftSize);
+            lastOffset = 0;
             lastBuffer = nullptr;
             pLastMpo->Put();
             pLastMpo = nullptr;
-            lastLeftSize = 0;
         }
 
         nRead = utils::IOUtils::ReadFully_V4(fd, (char*)buffer + lastLeftSize, m_batchReadSize);
@@ -149,24 +144,32 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
         std::vector<common::IEntry*> entries;
         ok = (nRead == m_batchReadSize);
         auto availableBufferSize = nRead + lastLeftSize;
+        lastLeftSize = 0; // 旧的buffer + 新读取的buffer开始处理了，上一次遗留的size就无用了。
         uint32_t offset = 0;
         while (offset < availableBufferSize) {
             auto leftSize = availableBufferSize - offset;
-            // 剩下的不够一个entry了
-            if (leftSize < (EOCP_SIZE_LEN + EOCP_VERSION_LEN)) {
-                lastBuffer = buffer;
-                pLastMpo = mpo;
-                lastLeftSize = uint32_t(leftSize);
-                break;
+            uint32_t len = 0;
+            bool notEnoughOneEntry = false;
+            if (leftSize < EOCP_ENTRY_HEADER_LEN) {
+                notEnoughOneEntry = true;
+            } else {
+                len = ByteOrderUtils::ReadUInt32(buffer + offset);
+                // 剩下的不够一个entry了
+                if (leftSize < EOCP_ENTRY_EXTRA_FIELDS_SIZE + len) {
+                    notEnoughOneEntry = true;
+                }
             }
 
-            auto len = ByteOrderUtils::ReadUInt32(buffer + offset);
-            auto walEntryLen = EOCP_ENTRY_EXTRA_FIELDS_SIZE + len;
-            // 剩下的不够一个entry了
-            if (leftSize < walEntryLen) {
+            if (notEnoughOneEntry) { // 剩下的不够一个entry了
+                if (!ok) { // 文件读尽了
+                    mpo->Put();
+                    EOCPLOGEFUN << " parse entry in " << m_sCpFilePath << " failed at offset " << offset;
+                    return LoadCheckpointResult(Code::FileCorrupt, FileCorruptError);
+                }
                 lastBuffer = buffer;
                 pLastMpo = mpo;
                 lastLeftSize = uint32_t(leftSize);
+                lastOffset = offset;
                 break;
             }
 
@@ -180,9 +183,9 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
 
             // auto version = *(buffer + offset + SMCP_SIZE_LEN);
             auto contentStartPtr = buffer + offset + EOCP_CONTENT_OFFSET;
-            auto contentEndPtr = buffer + len - 1;
+            auto contentEndPtr = contentStartPtr + len - 1;
             common::Buffer b;
-            b.Refresh(contentStartPtr, contentEndPtr, contentStartPtr, contentEndPtr, nullptr);
+            b.Refresh(contentStartPtr, contentEndPtr, contentStartPtr, contentEndPtr, nullptr, false);
             auto entry = m_entryCreator();
             if (!entry->Decode(b)) {
                 mpo->Put();
@@ -459,7 +462,7 @@ CheckpointResult EntryOrderCheckpoint::save_new_checkpoint(IEntriesTraveller *tr
         auto mpo = common::g_pMemPool->Get(walEntrySize);
         auto bufferStart = (uchar*)(mpo->Pointer());
         common::Buffer wb;
-        wb.Refresh(bufferStart, bufferStart + walEntrySize - 1, bufferStart, bufferStart + walEntrySize - 1, mpo);
+        wb.Refresh(bufferStart, bufferStart + walEntrySize - 1, bufferStart, bufferStart + walEntrySize - 1, mpo, true);
         // size
         ByteOrderUtils::WriteUInt32(wb.GetPos(), rawEntrySize);
         wb.MoveHeadBack(EOCP_SIZE_LEN);

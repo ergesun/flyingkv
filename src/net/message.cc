@@ -32,7 +32,7 @@ common::Buffer* Message::GetNewBuffer() {
 common::Buffer* Message::GetNewBuffer(uchar *pos, uchar *last, uchar *start, uchar *end,
                                       sys::MemPoolObject *mpo) {
     auto buf = Message::GetNewBuffer();
-    buf->Refresh(pos, last, start, end, mpo);
+    buf->Refresh(pos, last, start, end, mpo, true);
     return buf;
 }
 

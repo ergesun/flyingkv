@@ -7,6 +7,7 @@
 #define FLYINGKV_UTILS_IO_UTILS_H
 
 #include <cstdio>
+#include "../sys/mem-pool.h"
 
 #define WriteFileFullyWithFatalLOG(fd, buf, size, filePath)                                         \
         if (-1 == utils::IOUtils::WriteFully((fd), (buf), (size))) {                                \

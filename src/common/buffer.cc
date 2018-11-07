@@ -9,13 +9,16 @@
 
 namespace flyingkv {
 namespace common {
-void Buffer::Refresh(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPoolObject *mpo) {
-    if (m_pMpObject) {
-        m_pMpObject->Put();
-    } else {
-        DELETE_ARR_PTR(m_pStart);
+void Buffer::Refresh(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPoolObject *mpo, bool own) {
+    if (m_bOwn) {
+        if (m_pMpObject) {
+            m_pMpObject->Put();
+        } else {
+            DELETE_ARR_PTR(m_pStart);
+        }
     }
 
+    m_bOwn = own;
     m_pMpObject = mpo;
     m_pPos = pos;
     m_pLast = last;

@@ -23,8 +23,8 @@ namespace common {
 class Buffer {
 PUBLIC
     Buffer() = default;
-    Buffer(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPool::MemObject *mpo) :
-        m_pPos(pos), m_pLast(last), m_pStart(start), m_pEnd(end), m_pMpObject(mpo) {
+    Buffer(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPool::MemObject *mpo, bool own) :
+        m_pPos(pos), m_pLast(last), m_pStart(start), m_pEnd(end), m_pMpObject(mpo), m_bOwn(own) {
         check_available();
     }
     ~Buffer() {
@@ -36,10 +36,10 @@ PUBLIC
     Buffer& operator=(Buffer&) = delete;
 
     inline void Put() {
-        Refresh(nullptr, nullptr, nullptr, nullptr, nullptr);
+        Refresh(nullptr, nullptr, nullptr, nullptr, nullptr, false);
     }
 
-    void Refresh(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPool::MemObject *mpo);
+    void Refresh(uchar *pos, uchar *last, uchar *start, uchar *end, sys::MemPool::MemObject *mpo, bool own);
 
     inline bool Valid() const {
         return m_bAvailable;
@@ -111,7 +111,7 @@ PUBLIC
     }
 
     inline void Reset() {
-        Refresh(nullptr, nullptr, nullptr, nullptr, nullptr);
+        Refresh(nullptr, nullptr, nullptr, nullptr, nullptr, false);
     }
 
     inline void SetPos(uchar *p) {
@@ -165,6 +165,7 @@ PRIVATE
     uchar                     *m_pEnd              = nullptr;
     sys::MemPool::MemObject   *m_pMpObject         = nullptr;
     bool                       m_bAvailable        = false;
+    bool                       m_bOwn              = false;
 };
 }  // namespace common
 }  // namespace flyingkv
