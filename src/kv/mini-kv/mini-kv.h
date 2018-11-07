@@ -15,6 +15,7 @@
 #include "../../wal/iwal.h"
 #include "../../checkpoint/ientries-traveller.h"
 #include "../../sys/rw-mutex.h"
+#include "../../sys/timer.h"
 
 namespace flyingkv {
 namespace acc {
@@ -81,6 +82,12 @@ PRIVATE
     void on_checkpoint_load_entry(std::vector<common::IEntry*> entries);
     void on_wal_load_entries(std::vector<wal::WalEntry>);
 
+    void register_trigger_check_wal_timer();
+    void trigger_check_wal(void *);
+
+    bool can_make_checkpoint();
+    void make_checkpoint();
+
 PRIVATE
     bool                                  m_bStopped = true;
     std::map<MiniKVKey, RawPbEntryEntry*> m_kvs;
@@ -91,8 +98,10 @@ PRIVATE
     // TODO(sunchao): 在目前的同步rpc调用模型下acc作用有限(线程个数本身就有比较好的限制)，将来使用异步模型加上scheduler之后效果会好起来
     acc::IGranter                        *m_pGranter = nullptr;
     std::mutex                            m_walLock;
-    uint32_t                              m_triggerCheckWalSizeTickMs;
+    uint32_t                              m_triggerCheckWalSizeTickSeconds;
     uint32_t                              m_triggerCheckpointWalSizeMB;
+    sys::Timer::TimerCallback             m_triggerCheckWalCallback;
+    Timer::Event                          m_triggerCheckWalEvent;
 };
 }
 }

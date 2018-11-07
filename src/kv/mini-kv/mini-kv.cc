@@ -21,6 +21,7 @@
 #include "errors.h"
 
 #include "mini-kv.h"
+#include "../../common/global-vars.h"
 
 namespace flyingkv {
 namespace kv {
@@ -48,6 +49,8 @@ MiniKV::MiniKV(const KVConfig *pc) {
     }
     delete accConf;
     m_pGranter = rlc;
+    m_triggerCheckWalCallback = std::bind(&MiniKV::trigger_check_wal, this, std::placeholders::_1);
+    m_triggerCheckWalEvent = Timer::Event(nullptr, &m_triggerCheckWalCallback);
 }
 
 MiniKV::~MiniKV() {
@@ -76,10 +79,13 @@ bool MiniKV::Start() {
     auto walLoadRs = m_pWal->Load(std::bind(&MiniKV::on_wal_load_entries, this, std::placeholders::_1));
 
     auto ok = wal::Code::OK == walLoadRs.Rc;
+
     if (ok) {
         m_bStopped = false;
         hw_sw_memory_barrier();
+        register_trigger_check_wal_timer();
     }
+
     return ok;
 }
 
@@ -324,6 +330,28 @@ void MiniKV::on_checkpoint_load_entry(std::vector<common::IEntry*> entries) {
 }
 
 void MiniKV::on_wal_load_entries(std::vector<wal::WalEntry> entries) {
+
+}
+
+void MiniKV::register_trigger_check_wal_timer() {
+    common::g_pTimer->SubscribeEventAfter(cctime(m_triggerCheckWalSizeTickSeconds, 0), m_triggerCheckWalEvent);
+}
+
+void MiniKV::trigger_check_wal(void *) {
+    if (m_bStopped) {
+        return;
+    }
+
+    if ()
+
+    register_trigger_check_wal_timer();
+}
+
+bool MiniKV::can_make_checkpoint() {
+
+}
+
+void MiniKV::make_checkpoint() {
 
 }
 }

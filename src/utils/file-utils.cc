@@ -12,6 +12,7 @@
 #include "../common/common-def.h"
 
 #include "file-utils.h"
+#include "../sys/spin-lock.h"
 
 using std::ifstream;
 using std::stringstream;
@@ -200,6 +201,163 @@ int FileUtils::Unlink(const string &path) {
     }
 
     return unlink(path.c_str());
+}
+
+int FileUtils::TryLockFile(const File &file) {
+    sys::SpinLock l(&s_sl);
+    if (FileUtils::is_locking_file(file.path)) {
+        return EEXIST;
+    }
+
+    struct flock  fl;
+    bzero(&fl, sizeof(struct flock));
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    if (fcntl(file.fd, F_SETLK, &fl) == -1) {
+        return errno;
+    }
+
+    s_LockingFiles.push_back(file.path);
+    return 0;
+}
+
+/**
+ * 非阻塞获取一个文件锁。
+ * @param path 目标文件的路径
+ * @return 返回值的fd为-1失败，否则为文件fd
+ */
+File FileUtils::TryLockPath(const string &path) {
+    sys::SpinLock l(&s_sl);
+    if (FileUtils::is_locking_file(path)) {
+        return File();
+    }
+
+    int fd = open(path.c_str(), O_RDWR);
+    if (-1 == fd) {
+        return File();
+    }
+
+    struct flock  fl;
+    bzero(&fl, sizeof(struct flock));
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    if (fcntl(fd, F_SETLK, &fl) == -1) {
+        close(fd);
+        return File();
+    }
+
+    s_LockingFiles.push_back(path);
+    return File(fd, path);
+}
+
+File FileUtils::LockPath(const string &path) {
+    sys::SpinLock l(&s_sl);
+    if (FileUtils::is_locking_file(path)) {
+        return File();
+    }
+
+    int fd = open(path.c_str(), O_RDWR);
+    if (-1 == fd) {
+        return File();
+    }
+
+    struct flock  fl;
+    bzero(&fl, sizeof(struct flock));
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    if (fcntl(fd, F_SETLKW, &fl) == -1) {
+        close(fd);
+        return File();
+    }
+
+    s_LockingFiles.push_back(path);
+    return File(fd, path);
+}
+
+int FileUtils::LockFile(const File &file) {
+    sys::SpinLock l(&s_sl);
+    if (FileUtils::is_locking_file(file.path)) {
+        return EEXIST;
+    }
+
+    struct flock  fl;
+    bzero(&fl, sizeof(struct flock));
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    if (fcntl(file.fd, F_SETLKW, &fl) == -1) {
+        return errno;
+    }
+
+    s_LockingFiles.push_back(file.path);
+    return 0;
+}
+
+int FileUtils::UnlockFile(const File &file) {
+    sys::SpinLock l(&s_sl);
+
+    struct flock  fl;
+    bzero(&fl, sizeof(struct flock));
+    fl.l_type = F_UNLCK;
+    fl.l_whence = SEEK_SET;
+    if (fcntl(file.fd, F_SETLK, &fl) == -1) {
+        return  errno;
+    }
+
+    FileUtils::remove_locking_file_if_exist(file);
+    return 0;
+}
+
+File FileUtils::OpenFile(const char *path, int oflags) {
+    File file;
+    int fd = open(path, oflags);
+    if (-1 != fd) {
+        file.fd = fd;
+        file.path = path;
+    }
+
+    return file;
+}
+
+int FileUtils::CloseFile(File &file) {
+    int err = close(file.fd);
+    if (0 == err) {
+        sys::SpinLock l(&s_sl);
+        FileUtils::remove_locking_file_if_exist(file);
+    } else {
+        err = errno;
+        LOGEFUN << "close file error with msg = " << strerror(err) << " ;path: " << file.path.c_str();
+    }
+
+    return err;
+}
+
+int FileUtils::CloseWithoutRemoveLock(File &file) {
+    int err = close(file.fd);
+    if (0 != err) {
+        err = errno;
+        LOGEFUN << "close file " << file.path.c_str() << " error with msg = " << strerror(err);
+    }
+
+    return err;
+}
+
+bool inline FileUtils::is_locking_file(const string &path) {
+    for (auto &p : s_LockingFiles) {
+        if (p.compare(path) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void inline FileUtils::remove_locking_file_if_exist(const File &file) {
+    for (auto it = s_LockingFiles.begin(); it < s_LockingFiles.end(); ++it) {
+        if (it->compare(file.path.c_str()) == 0) {
+            s_LockingFiles.erase(it);
+            break;
+        }
+    }
 }
 } // namespace utils
 } // namespace flyingkv
