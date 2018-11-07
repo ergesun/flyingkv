@@ -191,6 +191,7 @@ TEST(LCWALTest, AppendEntryTest) {
     entry = handler->CreateNewEntryWithContent("defgh");
     rs = pWal->AppendEntry(entry);
     EXPECT_EQ(rs.Rc, Code::OK);
+    delete entry;
 
     // check contents
     auto segmentFp = pWal->m_currentSegFilePath;
@@ -258,6 +259,8 @@ TEST(LCWALTest, AppendEntryTest) {
 
     DELETE_ARR_PTR(buf);
     close(fd);
+
+    utils::FileUtils::RemoveDirectory(WAL_ROOT);
 }
 
 TEST(LCWALTest, LoadTest) {
@@ -291,6 +294,7 @@ TEST(LCWALTest, LoadTest) {
     entry = handler->CreateNewEntryWithContent("defgh");
     ars = pWal->AppendEntry(entry);
     EXPECT_EQ(ars.Rc, Code::OK);
+    delete entry;
 
     delete pWal;
     /// 2.2 load
@@ -322,8 +326,94 @@ TEST(LCWALTest, LoadTest) {
     delete pWal;
 
     delete pWalConf;
+
+    utils::FileUtils::RemoveDirectory(WAL_ROOT);
 }
 
 TEST(LCWALTest, TruncateTest) {
+    auto handler = new TestEntryHandler();
+    auto loadHandler = std::bind(&TestEntryHandler::OnLoad, handler, std::placeholders::_1);
+    utils::FileUtils::RemoveDirectory(WAL_ROOT);
+    auto pWalConf = new wal::LogCleanWalConfig(WAL_TYPE, WAL_ROOT, std::bind(&TestEntryHandler::CreateNewEntry, handler),
+                                               TEST_ENTRY_VERSION, DEFAULT_SEGMENTS_SIZE, DEFAULT_BATCH_READ_SIZE);
+    auto pWal = dynamic_cast<LogCleanWal*>(WALFactory::CreateInstance(pWalConf));
+    pWal->Init();
+    pWal->Load(loadHandler);
+    /// 2.1 insert some entries
+    auto entry = handler->CreateNewEntry();
+    auto ars = pWal->AppendEntry(entry);
+    EXPECT_EQ(ars.Rc, Code::OK);
+    delete entry;
 
+    pWal->create_new_segment_file();
+
+    entry = handler->CreateNewEntryWithContent("abc");
+    ars = pWal->AppendEntry(entry);
+    EXPECT_EQ(ars.Rc, Code::OK);
+    delete entry;
+
+    pWal->create_new_segment_file();
+    entry = handler->CreateNewEntryWithContent("defgh");
+    ars = pWal->AppendEntry(entry);
+    EXPECT_EQ(ars.Rc, Code::OK);
+    delete entry;
+
+    // invalid entry id
+    auto rs = pWal->Truncate(666);
+    EXPECT_EQ(rs.Rc, Code::InvalidEntryId);
+
+    rs = pWal->Truncate(1);
+    EXPECT_EQ(rs.Rc, Code::OK);
+    auto ok = utils::FileUtils::Exist(pWal->generate_segment_file_path(1));
+    EXPECT_EQ(ok, false);
+    EXPECT_EQ(pWal->m_minSegmentId, 2);
+    auto iter = pWal->m_mpEntriesIdSegId.find(1);
+    EXPECT_EQ(true, iter == pWal->m_mpEntriesIdSegId.end());
+
+    rs = pWal->Truncate(3);
+    EXPECT_EQ(rs.Rc, Code::OK);
+    ok = utils::FileUtils::Exist(pWal->generate_segment_file_path(2));
+    EXPECT_EQ(ok, false);
+    ok = utils::FileUtils::Exist(pWal->generate_segment_file_path(3));
+    EXPECT_EQ(ok, true);
+    EXPECT_EQ(pWal->m_minSegmentId, 3);
+    iter = pWal->m_mpEntriesIdSegId.find(3);
+    EXPECT_EQ(true, iter != pWal->m_mpEntriesIdSegId.end());
+
+    pWal->create_new_segment_file();
+
+    entry = handler->CreateNewEntryWithContent("pqr");
+    ars = pWal->AppendEntry(entry);
+    EXPECT_EQ(ars.Rc, Code::OK);
+    delete entry;
+
+    pWal->create_new_segment_file();
+
+    entry = handler->CreateNewEntryWithContent("xyz");
+    ars = pWal->AppendEntry(entry);
+    EXPECT_EQ(ars.Rc, Code::OK);
+    delete entry;
+
+    rs = pWal->Truncate(5);
+    EXPECT_EQ(rs.Rc, Code::OK);
+    ok = utils::FileUtils::Exist(pWal->generate_segment_file_path(3));
+    EXPECT_EQ(ok, false);
+    ok = utils::FileUtils::Exist(pWal->generate_segment_file_path(4));
+    EXPECT_EQ(ok, false);
+    ok = utils::FileUtils::Exist(pWal->generate_segment_file_path(5));
+    EXPECT_EQ(ok, true);
+
+    EXPECT_EQ(pWal->m_lastTruncMaxIdx, 5);
+    EXPECT_EQ(pWal->m_minSegmentId, 5);
+    EXPECT_EQ(pWal->m_currentSegmentId, 5);
+
+    ok = utils::FileUtils::Exist(pWal->m_sTruncInfoFilePath);
+    EXPECT_EQ(ok, false);
+    ok = utils::FileUtils::Exist(pWal->m_sTruncOKFlagFilePath);
+    EXPECT_EQ(ok, false);
+
+    delete pWalConf;
+    delete pWal;
+
+    utils::FileUtils::RemoveDirectory(WAL_ROOT);
 }

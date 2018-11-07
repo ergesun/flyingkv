@@ -249,11 +249,6 @@ TruncateResult LogCleanWal::Truncate(uint64_t id) {
         return TruncateResult(Code::InvalidEntryId, InvalidEntryIdError);
     }
 
-    if (0 == m_curSegFileSize) {
-        LOGIFUN << LOGCLEAN_WAL_NAME << " no entry, so no need to truncate.";
-        return TruncateResult(Code::OK);
-    }
-
     // 1. 写入truncate信息
     auto rs = create_trunc_info(id);
     if (Code::OK != rs.Rc) {
@@ -303,14 +298,15 @@ TruncateResult LogCleanWal::Truncate(uint64_t id) {
         return TruncateResult(Code::OK);
     }
 
-    m_minSegmentId = maxTruncateSegId + 1;
-    for (auto i = m_minSegmentId; i <= maxCleanEntryId; ++i) {
+    for (auto i = m_lastTruncMaxIdx; i <= maxCleanEntryId; ++i) {
         auto iter = m_mpEntriesIdSegId.find(i);
         if (m_mpEntriesIdSegId.end() != iter) {
             m_mpEntriesIdSegId.erase(iter);
         }
     }
 
+    m_lastTruncMaxIdx = maxCleanEntryId + 1;
+    m_minSegmentId = maxTruncateSegId + 1;
     auto wrs = create_trunc_ok_flag();
     if (Code::OK != wrs.Rc) {
         return TruncateResult(wrs.Rc, wrs.Errmsg);
@@ -674,7 +670,7 @@ LogCleanWal::LoadSegmentMaxEntryIdResult LogCleanWal::load_segment_max_entry_id(
 
     auto contentSize = ByteOrderUtils::ReadUInt32(buffer);
     //auto version = *(buffer + LOGCLEAN_WAL_SIZE_LEN);
-    auto entryId = ByteOrderUtils::ReadUInt32(buffer + LOGCLEAN_WAL_ENTRY_ID_OFFSET);
+    auto entryId = ByteOrderUtils::ReadUInt64(buffer + LOGCLEAN_WAL_ENTRY_ID_OFFSET);
     if (-1 == lseek((fd), contentSize, SEEK_CUR)) {
         auto errmsg = strerror(errno);
         LCLOGEFUN << " lseek file " << fp << " failed with errmsg " << errmsg;
