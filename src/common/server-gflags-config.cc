@@ -19,6 +19,11 @@ DEFINE_bool(alsoglogtostderr, false, "设置日志消息除了日志文件之外
 DEFINE_bool(colorglogtostderr, true, "设置记录到标准输出的颜色消息（如果终端支持）");
 
 /**
+ * server
+ */
+DEFINE_bool(init_daemon, false, "run in daemon");
+
+/**
  * rpc server common
  */
 DEFINE_int32(rpc_port, 2210, "设置server的端口");

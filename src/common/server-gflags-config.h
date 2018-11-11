@@ -22,6 +22,11 @@ DECLARE_bool(alsoglogtostderr);
 DECLARE_bool(colorglogtostderr);
 
 /**
+ * server
+ */
+DECLARE_bool(init_daemon);
+
+/**
  * rpc
  */
 DECLARE_int32(rpc_port);

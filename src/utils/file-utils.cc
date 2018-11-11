@@ -19,6 +19,8 @@ using std::stringstream;
 
 namespace flyingkv {
 namespace utils {
+std::unordered_set<std::string> FileUtils::s_LockingFiles;
+sys::spin_lock_t FileUtils::s_sl = UNLOCKED;
 int FileUtils::CreateDir(const string &dir, __mode_t mode) {
     int err;
     struct stat dir_stat;
@@ -217,7 +219,7 @@ int FileUtils::TryLockFile(const File &file) {
         return errno;
     }
 
-    s_LockingFiles.push_back(file.path);
+    s_LockingFiles.insert(file.path);
     return 0;
 }
 
@@ -246,7 +248,7 @@ File FileUtils::TryLockPath(const string &path) {
         return File();
     }
 
-    s_LockingFiles.push_back(path);
+    s_LockingFiles.insert(path);
     return File(fd, path);
 }
 
@@ -270,7 +272,7 @@ File FileUtils::LockPath(const string &path) {
         return File();
     }
 
-    s_LockingFiles.push_back(path);
+    s_LockingFiles.insert(path);
     return File(fd, path);
 }
 
@@ -288,7 +290,7 @@ int FileUtils::LockFile(const File &file) {
         return errno;
     }
 
-    s_LockingFiles.push_back(file.path);
+    s_LockingFiles.insert(file.path);
     return 0;
 }
 
@@ -307,6 +309,30 @@ int FileUtils::UnlockFile(const File &file) {
     return 0;
 }
 
+int FileUtils::IsLocking(const string &path) {
+    sys::SpinLock l(&s_sl);
+    if (FileUtils::is_locking_file(path)) {
+        return 1;
+    }
+
+    int fd = open(path.c_str(), O_RDWR);
+    if (-1 == fd) {
+        return -1;
+    }
+
+    struct flock  fl;
+    bzero(&fl, sizeof(struct flock));
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    if (fcntl(fd, F_GETLK, &fl) == -1) {
+        close(fd);
+        return  -1;
+    }
+
+    close(fd);
+    return fl.l_type != F_UNLCK;
+}
+
 File FileUtils::OpenFile(const char *path, int oflags) {
     File file;
     int fd = open(path, oflags);
@@ -320,44 +346,22 @@ File FileUtils::OpenFile(const char *path, int oflags) {
 
 int FileUtils::CloseFile(File &file) {
     int err = close(file.fd);
-    if (0 == err) {
-        sys::SpinLock l(&s_sl);
-        FileUtils::remove_locking_file_if_exist(file);
-    } else {
-        err = errno;
-        LOGEFUN << "close file error with msg = " << strerror(err) << " ;path: " << file.path.c_str();
-    }
+    sys::SpinLock l(&s_sl);
+    FileUtils::remove_locking_file_if_exist(file);
 
     return err;
 }
 
 int FileUtils::CloseWithoutRemoveLock(File &file) {
-    int err = close(file.fd);
-    if (0 != err) {
-        err = errno;
-        LOGEFUN << "close file " << file.path.c_str() << " error with msg = " << strerror(err);
-    }
-
-    return err;
+    return close(file.fd);
 }
 
 bool inline FileUtils::is_locking_file(const string &path) {
-    for (auto &p : s_LockingFiles) {
-        if (p.compare(path) == 0) {
-            return true;
-        }
-    }
-
-    return false;
+    return s_LockingFiles.find(path) != s_LockingFiles.end();
 }
 
 void inline FileUtils::remove_locking_file_if_exist(const File &file) {
-    for (auto it = s_LockingFiles.begin(); it < s_LockingFiles.end(); ++it) {
-        if (it->compare(file.path.c_str()) == 0) {
-            s_LockingFiles.erase(it);
-            break;
-        }
-    }
+    s_LockingFiles.erase(file.path);
 }
 } // namespace utils
 } // namespace flyingkv

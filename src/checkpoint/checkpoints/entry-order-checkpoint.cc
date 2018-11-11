@@ -4,6 +4,7 @@
  */
 
 #include <sys/mman.h>
+#include <wait.h>
 #include "../../common/common-def.h"
 #include "../../utils/file-utils.h"
 #include "../../utils/io-utils.h"
@@ -27,6 +28,7 @@ EntryOrderCheckpoint::EntryOrderCheckpoint(const EntryOrderCheckpointConfig *pc)
     m_sCpMetaFilePath = m_sRootDir + "/" + EOCP_META_SUFFIX;
     m_sNewCpMetaFilePath = m_sCpMetaFilePath + EOCP_NEW_FILE_SUFFIX;
     m_sNewStartFlagFilePath = m_sRootDir + "/" + EOCP_SAVE_START_FLAG;
+    m_sLockPath = m_sRootDir + "/" + EOCP_LOCK_NAME;
 }
 
 CheckpointResult EntryOrderCheckpoint::Init() {
@@ -199,25 +201,83 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
     return LoadCheckpointResult(metaRs.EntryId);
 }
 
-// TODO(sunchao): 1.有时间优化为batch写 2. io和计算异步？
-CheckpointResult EntryOrderCheckpoint::Save(IEntriesTraveller *traveller) {
+SaveCheckpointResult EntryOrderCheckpoint::Save(IEntriesTraveller *traveller) {
+    LOGDFUN1("save checkpoint");
     if (UNLIKELY(!m_bInited)) {
         LOGEFUN << EOCP_NAME << UninitializedError;
-        return CheckpointResult(Code::Uninited, UninitializedError);
+        return SaveCheckpointResult(Code::Uninited, UninitializedError);
     }
     if (traveller->Empty()) {
-        return CheckpointResult(Code::OK);
+        auto rs = load_meta();
+        if (Code::OK != rs.Rc) {
+            return SaveCheckpointResult(rs.Rc, rs.Errmsg);
+        }
+        return SaveCheckpointResult(rs.EntryId);
     }
 
+    auto lockRs = utils::FileUtils::IsLocking(m_sLockPath);
+    if (-1 == lockRs) {
+        auto errmsg  = strerror(errno);
+        LOGEFUN << "lock file " << m_sLockPath << " error " << errmsg;
+        return SaveCheckpointResult(Code::FileSystemError, errmsg);
+    }
+
+    if (1 == lockRs) {
+        return SaveCheckpointResult(Code::Locking, IsLockingError);
+    }
+
+    traveller->Prepare();
+    auto pid = fork();
+    if (pid < 0) {
+        auto errmsg = strerror(errno);
+        LOGEFUN << "fork process error " << errmsg;
+        return SaveCheckpointResult(Code::ForkError, errmsg);
+    } else if (pid == 0) {
+        do_save_in_child(traveller);
+        LOGIFUN << "checkpoint child process exit.";
+        exit(0);
+    } else {
+        traveller->CompletePrepare();
+        return do_save_in_parent(pid);
+    }
+}
+
+SaveCheckpointResult EntryOrderCheckpoint::do_save_in_parent(int childPid) {
+    while (true) {
+        auto pid = waitpid(childPid, nullptr, 0);
+        if (-1 == pid) {
+            auto errmsg = strerror(errno);
+            if (EINTR == errno) {
+                LOGEFUN << "wait child error " << errmsg;
+                continue;
+            } else {
+                return SaveCheckpointResult(Code::WaitChildError, errmsg);
+            }
+        } else {
+            if (is_completed()) {
+                auto rs = load_meta();
+                if (Code::OK != rs.Rc) {
+                    return SaveCheckpointResult(rs.Rc, rs.Errmsg);
+                }
+                return SaveCheckpointResult(rs.EntryId);
+            } else {
+                return SaveCheckpointResult(Code::UnknownChildProcessError, UnknownChildError);
+            }
+        }
+    }
+}
+
+// TODO(sunchao): 1.有时间优化为batch写 2. io和计算异步？
+void EntryOrderCheckpoint::do_save_in_child(IEntriesTraveller *traveller) {
     auto rs = check_and_recover();
     if (Code::OK != rs.Rc) {
-        return rs;
+        return;
     }
 
     auto maxEntryId = traveller->MaxId();
     rs = init_new_checkpoint(maxEntryId);
     if (Code::OK != rs.Rc) {
-        return rs;
+        return;
     }
 
     // save entries
@@ -226,30 +286,27 @@ CheckpointResult EntryOrderCheckpoint::Save(IEntriesTraveller *traveller) {
     // create ok flag
     rs = create_ok_flag();
     if (Code::OK != rs.Rc) {
-        return rs;
+        return;
     }
 
     // rm start flag
     if (-1 == utils::FileUtils::Unlink(m_sNewStartFlagFilePath)) {
         auto errmsg = strerror(errno);
         EOCPLOGEFUN << " unlink start flag file " << m_sNewStartFlagFilePath << " error " << errmsg;
-        return CheckpointResult(Code::FileSystemError, errmsg);
+        return;
     }
 
     // replace meta and checkpoint
     rs = replace_old_checkpoint();
     if (Code::OK != rs.Rc) {
-        return rs;
+        return;
     }
 
     // clean ok flag
     if (-1 == utils::FileUtils::Unlink(m_sNewCpSaveOkFilePath)) {
         auto errmsg = strerror(errno);
         EOCPLOGEFUN << " unlink ok flag file " << m_sNewCpSaveOkFilePath << " error " << errmsg;
-        return CheckpointResult(Code::FileSystemError, errmsg);
     }
-
-    return CheckpointResult(Code::OK);
 }
 
 CheckpointResult EntryOrderCheckpoint::init_new_checkpoint(uint64_t id) {

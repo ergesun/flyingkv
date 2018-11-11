@@ -36,7 +36,7 @@ class ICheckpoint;
 namespace kv {
 class KVConfig;
 class RawPbEntryEntry;
-class MiniKV : public common::IService, public common::IKVOperator, public checkpoint::IEntriesTraveller {
+class MiniKV : public common::IService, public common::IKVOperator {
 PUBLIC
     explicit MiniKV(const KVConfig *pc);
     ~MiniKV() override;
@@ -50,18 +50,12 @@ PUBLIC
     common::SP_PB_MSG Delete(common::KVDeleteRequest) override;
     common::SP_PB_MSG Scan(common::KVScanRequest)   override;
 
-    // entries traveller
-    common::IEntry *GetNextEntry() override;
-    bool Empty() override;
-
-    uint64_t MaxId() override;
-
-    struct MiniKVKey {
+    struct Key {
         const uchar *Data;
         uint32_t     Len;
 
         // 这里不考虑空值，minikv会有空key检查
-        bool operator<(const MiniKVKey &b) const {
+        bool operator<(const Key &b) const {
             auto minLen = this->Len < b.Len ? this->Len : b.Len;
             auto lessThanB = this->Len < b.Len;
             auto rs = memcmp(this->Data, b.Data, minLen);
@@ -85,12 +79,12 @@ PRIVATE
     void register_trigger_check_wal_timer();
     void trigger_check_wal(void *);
 
-    bool can_make_checkpoint();
-    void make_checkpoint();
+    void on_checkpoint_prepare();
+    void on_checkpoint_complete_prepare();
 
 PRIVATE
     bool                                  m_bStopped = true;
-    std::map<MiniKVKey, RawPbEntryEntry*> m_kvs;
+    std::map<Key, RawPbEntryEntry*>       m_kvs;
     sys::RwMutex                          m_kvLock;
     sys::MemPool                         *m_pMp = nullptr;
     wal::IWal                            *m_pWal = nullptr;
@@ -99,9 +93,10 @@ PRIVATE
     acc::IGranter                        *m_pGranter = nullptr;
     std::mutex                            m_walLock;
     uint32_t                              m_triggerCheckWalSizeTickSeconds;
-    uint32_t                              m_triggerCheckpointWalSizeMB;
+    uint32_t                              m_triggerCheckpointWalSizeByte;
     sys::Timer::TimerCallback             m_triggerCheckWalCallback;
     Timer::Event                          m_triggerCheckWalEvent;
+    uint64_t                              m_maxId;
 };
 }
 }

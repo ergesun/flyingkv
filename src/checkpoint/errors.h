@@ -15,18 +15,24 @@ namespace checkpoint {
 enum class Code {
     OK   = 0,
     Uninited,
+    Locking,
     FileCorrupt,
     FileSystemError,
     EncodeEntryError,
     DecodeEntryError,
-    MissingFile
+    MissingFile,
+    ForkError,
+    WaitChildError,
+    UnknownChildProcessError
 };
 
 const char* const FileCorruptError = " file corrupt";
-const char* const UninitializedError    = " has not been initialized";
+const char* const UninitializedError = " has not been initialized";
 const char* const EncodeEntryError = " encode entry error";
 const char* const DecodeEntryError = " decode entry error";
-const char* const MissingFileError       = " file is missing";
+const char* const MissingFileError = " file is missing";
+const char* const IsLockingError = " is in locking state";
+const char* const UnknownChildError = " unknown child process error";
 }
 }
 

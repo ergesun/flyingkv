@@ -15,6 +15,7 @@ class IEntry {
 PUBLIC
     virtual ~IEntry() = default;
 
+    virtual uint32_t TypeId() = 0;
     virtual bool Encode(std::shared_ptr<Buffer>&) = 0;
     virtual bool Decode(Buffer&) = 0;
 };

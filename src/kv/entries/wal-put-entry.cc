@@ -16,6 +16,10 @@ namespace kv {
 WalPutEntry::WalPutEntry(sys::MemPool *mp) : m_pMp(mp) {}
 WalPutEntry::WalPutEntry(sys::MemPool *mp, std::shared_ptr<protocol::Entry> sspe) : m_pMp(mp), m_sspContent(std::move(sspe)) {}
 
+uint32_t WalPutEntry::TypeId() {
+    return uint32_t(EntryType::WalPut);
+}
+
 bool WalPutEntry::Encode(std::shared_ptr<common::Buffer> &sspBuf) {
     if (!m_sspContent) {
         return false;
@@ -50,6 +54,7 @@ bool WalPutEntry::Decode(common::Buffer &buffer) {
 
     auto entry = new protocol::Entry();
     if (!utils::ProtoBufUtils::Deserialize(&buffer, entry)) {
+        delete entry;
         return false;
     }
 

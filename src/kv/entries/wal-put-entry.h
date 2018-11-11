@@ -22,6 +22,8 @@ PUBLIC
     WalPutEntry(sys::MemPool*, std::shared_ptr<protocol::Entry>);
     ~WalPutEntry() override = default;
 
+    uint32_t TypeId() override;
+
     bool Encode(std::shared_ptr<common::Buffer>&) override;
     bool Decode(common::Buffer &buffer) override;
 

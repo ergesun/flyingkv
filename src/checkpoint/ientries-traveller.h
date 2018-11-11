@@ -17,6 +17,8 @@ class IEntriesTraveller {
 PUBLIC
     virtual ~IEntriesTraveller() = default;
 
+    virtual void Prepare() = 0;
+    virtual void CompletePrepare() = 0;
     virtual common::IEntry* GetNextEntry() = 0;
     virtual bool Empty() = 0;
     virtual uint64_t MaxId() = 0;

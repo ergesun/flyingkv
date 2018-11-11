@@ -12,6 +12,7 @@
 #include <string>
 #include <fcntl.h>
 #include <unordered_set>
+#include <vector>
 
 #include "../sys/spin-lock.h"
 
@@ -24,10 +25,10 @@ struct File {
     string path;
 
     File() = default;
-    File(int f, string p) : fd(f), path(p) {}
+    File(int f, string p) : fd(f), path(std::move(p)) {}
     File(File &f) = default;
-    File& operator=(File &f) = default;
-    File(File &&f) {
+    File& operator=(const File &f) = default;
+    File(File &&f) noexcept {
         if (this != &f) {
             fd = f.fd;
             path = std::move(f.path);
@@ -195,6 +196,13 @@ PUBLIC
      * @return 返回值的fd为-1失败，否则为文件fd
      */
     static File LockPath(const string &path);
+
+    /**
+     * 判断文件是否有锁
+     * @param file
+     * @return -1出错，0没有，1有
+     */
+    static int IsLocking(const string &file);
 
     /**
      * TODO(sunchao): 完善这个open以支持创建文件

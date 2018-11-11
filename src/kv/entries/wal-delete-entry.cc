@@ -20,6 +20,10 @@ WalDeleteEntry::~WalDeleteEntry() {
     }
 }
 
+uint32_t WalDeleteEntry::TypeId() {
+    return uint32_t(EntryType::WalDelete);
+}
+
 bool WalDeleteEntry::Encode(std::shared_ptr<common::Buffer> &sspBuf) {
     if (!m_pContent) {
         return false;
@@ -50,7 +54,8 @@ bool WalDeleteEntry::Decode(common::Buffer &buffer) {
     }
 
     auto len = buffer.AvailableLength();
-    m_pContent = new uchar[len];
+    m_pContent = new uchar[len + 1];
+    m_pContent[len] = '\0';
     m_bOwn = true;
     memcpy(m_pContent, buffer.GetPos(), size_t(len));
 

@@ -22,6 +22,7 @@
 #define    EOCP_COMPLETE_FLAG   "smcp.ok"
 #define    EOCP_META_SUFFIX     ".meta"
 #define    EOCP_NEW_FILE_SUFFIX ".new"
+#define    EOCP_LOCK_NAME       ".lock"
 
 #define    EOCP_START_POS_LEN            4
 #define    EOCP_SIZE_LEN                 4
@@ -35,16 +36,26 @@ namespace flyingkv {
 namespace checkpoint {
 /**
  * save cp:
- *   1.  create start flag file
- *   2.  save checkpoint meta to yyy.new
- *   3.  save checkpoint to xxx.new
- *   4.  create ok flag file
- *   5.  rm start flag file
- *   6.  rm current checkpoint meta file
- *   7.  rm current checkpoint file
- *   8.  mv new checkpoint meta yyy.new to yyy
- *   9.  mv new checkpoint xxx.new to xxx
- *   10. rm ok flag file
+ * - current process:
+ *  1. check lock
+ *  2. fork child
+ *  3. wait child
+ *
+ * - child process:
+ *  1.  lock
+ *  2.  check and recover
+ *  3.  create start flag file
+ *  4.  save checkpoint meta to yyy.new
+ *  5.  save checkpoint to xxx.new
+ *  6.  create ok flag file
+ *  7.  rm start flag file
+ *  8.  rm current checkpoint meta file
+ *  9.  rm current checkpoint file
+ *  10.  mv new checkpoint meta yyy.new to yyy
+ *  11.  mv new checkpoint xxx.new to xxx
+ *  12. rm ok flag file
+ *  13. unlock
+ *  14. exit
  */
 
 class EntryOrderCheckpoint : public ICheckpoint {
@@ -54,7 +65,7 @@ PUBLIC
 
     CheckpointResult Init() override;
     LoadCheckpointResult Load(EntryLoadedCallback callback) override;
-    CheckpointResult Save(IEntriesTraveller *traveller) override;
+    SaveCheckpointResult Save(IEntriesTraveller *traveller) override;
 
 PRIVATE
     struct LoadMetaResult : public CheckpointResult {
@@ -65,6 +76,8 @@ PRIVATE
     };
 
 PRIVATE
+    SaveCheckpointResult do_save_in_parent(int childPid);
+    void do_save_in_child(IEntriesTraveller *traveller);
     CheckpointResult init_new_checkpoint(uint64_t id);
     inline bool is_completed();
     CheckpointResult create_ok_flag();
@@ -85,6 +98,7 @@ PRIVATE
     std::string                 m_sNewCpMetaFilePath;
     std::string                 m_sNewStartFlagFilePath;
     std::string                 m_sNewCpSaveOkFilePath;
+    std::string                 m_sLockPath;
     common::EntryCreateHandler  m_entryCreator;
     uint8_t                     m_writeEntryVersion;
     uint32_t                    m_batchReadSize;

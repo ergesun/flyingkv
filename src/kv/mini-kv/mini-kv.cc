@@ -22,6 +22,7 @@
 
 #include "mini-kv.h"
 #include "../../common/global-vars.h"
+#include "mini-kv-traveller.h"
 
 namespace flyingkv {
 namespace kv {
@@ -51,6 +52,8 @@ MiniKV::MiniKV(const KVConfig *pc) {
     m_pGranter = rlc;
     m_triggerCheckWalCallback = std::bind(&MiniKV::trigger_check_wal, this, std::placeholders::_1);
     m_triggerCheckWalEvent = Timer::Event(nullptr, &m_triggerCheckWalCallback);
+    m_triggerCheckWalSizeTickSeconds = pc->CheckWalSizeTickSeconds;
+    m_triggerCheckpointWalSizeByte = pc->DoCheckpointWalSizeMB * 1024 * 1024;
 }
 
 MiniKV::~MiniKV() {
@@ -71,13 +74,13 @@ bool MiniKV::Start() {
         return false;
     }
 
+    m_maxId = cpLoadRs.MaxId;
     auto walInitRs = m_pWal->Init();
     if (wal::Code::OK != walInitRs.Rc) {
         return false;
     }
 
     auto walLoadRs = m_pWal->Load(std::bind(&MiniKV::on_wal_load_entries, this, std::placeholders::_1));
-
     auto ok = wal::Code::OK == walLoadRs.Rc;
 
     if (ok) {
@@ -122,16 +125,20 @@ common::SP_PB_MSG MiniKV::Put(common::KVPutRequest req) {
     {
         std::unique_lock<std::mutex> l(m_walLock);
         walRs = m_pWal->AppendEntry(pWalPutEntry.get());
-    }
-    if (walRs.Rc != wal::Code::OK) {
-        pbResp->set_rc(protocol::Code::InternalErr);
-        pbResp->set_errmsg(std::move(walRs.Errmsg));
+        if (walRs.Rc != wal::Code::OK) {
+            pbResp->set_rc(protocol::Code::InternalErr);
+            pbResp->set_errmsg(std::move(walRs.Errmsg));
 
-        return rs;
+            return rs;
+        }
+
+        if (m_maxId < walRs.EntryId) {
+            m_maxId = walRs.EntryId;
+        }
     }
 
     // insert into kv in memory
-    MiniKVKey k = {
+    Key k = {
             .Data = reinterpret_cast<uchar*>(const_cast<char*>(pbRawEntry->key().c_str())),
             .Len = uint32_t(pbRawEntry->key().length())
     };
@@ -165,14 +172,14 @@ common::SP_PB_MSG MiniKV::Get(common::KVGetRequest req) {
     // acc check
     // TODO(sunchao): add req timeout config and open acc
 
-    MiniKVKey k = {
+    Key k = {
             .Data = reinterpret_cast<uchar*>(const_cast<char*>(req->key().c_str())),
             .Len = uint32_t(req->key().length())
     };
 
     pbResp->set_rc(protocol::Code::OK);
     protocol::Entry *prsEntry = nullptr;
-    std::map<MiniKVKey, RawPbEntryEntry*>::iterator iter;
+    std::map<Key, RawPbEntryEntry*>::iterator iter;
     {
         sys::ReadLock rl(&m_kvLock);
         iter = m_kvs.find(k);
@@ -213,16 +220,20 @@ common::SP_PB_MSG MiniKV::Delete(common::KVDeleteRequest req) {
     {
         std::unique_lock<std::mutex> l(m_walLock);
         walRs = m_pWal->AppendEntry(wde.get());
-    }
-    if (walRs.Rc != wal::Code::OK) {
-        pbResp->set_rc(protocol::Code::InternalErr);
-        pbResp->set_errmsg(std::move(walRs.Errmsg));
+        if (walRs.Rc != wal::Code::OK) {
+            pbResp->set_rc(protocol::Code::InternalErr);
+            pbResp->set_errmsg(std::move(walRs.Errmsg));
 
-        return rs;
+            return rs;
+        }
+
+        if (m_maxId < walRs.EntryId) {
+            m_maxId = walRs.EntryId;
+        }
     }
 
     pbResp->set_rc(protocol::Code::OK);
-    MiniKVKey k = {
+    Key k = {
             .Data = reinterpret_cast<uchar*>(const_cast<char*>(req->key().c_str())),
             .Len = uint32_t(req->key().length())
     };
@@ -231,7 +242,9 @@ common::SP_PB_MSG MiniKV::Delete(common::KVDeleteRequest req) {
         WriteLock wl(&m_kvLock);
         auto iter = m_kvs.find(k);
         if (iter != m_kvs.end()) {
+            auto tmp =  iter->second;
             m_kvs.erase(iter);
+            delete tmp;
         }
     }
 
@@ -259,7 +272,7 @@ common::SP_PB_MSG MiniKV::Scan(common::KVScanRequest req) {
         sk = reinterpret_cast<uchar*>(const_cast<char*>(req->startkey().c_str()));
     }
 
-    MiniKVKey k = {
+    Key k = {
             .Data = sk,
             .Len = uint32_t(req->startkey().length())
     };
@@ -295,18 +308,6 @@ common::SP_PB_MSG MiniKV::Scan(common::KVScanRequest req) {
     return rs;
 }
 
-common::IEntry *MiniKV::GetNextEntry() {
-    return nullptr;
-}
-
-bool MiniKV::Empty() {
-    return false;
-}
-
-uint64_t MiniKV::MaxId() {
-    return 0;
-}
-
 common::IEntry* MiniKV::create_wal_new_entry(const common::Buffer &b) {
     auto type = EntryType(*b.GetPos());
     switch (type) {
@@ -326,11 +327,52 @@ common::IEntry* MiniKV::create_checkpoint_new_entry(const common::Buffer &b) {
 }
 
 void MiniKV::on_checkpoint_load_entry(std::vector<common::IEntry*> entries) {
+    if (entries.empty()) {
+        return;
+    }
 
+    for (auto p : entries) {
+        auto entry = dynamic_cast<RawPbEntryEntry*>(p);
+        Key k = {.Data = reinterpret_cast<uchar*>(const_cast<char*>(entry->Get()->key().c_str())),
+                 .Len = uint32_t(entry->Get()->key().length())};
+        m_kvs[k] = entry;
+    }
 }
 
 void MiniKV::on_wal_load_entries(std::vector<wal::WalEntry> entries) {
+    if (entries.empty()) {
+        return;
+    }
 
+    for (auto p : entries) {
+        if (m_maxId < p.Id) {
+            m_maxId = p.Id;
+        }
+
+        switch (EntryType(p.Entry->TypeId())) {
+            case EntryType::WalDelete: {
+                auto deleteEntry = dynamic_cast<WalDeleteEntry*>(p.Entry);
+                auto kStr = deleteEntry->Get();
+                Key k = {.Data = kStr,
+                         .Len = uint32_t(strlen(reinterpret_cast<const char*>(kStr)))};
+                m_kvs.erase(k);
+                break;
+            }
+            case EntryType::WalPut: {
+                auto putEntry = dynamic_cast<WalPutEntry*>(p.Entry);
+                auto ssppbEntry = putEntry->Get();
+                delete putEntry;
+                Key k = {.Data = reinterpret_cast<uchar*>(const_cast<char*>(ssppbEntry->key().c_str())),
+                        .Len = uint32_t(ssppbEntry->key().length())};
+                m_kvs[k] = new RawPbEntryEntry(m_pMp, ssppbEntry);
+                break;
+            }
+            default:
+                LOGFFUN << "unknown entry type";
+        }
+
+
+    }
 }
 
 void MiniKV::register_trigger_check_wal_timer() {
@@ -342,17 +384,38 @@ void MiniKV::trigger_check_wal(void *) {
         return;
     }
 
-    if ()
+    std::thread([&]() {
+        auto walRs = m_pWal->Size();
+        if (wal::Code::OK != walRs.Rc) {
+            LOGFFUN << "wal error " << walRs.Errmsg;
+        }
+        if (walRs.Size >= m_triggerCheckpointWalSizeByte) {
+            auto traveller = new MiniKVTraveller(&m_kvs, m_maxId, std::bind(&MiniKV::on_checkpoint_prepare, this),
+                        std::bind(&MiniKV::on_checkpoint_complete_prepare, this));
+            auto cpRs = m_pCheckpoint->Save(traveller);
+            delete traveller;
+            if (checkpoint::Code::OK == cpRs.Rc) {
+                std::unique_lock<std::mutex> l(m_walLock);
+                LOGIFUN << "truncate wal to idx " << cpRs.MaxId;
+                auto walTruncRs = m_pWal->Truncate(cpRs.MaxId);
+                if (walTruncRs.Rc != wal::Code::OK) {
+                    LOGFFUN << "wal do truncate error " << walTruncRs.Errmsg;
+                }
+            } else {
+                LOGEFUN << "save checkpoint error " << cpRs.Errmsg;
+            }
+        }
 
-    register_trigger_check_wal_timer();
+        register_trigger_check_wal_timer();
+    });
 }
 
-bool MiniKV::can_make_checkpoint() {
-
+void MiniKV::on_checkpoint_prepare() {
+    m_kvLock.RLock();
 }
 
-void MiniKV::make_checkpoint() {
-
+void MiniKV::on_checkpoint_complete_prepare() {
+    m_kvLock.UnLock();
 }
 }
 }

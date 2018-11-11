@@ -19,6 +19,7 @@ PUBLIC
     WalDeleteEntry(sys::MemPool*, uchar*, size_t size, bool own);
     ~WalDeleteEntry() override;
 
+    uint32_t TypeId() override;
     bool Encode(std::shared_ptr<common::Buffer>&) override;
     bool Decode(common::Buffer &buffer) override;
 

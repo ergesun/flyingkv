@@ -4,14 +4,19 @@
  */
 
 #include "../../common/buffer.h"
+#include "../../utils/protobuf-utils.h"
+#include "common.h"
 
 #include "raw-pb-entry-entry.h"
-#include "../../utils/protobuf-utils.h"
 
 namespace flyingkv {
 namespace kv {
 RawPbEntryEntry::RawPbEntryEntry(sys::MemPool *mp) : m_pMp(mp) {}
 RawPbEntryEntry::RawPbEntryEntry(sys::MemPool *mp, std::shared_ptr<protocol::Entry> sspe) : m_pMp(mp), m_sspContent(std::move(sspe)) {}
+
+uint32_t RawPbEntryEntry::TypeId() {
+    return uint32_t(EntryType::RawEntry);
+}
 
 bool RawPbEntryEntry::Encode(std::shared_ptr<common::Buffer> &sspBuf) {
     if (!m_sspContent) {

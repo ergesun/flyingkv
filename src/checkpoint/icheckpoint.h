@@ -19,6 +19,7 @@ class IEntry;
 
 namespace checkpoint {
 typedef std::function<void(std::vector<common::IEntry*>)> EntryLoadedCallback;
+typedef std::function<void(bool)> SaveCheckpointCallback;
 
 struct CheckpointResult {
     Code    Rc;
@@ -35,13 +36,15 @@ struct LoadCheckpointResult : public CheckpointResult {
     LoadCheckpointResult(Code rc, const string &errmsg) : CheckpointResult(rc, errmsg) {}
 };
 
+typedef LoadCheckpointResult SaveCheckpointResult;
+
 class ICheckpoint {
 PUBLIC
     virtual ~ICheckpoint() = default;
 
     virtual CheckpointResult Init() = 0;
     virtual LoadCheckpointResult Load(EntryLoadedCallback) = 0;
-    virtual CheckpointResult Save(IEntriesTraveller*) = 0;
+    virtual SaveCheckpointResult Save(IEntriesTraveller*) = 0;
 };
 }
 }
