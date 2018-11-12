@@ -1,0 +1,21 @@
+{
+  "acc" : {
+    "skip"     : 0,
+    "type"     : "simple",
+    "limiters" : [
+      {
+        "skip" : 0,
+        "name" : "qps",
+        "type" : "token-bucket",
+        "ms"   : 100,
+        "speed": 1000,
+        "rwt"  : {
+          "put"    : 1,
+          "get"    : 1,
+          "delete"  : 1,
+          "scan" : 1
+        }
+      }
+    ]
+  }
+}

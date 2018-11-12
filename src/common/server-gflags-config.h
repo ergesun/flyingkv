@@ -38,7 +38,6 @@ DECLARE_int32(rpc_io_threads_cnt);
  */
 DECLARE_string(acc_conf_path);
 
-
 /**
  * kv
  */

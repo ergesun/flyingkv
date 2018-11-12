@@ -21,6 +21,7 @@
 
 #include "./rpc/kv-rpc-sync-server.h"
 #include "../kv/config.h"
+#include "../kv/kv-factory.h"
 
 using namespace flyingkv;
 
@@ -63,9 +64,19 @@ void uninit_gflags_glog() {
 void startup() {
     std::unique_lock<std::mutex> l(g_m);
     // TODO(sunchao): use factory
-    kv::KVConfig kvConf = {};
-    auto pKV = new kv::MiniKV(&kvConf);
-    g_pKV = pKV;
+    kv::KVConfig kvConf = {.Type = FLAGS_kv_type, .AccConfPath = FLAGS_acc_conf_path,
+                            .WalType = FLAGS_wal_type, .WalRootDirPath = FLAGS_wal_dir,
+                            .WalWriteEntryVersion = uint8_t(FLAGS_wal_entry_write_version),
+                            .WalMaxSegmentSize = FLAGS_wal_max_segment_size,
+                            .WalReadBatchSize = FLAGS_wal_batch_read_size,
+                            .CheckpointType = FLAGS_cp_type,
+                            .CheckpointRootDirPath = FLAGS_cp_dir,
+                            .CheckpointWriteEntryVersion = uint8_t(FLAGS_cp_entry_write_version),
+                            .CheckpointReadBatchSize = FLAGS_cp_batch_read_size,
+                            .CheckWalSizeTickSeconds = FLAGS_kv_check_wal_size_tick,
+                            .DoCheckpointWalSizeMB = FLAGS_kv_do_checkpoint_wal_size};
+    auto pKV = kv::KVFactory::CreateInstance(&kvConf);
+    g_pKV = dynamic_cast<common::IService*>(pKV);
     if (!g_pKV->Start()) {
         LOGFFUN << "start kv service is failure.";
     }
@@ -94,6 +105,7 @@ void stop() {
     }
 
     g_bStopped = true;
+    g_cv.notify_all();
 }
 
 void waitStop() {
@@ -109,6 +121,7 @@ void signal_handler(int sig) {
         {SIGINT, "SIGINT"},
         {SIGTERM, "SIGTERM"},
         {SIGPIPE, "SIGPIPE"},
+        {SIGQUIT, "SIGQUIT"},
         {SIGALRM, "SIGALRM"}
     };
 
@@ -124,6 +137,7 @@ void signal_handler(int sig) {
             break;
         }
         case SIGINT:
+        case SIGQUIT:
         case SIGTERM: {
             stop();
             break;

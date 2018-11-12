@@ -56,6 +56,10 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
         return LoadCheckpointResult(metaRs.Rc, metaRs.Errmsg);
     }
 
+    if (metaRs.EntryId == EOCP_INVALID_ENTRY_ID) {
+        return LoadCheckpointResult(EOCP_INVALID_ENTRY_ID);
+    }
+
     if (!utils::FileUtils::Exist(m_sCpFilePath)) {
         EOCPLOGEFUN << " checkpoint file missing";
         return LoadCheckpointResult(Code::MissingFile, MissingFileError);
@@ -432,6 +436,7 @@ CheckpointResult EntryOrderCheckpoint::replace_old_checkpoint() {
 
 EntryOrderCheckpoint::LoadMetaResult EntryOrderCheckpoint::load_meta() {
     if (!utils::FileUtils::Exist(m_sCpMetaFilePath)) {
+        LOGIFUN << "file " << m_sCpMetaFilePath << " not exist";
         return LoadMetaResult(EOCP_INVALID_ENTRY_ID);
     }
 

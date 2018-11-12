@@ -13,7 +13,7 @@ namespace kv {
 class KVConfig;
 class KVFactory {
 PUBLIC
-    common::IKVOperator* CreateInstance(const KVConfig *pc);
+    static common::IKVOperator* CreateInstance(const KVConfig *pc);
 };
 }
 }
