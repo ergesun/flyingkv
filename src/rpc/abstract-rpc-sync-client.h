@@ -99,9 +99,8 @@ PRIVATE
     };
 
 PUBLIC
-    ARpcSyncClient(net::ISocketService *ss, const sys::cctime &timeout,
-            uint16_t workThreadsCnt, sys::MemPool *memPool = nullptr) :
-    rpc::ARpcClient(ss, memPool), m_timeout(timeout) {}
+    ARpcSyncClient(net::ISocketService *ss, const sys::cctime &timeout, sys::MemPool *memPool = nullptr) :
+                    rpc::ARpcClient(ss, memPool), m_timeout(timeout) {}
 
 PROTECTED
     std::shared_ptr<net::NotifyMessage> recvMessage(RpcCtx *rc);

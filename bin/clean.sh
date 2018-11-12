@@ -3,8 +3,6 @@
 BIN_DIR=$(cd `dirname $0`; pwd)
 ROOT_DIR=${BIN_DIR}/..
 
-. ${ROOT_DIR}/conf/flyingkv-common-def.sh
-
 BUILD_OBJS_FOLDER="cmake-objs"
 BUILD_OBJS_DIR=${BIN_DIR}/../${BUILD_OBJS_FOLDER}
 

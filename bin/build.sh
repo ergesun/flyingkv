@@ -18,6 +18,7 @@ function print_usage {
     echo_yellow "  -d           \t build with debug info."
     echo_yellow "  -dl          \t build with debug log."
     echo_yellow "  -ut          \t build unit test. It should pass a unit_test module param. eg: [./build.sh -ut rpc]. Support [all] param present all unit tests。"
+    echo_yellow "  -eg          \t build examples."
     echo_yellow "  --list-ut    \t list all unit test."
     echo_yellow "  -tl          \t build tools. It should pass a tool name param. eg: [./build.sh -tl qps]"
     echo_yellow "  --list-tools \t list all tools."
@@ -57,6 +58,9 @@ MAKE_ARGS=
 has_ut=
 UT_MODULE=
 
+has_eg=
+EG_MODULE=
+
 has_tl=
 TL_MODULE=
 
@@ -76,6 +80,11 @@ do
         BUILD_PROJECT_TYPE="ProjectType: flyingkv unit-test"
         has_ut="1"
         param_state="ut"
+    elif [ "$p" = "-eg" ]; then
+            BUILD_FLAG="${BUILD_FLAG} -DPROJECT_TYPE=EXAMPLES"
+            BUILD_PROJECT_TYPE="ProjectType: flyingkv examples"
+            has_eg="1"
+            param_state="eg"
     elif [ "$p" = "-tl" ]; then
         BUILD_FLAG="${BUILD_FLAG} -DPROJECT_TYPE=TOOLS"
         BUILD_PROJECT_TYPE="ProjectType: tools"
@@ -92,6 +101,9 @@ do
         if [ "$param_state" = "ut" ]; then
             UT_MODULE=$p
             BUILD_PROJECT_TYPE="${BUILD_PROJECT_TYPE} - ${UT_MODULE}"
+        elif [ "$param_state" = "eg" ]; then
+            EG_MODULE=$p
+            BUILD_PROJECT_TYPE="${BUILD_PROJECT_TYPE} - ${EG_MODULE}"
         elif [ "$param_state" = "tl" ]; then
             TL_MODULE=$p
             BUILD_PROJECT_TYPE="${BUILD_PROJECT_TYPE} - ${TL_MODULE}"

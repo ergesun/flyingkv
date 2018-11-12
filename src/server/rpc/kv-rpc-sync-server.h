@@ -40,13 +40,13 @@ PRIVATE
     common::SP_PB_MSG on_scan(common::SP_PB_MSG sspMsg);
     common::SP_PB_MSG create_scan_request();
 
-    void onRecvNetMessage(std::shared_ptr<net::NotifyMessage> sspNM);
+    void on_recv_net_message(std::shared_ptr<net::NotifyMessage> sspNM);
 
 PRIVATE
     bool                      m_bStopped        = true;
     uint16_t                  m_iIOThreadsCnt   = 0;
-    rpc::RpcServerSync           *m_pRpcServer      = nullptr;
-    common::IKVOperator       *m_pHandler        = nullptr;/*关联关系，无需释放*/
+    rpc::RpcServerSync       *m_pRpcServer      = nullptr;
+    common::IKVOperator      *m_pHandler        = nullptr;/*关联关系，无需释放*/
     net::ISocketService      *m_pSocketService  = nullptr;
     bool                      m_bOwnMemPool     = false;
     sys::MemPool             *m_pMemPool        = nullptr;

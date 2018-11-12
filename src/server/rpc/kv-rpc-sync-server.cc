@@ -39,7 +39,7 @@ KVRpcServerSync::KVRpcServerSync(common::IKVOperator *handler, uint16_t workThre
     };
 
     net::NssConfig nc(net::SocketProtocol::Tcp, sspNat, port, net::NetStackWorkerMgrType::Unique,
-                      m_pMemPool, std::bind(&KVRpcServerSync::onRecvNetMessage, this, std::placeholders::_1),
+                      m_pMemPool, std::bind(&KVRpcServerSync::on_recv_net_message, this, std::placeholders::_1),
                       connTimeout);
     m_pSocketService = net::SocketServiceFactory::CreateService(nc);
     m_pRpcServer = new rpc::RpcServerSync(workThreadsCnt, m_pSocketService, memPool);
@@ -146,7 +146,7 @@ common::SP_PB_MSG KVRpcServerSync::create_scan_request() {
     return common::SP_PB_MSG(new protocol::ScanRequest());
 }
 
-void KVRpcServerSync::onRecvNetMessage(std::shared_ptr<net::NotifyMessage> sspNM) {
+void KVRpcServerSync::on_recv_net_message(std::shared_ptr<net::NotifyMessage> sspNM) {
     if (UNLIKELY(m_bStopped)) {
         return;
     }
