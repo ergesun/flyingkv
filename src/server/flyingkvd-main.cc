@@ -168,6 +168,7 @@ try {
         return -1;
     }
 
+    init_gflags_glog(&argc, &argv);
     if (FLAGS_init_daemon) {
         if (-1 == daemon(0, 0)) {
             LOGFFUN << "daemon error " << strerror(errno);
@@ -175,7 +176,6 @@ try {
     }
 
     umask(0);
-    init_gflags_glog(&argc, &argv);
     flyingkv::common::initialize();
     startup();
     register_signal();
