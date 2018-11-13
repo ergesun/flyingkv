@@ -74,7 +74,7 @@ bool MiniKV::Start() {
         return false;
     }
 
-    m_maxId = cpLoadRs.MaxId;
+    m_applyId = cpLoadRs.MaxId;
     auto walInitRs = m_pWal->Init();
     if (wal::Code::OK != walInitRs.Rc) {
         return false;
@@ -82,23 +82,23 @@ bool MiniKV::Start() {
 
     auto walLoadRs = m_pWal->Load(std::bind(&MiniKV::on_wal_load_entries, this, std::placeholders::_1));
     auto ok = wal::Code::OK == walLoadRs.Rc;
-
     if (ok) {
         m_bStopped = false;
         hw_sw_memory_barrier();
+        m_pCheckerThread = new std::thread([&](){
+            while (!m_bStopped) {
+                while (!m_bCheck) {
+                    std::unique_lock<std::mutex> l(m_checkMtx);
+                    m_checkCV.wait(l);
+                }
+
+                check_wal();
+            }
+        });
+
         register_trigger_check_wal_timer();
     }
 
-    m_pCheckerThread = new std::thread([&](){
-        while (!m_bStopped) {
-            while (!m_bCheck) {
-                std::unique_lock<std::mutex> l(m_checkMtx);
-                m_checkCV.wait(l);
-            }
-
-            check_wal();
-        }
-    });
     return ok;
 }
 
@@ -132,20 +132,17 @@ common::SP_PB_MSG MiniKV::Put(common::SP_PB_MSG rawReq) {
     // write wal
     std::shared_ptr<protocol::Entry> pbRawEntry(req->release_entry());
     std::unique_ptr<WalPutEntry> pWalPutEntry(new WalPutEntry(m_pMp, pbRawEntry));
-    wal::AppendEntryResult walRs;
-    {
-        std::unique_lock<std::mutex> l(m_walLock);
-        walRs = m_pWal->AppendEntry(pWalPutEntry.get());
-        if (walRs.Rc != wal::Code::OK) {
-            pbResp->set_rc(protocol::Code::InternalErr);
-            pbResp->set_errmsg(std::move(walRs.Errmsg));
+    std::unique_lock<std::mutex> l(m_walLock);
+    auto walRs = m_pWal->AppendEntry(pWalPutEntry.get());
+    if (walRs.Rc != wal::Code::OK) {
+        pbResp->set_rc(protocol::Code::InternalErr);
+        pbResp->set_errmsg(std::move(walRs.Errmsg));
 
-            return rs;
-        }
+        return rs;
+    }
 
-        if (m_maxId < walRs.EntryId) {
-            m_maxId = walRs.EntryId;
-        }
+    if (m_applyId < walRs.EntryId) {
+        m_applyId = walRs.EntryId;
     }
 
     // insert into kv in memory
@@ -229,20 +226,17 @@ common::SP_PB_MSG MiniKV::Delete(common::SP_PB_MSG rawReq) {
 
     // write wal
     std::unique_ptr<WalDeleteEntry> wde(new WalDeleteEntry(m_pMp, reinterpret_cast<uchar*>(const_cast<char*>(req->key().c_str())), req->key().length(), false));
-    wal::AppendEntryResult walRs;
-    {
-        std::unique_lock<std::mutex> l(m_walLock);
-        walRs = m_pWal->AppendEntry(wde.get());
-        if (walRs.Rc != wal::Code::OK) {
-            pbResp->set_rc(protocol::Code::InternalErr);
-            pbResp->set_errmsg(std::move(walRs.Errmsg));
+    std::unique_lock<std::mutex> l(m_walLock);
+    auto walRs = m_pWal->AppendEntry(wde.get());
+    if (walRs.Rc != wal::Code::OK) {
+        pbResp->set_rc(protocol::Code::InternalErr);
+        pbResp->set_errmsg(std::move(walRs.Errmsg));
 
-            return rs;
-        }
+        return rs;
+    }
 
-        if (m_maxId < walRs.EntryId) {
-            m_maxId = walRs.EntryId;
-        }
+    if (m_applyId < walRs.EntryId) {
+        m_applyId = walRs.EntryId;
     }
 
     pbResp->set_rc(protocol::Code::OK);
@@ -364,10 +358,11 @@ void MiniKV::on_wal_load_entries(std::vector<wal::WalEntry> entries) {
     }
 
     for (auto p : entries) {
-        if (m_maxId < p.Id) {
-            m_maxId = p.Id;
+        if (m_applyId > p.Id) {
+            continue;
         }
 
+        m_applyId = p.Id;
         switch (EntryType(p.Entry->TypeId())) {
             case EntryType::WalDelete: {
                 auto deleteEntry = dynamic_cast<WalDeleteEntry*>(p.Entry);
@@ -412,7 +407,7 @@ void MiniKV::check_wal() {
         LOGFFUN << "wal error " << walRs.Errmsg;
     }
     if (walRs.Size >= m_triggerCheckpointWalSizeByte) {
-        auto traveller = new MiniKVTraveller(&m_kvs, m_maxId, std::bind(&MiniKV::on_checkpoint_prepare, this),
+        auto traveller = new MiniKVTraveller(&m_kvs, m_applyId, std::bind(&MiniKV::on_checkpoint_prepare, this),
                                              std::bind(&MiniKV::on_checkpoint_complete_prepare, this));
         auto cpRs = m_pCheckpoint->Save(traveller);
         delete traveller;
@@ -432,11 +427,11 @@ void MiniKV::check_wal() {
 }
 
 void MiniKV::on_checkpoint_prepare() {
-    m_kvLock.RLock();
+    m_walLock.lock();
 }
 
 void MiniKV::on_checkpoint_complete_prepare() {
-    m_kvLock.UnLock();
+    m_walLock.unlock();
 }
 }
 }

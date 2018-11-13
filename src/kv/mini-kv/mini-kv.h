@@ -36,6 +36,7 @@ class ICheckpoint;
 namespace kv {
 class KVConfig;
 class RawPbEntryEntry;
+// TODO(sunchao): 写日志和应用状态机做成并发的？
 class MiniKV : public common::IService, public common::IKVOperator {
 PUBLIC
     explicit MiniKV(const KVConfig *pc);
@@ -98,7 +99,7 @@ PRIVATE
     uint32_t                              m_triggerCheckpointWalSizeByte;
     sys::Timer::TimerCallback             m_triggerCheckWalCallback;
     Timer::Event                          m_triggerCheckWalEvent;
-    uint64_t                              m_maxId;
+    uint64_t                              m_applyId;
     bool                                  m_bCheck = false;
     std::mutex                            m_checkMtx;
     std::condition_variable               m_checkCV;

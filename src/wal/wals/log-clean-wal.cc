@@ -275,7 +275,7 @@ TruncateResult LogCleanWal::Truncate(uint64_t id) {
         return TruncateResult(Code::FileSystemError, errmsg);
     }
 
-    if (0 == nextSegSize) {
+    if (LOGCLEAN_WAL_MAGIC_NO_LEN == nextSegSize) {
         --maxTruncateSegId;
     }
 

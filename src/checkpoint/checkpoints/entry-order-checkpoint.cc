@@ -213,13 +213,6 @@ SaveCheckpointResult EntryOrderCheckpoint::Save(IEntriesTraveller *traveller) {
         LOGEFUN << EOCP_NAME << UninitializedError;
         return SaveCheckpointResult(Code::Uninited, UninitializedError);
     }
-    if (traveller->Empty()) {
-        auto rs = load_meta();
-        if (Code::OK != rs.Rc) {
-            return SaveCheckpointResult(rs.Rc, rs.Errmsg);
-        }
-        return SaveCheckpointResult(rs.EntryId);
-    }
 
     auto lockRs = utils::FileUtils::IsLocking(m_sLockPath);
     if (-1 == lockRs) {
@@ -276,6 +269,12 @@ SaveCheckpointResult EntryOrderCheckpoint::do_save_in_parent(int childPid) {
 
 // TODO(sunchao): 1.有时间优化为batch写 2. io和计算异步？
 void EntryOrderCheckpoint::do_save_in_child(IEntriesTraveller *traveller) {
+    auto lockFile = utils::FileUtils::LockPath(m_sLockPath);
+    if (-1 == lockFile.fd) {
+        auto errmsg = strerror(errno);
+        EOCPLOGEFUN << " lock file " << m_sLockPath << " error " << errmsg;
+        exit(1);
+    }
     auto rs = check_and_recover();
     if (Code::OK != rs.Rc) {
         return;
@@ -293,6 +292,19 @@ void EntryOrderCheckpoint::do_save_in_child(IEntriesTraveller *traveller) {
     // create ok flag
     rs = create_ok_flag();
     if (Code::OK != rs.Rc) {
+        return;
+    }
+
+    // close and rm lock file
+    if (-1 == utils::FileUtils::CloseFile(lockFile)) {
+        auto errmsg = strerror(errno);
+        EOCPLOGEFUN << " close lock file " << lockFile.path << " error " << errmsg;
+        return;
+    }
+
+    if (-1 == utils::FileUtils::Unlink(lockFile.path)) {
+        auto errmsg = strerror(errno);
+        EOCPLOGEFUN << " unlink lock file " << lockFile.path << " error " << errmsg;
         return;
     }
 
@@ -336,7 +348,7 @@ CheckpointResult EntryOrderCheckpoint::init_new_checkpoint(uint64_t id) {
 }
 
 bool EntryOrderCheckpoint::is_completed() {
-    return !utils::FileUtils::Exist(m_sNewStartFlagFilePath) && !utils::FileUtils::Exist(m_sNewCpSaveOkFilePath);
+    return !utils::FileUtils::Exist(m_sLockPath) && !utils::FileUtils::Exist(m_sNewStartFlagFilePath) && !utils::FileUtils::Exist(m_sNewCpSaveOkFilePath);
 }
 
 CheckpointResult EntryOrderCheckpoint::create_ok_flag() {

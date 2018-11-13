@@ -262,7 +262,7 @@ File FileUtils::LockPath(const string &path) {
         return File();
     }
 
-    int fd = open(path.c_str(), O_RDWR);
+    int fd = open(path.c_str(), O_CREAT|O_RDWR);
     if (-1 == fd) {
         return File();
     }
@@ -323,7 +323,7 @@ int FileUtils::IsLocking(const string &path) {
         return 0;
     }
 
-    int fd = open(path.c_str(), O_RDWR);
+    int fd = FileUtils::Open(path, O_RDWR, O_CREAT, 0644);
     if (-1 == fd) {
         return -1;
     }

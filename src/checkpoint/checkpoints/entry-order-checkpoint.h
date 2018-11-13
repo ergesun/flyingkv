@@ -42,7 +42,7 @@ namespace checkpoint {
  *  3. wait child
  *
  * - child process:
- *  1.  lock
+ *  1.  create lock file and lock it
  *  2.  check and recover
  *  3.  create start flag file
  *  4.  save checkpoint meta to yyy.new
@@ -51,10 +51,10 @@ namespace checkpoint {
  *  7.  rm start flag file
  *  8.  rm current checkpoint meta file
  *  9.  rm current checkpoint file
- *  10.  mv new checkpoint meta yyy.new to yyy
- *  11.  mv new checkpoint xxx.new to xxx
+ *  10. mv new checkpoint meta yyy.new to yyy
+ *  11. mv new checkpoint xxx.new to xxx
  *  12. rm ok flag file
- *  13. unlock
+ *  13. unlock and rm lock file
  *  14. exit
  */
 

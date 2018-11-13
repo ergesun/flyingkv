@@ -14,11 +14,13 @@ using namespace flyingkv;
 using namespace flyingkv::client;
 
 void action_example(FlyingKVClient *pClient);
-void put_entries_example(FlyingKVClient *pClient);
+void put_example(FlyingKVClient *pClient);
+void list_example(FlyingKVClient *pClient);
+void clean_example(FlyingKVClient *pClient);
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        std::cerr << "you need input an action arg in case of [action, put]" << std::endl;
+        std::cerr << "you need input an action arg in case of [action, put, list, clean]" << std::endl;
         exit(0);
     }
 
@@ -33,7 +35,11 @@ int main(int argc, char **argv) {
     if (strcmp(action, "action") == 0) {
         action_example(pClient);
     } else if (strcmp(action, "put") == 0) {
-        put_entries_example(pClient);
+        put_example(pClient);
+    } else if (strcmp(action, "list") == 0) {
+        list_example(pClient);
+    } else if (strcmp(action, "clean") == 0) {
+        clean_example(pClient);
     } else {
         std::cerr << "no such action" << std::endl;
     }
@@ -75,7 +81,7 @@ void action_example(FlyingKVClient *pClient) {
     std::cout << "scanRs.code " << scanRs->rc() << ", scanRs.count = " << scanRs->entries().size() << std::endl;
 }
 
-void put_entries_example(FlyingKVClient *pClient) {
+void put_example(FlyingKVClient *pClient) {
     auto curSize = 0;
     auto totalSize = 1024 * 2;
     for (int i = 0; curSize < totalSize; i++) {
@@ -92,3 +98,27 @@ void put_entries_example(FlyingKVClient *pClient) {
     std::cout << "scanRs.code " << scanRs->rc() << ", scanRs.count = " << scanRs->entries().size() << std::endl;
 }
 
+void list_example(FlyingKVClient *pClient) {
+    std::cout << "start list " << std::endl;
+    auto scanRs = pClient->Scan("sun", true, protocol::SortOrder::Asc, 99999999);
+    auto size = scanRs->entries().size();
+    for (int i = 0; i < size; ++i) {
+        std::cout << "entry = [ " << scanRs->entries(i).key() << ", " << scanRs->entries(i).value() << " ]" << std::endl;
+    }
+
+    std::cout << "list.code " << scanRs->rc() << ", list.count = " << size << std::endl;
+}
+
+void clean_example(FlyingKVClient *pClient) {
+    std::cout << "start scan " << std::endl;
+    auto scanRs = pClient->Scan("sun", true, protocol::SortOrder::Asc, 99999999);
+    auto size = scanRs->entries().size();
+    std::cout << "scanRs.code " << scanRs->rc() << ", scanRs.count = " << size << std::endl;
+    std::cout << "start clean " << std::endl;
+    for (int i = 0; i < size; ++i) {
+        auto delRs = pClient->Delete(scanRs->entries(i).key());
+        std::cout << "delRs.code " << delRs->rc() << std::endl;
+    }
+
+    std::cout << "clean completed" << std::endl;
+}
