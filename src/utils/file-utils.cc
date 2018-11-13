@@ -319,6 +319,10 @@ int FileUtils::IsLocking(const string &path) {
         return 1;
     }
 
+    if (!FileUtils::Exist(path)) {
+        return 0;
+    }
+
     int fd = open(path.c_str(), O_RDWR);
     if (-1 == fd) {
         return -1;

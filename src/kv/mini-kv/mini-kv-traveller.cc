@@ -9,9 +9,11 @@
 
 namespace flyingkv {
 namespace kv {
-MiniKVTraveller::MiniKVTraveller(const std::map<MiniKV::Key, RawPbEntryEntry*> *entries, uint64_t maxId,
+MiniKVTraveller::MiniKVTraveller(std::map<MiniKV::Key, RawPbEntryEntry*> *entries, uint64_t maxId,
                                  std::function<void()> prepare, std::function<void()> completePrepare) :
-   m_pEntries(entries), m_maxId(maxId), m_prepare(std::move(prepare)), m_completePrepare(std::move(completePrepare)) {}
+   m_pEntries(entries), m_maxId(maxId), m_prepare(std::move(prepare)), m_completePrepare(std::move(completePrepare)) {
+    m_cur = m_pEntries->begin();
+}
 
 void MiniKVTraveller::Prepare() {
     m_prepare();

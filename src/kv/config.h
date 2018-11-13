@@ -23,7 +23,7 @@ struct KVConfig {
     uint8_t       CheckpointWriteEntryVersion;
     uint32_t      CheckpointReadBatchSize;
     uint32_t      CheckWalSizeTickSeconds;
-    uint32_t      DoCheckpointWalSizeMB;
+    uint32_t      DoCheckpointWalSizeBytes;
 
     KVConfig(const std::string &type, const std::string &accConfPath, const std::string &walType,
                     const std::string &walRoot, uint8_t walWriteEntryVersion, uint32_t walMaxSegmentSize,
@@ -34,7 +34,7 @@ struct KVConfig {
                                             WalMaxSegmentSize(walMaxSegmentSize), WalReadBatchSize(walReadBatchSize),
                                             CheckpointType(cpType), CheckpointRootDirPath(cpRoot),
                                             CheckpointWriteEntryVersion(cpWriteEntryVersion), CheckpointReadBatchSize(cpReadBatchSize),
-                                            CheckWalSizeTickSeconds(checkWalSizeTick), DoCheckpointWalSizeMB(doCpWalSize) {}
+                                            CheckWalSizeTickSeconds(checkWalSizeTick), DoCheckpointWalSizeBytes(doCpWalSize) {}
 };
 
 //typedef KVConfig MiniKVConfig;

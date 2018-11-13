@@ -42,7 +42,7 @@ void init_gflags_glog(int *argc, char ***argv) {
     gflags::ParseCommandLineFlags(argc, argv, true);
     google::InitGoogleLogging((*argv)[0]);
     FLAGS_log_dir = FLAGS_glog_dir;
-    if (-1 == FileUtils::CreateDirPath(FLAGS_log_dir.c_str(), 0775)) {
+    if (-1 == FileUtils::CreateDirPath(FLAGS_log_dir, 0775)) {
         THROW_CREATE_DIR_ERR();
     }
 
@@ -74,7 +74,7 @@ void startup() {
                             .CheckpointWriteEntryVersion = uint8_t(FLAGS_cp_entry_write_version),
                             .CheckpointReadBatchSize = FLAGS_cp_batch_read_size,
                             .CheckWalSizeTickSeconds = FLAGS_kv_check_wal_size_tick,
-                            .DoCheckpointWalSizeMB = FLAGS_kv_do_checkpoint_wal_size};
+                            .DoCheckpointWalSizeBytes = FLAGS_kv_do_checkpoint_wal_size};
     auto pKV = kv::KVFactory::CreateInstance(&kvConf);
     g_pKV = dynamic_cast<common::IService*>(pKV);
     if (!g_pKV->Start()) {

@@ -14,7 +14,7 @@ namespace flyingkv {
 namespace kv {
 class MiniKVTraveller : public checkpoint::IEntriesTraveller {
 PUBLIC
-    MiniKVTraveller(const std::map<MiniKV::Key, RawPbEntryEntry*> *entries, uint64_t maxId,
+    MiniKVTraveller(std::map<MiniKV::Key, RawPbEntryEntry*> *entries, uint64_t maxId,
                     std::function<void()> prepare, std::function<void()> completePrepare);
     ~MiniKVTraveller() override = default;
 
@@ -26,7 +26,7 @@ PUBLIC
 
 PRIVATE
     const std::map<MiniKV::Key, RawPbEntryEntry*> *m_pEntries;
-    std::map<MiniKV::Key, RawPbEntryEntry*>::iterator m_cur;
+    std::map<MiniKV::Key, RawPbEntryEntry*>::const_iterator m_cur;
     uint64_t  m_maxId;
     std::function<void()> m_prepare;
     std::function<void()> m_completePrepare;

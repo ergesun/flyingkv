@@ -199,6 +199,7 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     *(wb.GetPos()) = m_writeEntryVersion;
     wb.MoveHeadBack(LOGCLEAN_WAL_VERSION_LEN);
 
+    ++m_currentEntryIdx;
     // log id
     ByteOrderUtils::WriteUInt64(wb.GetPos(), m_currentEntryIdx);
     wb.MoveHeadBack(LOGCLEAN_WAL_ENTRY_ID_LEN);
@@ -224,7 +225,6 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
     }
     m_curSegFileSize += walEntrySize;
     m_mpEntriesIdSegId[m_currentEntryIdx] = m_currentSegmentId;
-    ++m_currentEntryIdx;
     if (m_curSegFileSize >= m_segmentMaxSize) {
         auto rs = create_new_segment_file();
         if (rs.Rc != Code::OK) {

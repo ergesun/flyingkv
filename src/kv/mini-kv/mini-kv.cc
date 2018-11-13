@@ -53,7 +53,7 @@ MiniKV::MiniKV(const KVConfig *pc) {
     m_triggerCheckWalCallback = std::bind(&MiniKV::trigger_check_wal, this, std::placeholders::_1);
     m_triggerCheckWalEvent = Timer::Event(nullptr, &m_triggerCheckWalCallback);
     m_triggerCheckWalSizeTickSeconds = pc->CheckWalSizeTickSeconds;
-    m_triggerCheckpointWalSizeByte = pc->DoCheckpointWalSizeMB * 1024 * 1024;
+    m_triggerCheckpointWalSizeByte = pc->DoCheckpointWalSizeBytes;
 }
 
 MiniKV::~MiniKV() {
@@ -275,7 +275,8 @@ common::SP_PB_MSG MiniKV::Scan(common::SP_PB_MSG rawReq) {
         return rs;
     }
 
-    if (0 == req->limit()) {
+    auto limit = req->limit();
+    if (0 == limit) {
         pbResp->set_rc(protocol::Code::OK);
         return rs;
     }
@@ -291,6 +292,7 @@ common::SP_PB_MSG MiniKV::Scan(common::SP_PB_MSG rawReq) {
             .Len = uint32_t(req->startkey().length())
     };
 
+    uint32_t curCnt = 0;
     pbResp->set_rc(protocol::Code::OK);
     {
         ReadLock rl(&m_kvLock);
@@ -300,19 +302,22 @@ common::SP_PB_MSG MiniKV::Scan(common::SP_PB_MSG rawReq) {
         }
 
         if (req->containstartkey()) {
+            ++curCnt;
             auto prsEntry = pbResp->add_entries();
             prsEntry->CopyFrom(*iter->second->Get().get());
         }
 
         if (req->order() == protocol::SortOrder::Asc) {
             ++iter;
-            for (;iter != m_kvs.end(); ++iter) {
+            for (;(curCnt < limit) && (iter != m_kvs.end()); ++iter) {
+                ++curCnt;
                 auto prsEntry = pbResp->add_entries();
                 prsEntry->CopyFrom(*iter->second->Get().get());
             }
         } else {
             --iter;
-            for (;iter != m_kvs.end(); --iter) {
+            for (;(curCnt < limit) && (iter != m_kvs.end()); --iter) {
+                ++curCnt;
                 auto prsEntry = pbResp->add_entries();
                 prsEntry->CopyFrom(*iter->second->Get().get());
             }
@@ -384,8 +389,6 @@ void MiniKV::on_wal_load_entries(std::vector<wal::WalEntry> entries) {
             default:
                 LOGFFUN << "unknown entry type";
         }
-
-
     }
 }
 

@@ -27,9 +27,9 @@
 #define    EOCP_START_POS_LEN            4
 #define    EOCP_SIZE_LEN                 4
 #define    EOCP_VERSION_LEN              1
-#define    EOCP_ENTRY_HEADER_LEN         13 // EOCP_SIZE_LEN + EOCP_VERSION_LEN
-#define    EOCP_CONTENT_OFFSET           13 // EOCP_SIZE_LEN + EOCP_VERSION_LEN
-#define    EOCP_ENTRY_EXTRA_FIELDS_SIZE  17 // contentLen(4) + version(1) + startPos(4)
+#define    EOCP_ENTRY_HEADER_LEN         5 // EOCP_SIZE_LEN + EOCP_VERSION_LEN
+#define    EOCP_CONTENT_OFFSET           5 // EOCP_SIZE_LEN + EOCP_VERSION_LEN
+#define    EOCP_ENTRY_EXTRA_FIELDS_SIZE  9 // contentLen(4) + version(1) + startPos(4)
 #define    EOCP_INVALID_ENTRY_ID         0
 
 namespace flyingkv {
