@@ -12,8 +12,6 @@ BUILD_OBJS_DIR=${BIN_DIR}/../${BUILD_OBJS_FOLDER}
 function print_usage {
     echo_red "Usage: clean COMMAND."
     echo_yellow "where COMMAND is one of:"
-    echo_yellow "  -conf \t clean generated supervisor conf."
-    echo_yellow "  -pack \t clean packed dist."
     echo_yellow "  -gen  \t clean generated files."
     echo_yellow "  -all  \t clean all generated targets(reset to just git clone state)."
     echo_yellow "  -h    \t show help."
@@ -21,25 +19,12 @@ function print_usage {
 
 for p in "$@"
 do
-    if [ "$p" = "-conf" ]; then
-        echo "cleaning generated conf..."
-        rm -rf ${GEN_CONF_ROOT_DIR}
-    elif [ "$p" = "-pack" ]; then
-        echo "cleaning packed..."
-        rm -rf ${PACK_ROOT_DIR}
-        rm -rf ${ROOT_DIR}/flyingkv-dist.tgz
-    elif [ "$p" = "-gen" ]; then
+    if [ "$p" = "-gen" ]; then
         echo "cleaning codegen..."
         rm -rf ${ROOT_DIR}/src/codegen
     elif [ "$p" = "-all" ]; then
-        echo "cleaning generated conf..."
-        rm -rf ${GEN_CONF_ROOT_DIR}
-        echo "cleaning packed..."
-        rm -rf ${PACK_ROOT_DIR}
         echo "cleaning codegen..."
         rm -rf ${ROOT_DIR}/src/codegen
-        echo "cleaning dist..."
-        rm -rf ${ROOT_DIR}/flyingkv-dist.tgz
     elif [ "$p" == "-h" ]; then
         print_usage
         exit 0
