@@ -14,10 +14,12 @@
 #include "rpc/kv-rpc-sync-client.h"
 #include "flyingkv-client.h"
 #include "../sys/gcc-buildin.h"
+#include "../common/global-vars.h"
 
 namespace flyingkv {
 namespace client {
 FlyingKVClient::FlyingKVClient(const ClientConfig &cc): m_rpcServerIp(cc.ServerIp), m_rpcServerPort(cc.ServerPort) {
+    common::initialize();
     m_pMemPool = new sys::MemPool();
     m_iIOThreadsCnt = cc.RpcIOThreadsCnt;
     std::shared_ptr<net::net_addr_t> sspNat(nullptr);
@@ -38,6 +40,7 @@ FlyingKVClient::~FlyingKVClient() {
     DELETE_PTR(m_pRpcClient);
     DELETE_PTR(m_pSocketService);
     DELETE_PTR(m_pMemPool);
+    common::uninitialize();
 }
 
 bool FlyingKVClient::Start() {

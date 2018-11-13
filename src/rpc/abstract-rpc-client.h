@@ -111,7 +111,7 @@ PUBLIC
      * @return SentRet::msgId如果是INVALID_MSG_ID(0)则失败，否则成功。
      */
     SentRet SendMessageAsync(std::string &&rpcName, net::Message::Id id, common::SP_PB_MSG msg, net::net_peer_info_t &&peer);
-    void HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) override final;
+    void HandleMessage(std::shared_ptr<net::NotifyMessage> sspNM) final;
 
 PROTECTED
     bool registerRpc(std::string &&rpcName, uint16_t id);

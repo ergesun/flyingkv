@@ -27,8 +27,8 @@ DEFINE_bool(init_daemon, false, "run in daemon");
  * rpc server common
  */
 DEFINE_int32(rpc_port, 2210, "设置server的端口");
-DEFINE_int32(rpc_server_threads_cnt, 0, "设置用于rpc server处理任务的线程池线程个数。默认0为cpu逻辑核数的2倍。");
-DEFINE_int32(rpc_io_threads_cnt, 0, "设置rpc处理时消息分发的线程数目。默认0为cpu逻辑核数的2倍。");
+DEFINE_int32(rpc_server_threads_cnt, 1, "设置用于rpc server处理任务的线程池线程个数。");
+DEFINE_int32(rpc_io_threads_cnt, 1, "设置rpc处理时消息分发的线程数目。");
 
 /**
  * acc

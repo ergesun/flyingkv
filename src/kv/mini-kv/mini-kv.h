@@ -45,10 +45,10 @@ PUBLIC
     bool Stop() override;
 
     // kv operator
-    common::SP_PB_MSG Put(common::KVPutRequest)    override;
-    common::SP_PB_MSG Get(common::KVGetRequest)    override;
-    common::SP_PB_MSG Delete(common::KVDeleteRequest) override;
-    common::SP_PB_MSG Scan(common::KVScanRequest)   override;
+    common::SP_PB_MSG Put(common::SP_PB_MSG)    override;
+    common::SP_PB_MSG Get(common::SP_PB_MSG)    override;
+    common::SP_PB_MSG Delete(common::SP_PB_MSG) override;
+    common::SP_PB_MSG Scan(common::SP_PB_MSG)   override;
 
     struct Key {
         const uchar *Data;
@@ -82,6 +82,8 @@ PRIVATE
     void on_checkpoint_prepare();
     void on_checkpoint_complete_prepare();
 
+    void check_wal();
+
 PRIVATE
     bool                                  m_bStopped = true;
     std::map<Key, RawPbEntryEntry*>       m_kvs;
@@ -97,6 +99,10 @@ PRIVATE
     sys::Timer::TimerCallback             m_triggerCheckWalCallback;
     Timer::Event                          m_triggerCheckWalEvent;
     uint64_t                              m_maxId;
+    bool                                  m_bCheck = false;
+    std::mutex                            m_checkMtx;
+    std::condition_variable               m_checkCV;
+    std::thread                          *m_pCheckerThread = nullptr;
 };
 }
 }

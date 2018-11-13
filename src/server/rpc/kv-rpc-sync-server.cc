@@ -99,11 +99,7 @@ void KVRpcServerSync::register_rpc_handlers() {
 }
 
 common::SP_PB_MSG KVRpcServerSync::on_put(common::SP_PB_MSG sspMsg) {
-    common::KVPutRequest req;
-    auto reqPtr = sspMsg.get();
-    sspMsg.reset();
-    req.reset(dynamic_cast<protocol::PutRequest*>(reqPtr));
-    return m_pHandler->Put(req);
+    return m_pHandler->Put(sspMsg);
 }
 
 common::SP_PB_MSG KVRpcServerSync::create_put_request() {
@@ -111,11 +107,7 @@ common::SP_PB_MSG KVRpcServerSync::create_put_request() {
 }
 
 common::SP_PB_MSG KVRpcServerSync::on_get(common::SP_PB_MSG sspMsg) {
-    common::KVGetRequest req;
-    auto reqPtr = sspMsg.get();
-    sspMsg.reset();
-    req.reset(dynamic_cast<protocol::GetRequest*>(reqPtr));
-    return m_pHandler->Get(req);
+    return m_pHandler->Get(sspMsg);
 }
 
 common::SP_PB_MSG KVRpcServerSync::create_get_request() {
@@ -123,11 +115,7 @@ common::SP_PB_MSG KVRpcServerSync::create_get_request() {
 }
 
 common::SP_PB_MSG KVRpcServerSync::on_delete(common::SP_PB_MSG sspMsg) {
-    common::KVDeleteRequest req;
-    auto reqPtr = sspMsg.get();
-    sspMsg.reset();
-    req.reset(dynamic_cast<protocol::DeleteRequest*>(reqPtr));
-    return m_pHandler->Delete(req);
+    return m_pHandler->Delete(sspMsg);
 }
 
 common::SP_PB_MSG KVRpcServerSync::create_delete_request() {
@@ -135,11 +123,7 @@ common::SP_PB_MSG KVRpcServerSync::create_delete_request() {
 }
 
 common::SP_PB_MSG KVRpcServerSync::on_scan(common::SP_PB_MSG sspMsg) {
-    common::KVScanRequest req;
-    auto reqPtr = sspMsg.get();
-    sspMsg.reset();
-    req.reset(dynamic_cast<protocol::ScanRequest*>(reqPtr));
-    return m_pHandler->Scan(req);
+    return m_pHandler->Scan(sspMsg);
 }
 
 common::SP_PB_MSG KVRpcServerSync::create_scan_request() {
@@ -151,7 +135,7 @@ void KVRpcServerSync::on_recv_net_message(std::shared_ptr<net::NotifyMessage> ss
         return;
     }
 
-    m_pRpcServer->HandleMessage(sspNM);
+    m_pRpcServer->HandleMessage(std::move(sspNM));
 }
 } // namespace server
 } // namespace flyingkv

@@ -3,25 +3,57 @@
 [TOC]
 
 ## 简介
+一个插件式的单机存储引擎。
 
+工程主要目录：
 
-## 编码规范
-- 采用google编码规范，如google规范与下面有冲突，以下面本文内容为准。
+目录|说明
+:---|:---
+docs|文档
+bin|各种可执行脚本工具(build、generate)
+conf|配置文件
+proto|rpc IDLs
+codegen|pb生成代码
+sys|封装的os底层接口
+server|服务端入口
+kv|kv状态机
+rpc|封装的rpc框架
+client|客户端
+examples|例子
 
-- 函数命明规则
- > public: 任意单词首字母大写<br>
- > protected: 除首个单词之外的其余单词均首字母大写<br>
- > private: 单词间通过"_"连接，均小写字母。
- 
-- 变量命明规则
- > 类的成员变量: m_[type][name] -- type(i(int), s(str), v(vector), l(list), e(enum)...)小写，name参考函数的public。<br>
- > 类的静态成员: s_[type][name] -- 同类的成员变量。<br>
- > 文件全局变量: g_[type][name] -- 同类的成员变量。<br>
- > 函数局部变量: name -- 写法同函数的protected。<br>
- > 函数出入参数: 同局部变量。
+## 先决条件
+
+项|值
+:---|:---
+OS|linux kernel >=3.10.0-327.36.4.el7.x86_64
+gcc|>= 4.8.2
+
+## build
+脚本的使用参考各脚本的-h
+### prepare
+1. ./bin/download-thirdparty.sh
+2. ./bin/install-thirdparty.sh
+
+### flyingkv
+./bin/build.sh -gen
+
+### ut
+./bin/build.sh -gen -ut all
+
+### examples
+./bin/build.sh -gen -eg
+
+## run
+### flyingkv
+./flyingkvd --flagfile=./conf/flyingkv.conf
+
+### ut
+./bin/run-all-uts.sh
+
+### examples
+./flyingkveg
 
 ## TODO
 1. add async rpc server, so we can support more concurrency requests and add a scheduler use queue to scheduler and control requests.
-2. checkpoint add index meta, wal add log idx to support more complex semantic
 2. fix ut
 3. use yaml?

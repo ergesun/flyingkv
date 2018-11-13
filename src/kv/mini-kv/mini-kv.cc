@@ -89,6 +89,16 @@ bool MiniKV::Start() {
         register_trigger_check_wal_timer();
     }
 
+    m_pCheckerThread = new std::thread([&](){
+        while (!m_bStopped) {
+            while (!m_bCheck) {
+                std::unique_lock<std::mutex> l(m_checkMtx);
+                m_checkCV.wait(l);
+            }
+
+            check_wal();
+        }
+    });
     return ok;
 }
 
@@ -98,8 +108,9 @@ bool MiniKV::Stop() {
     return true;
 }
 
-common::SP_PB_MSG MiniKV::Put(common::KVPutRequest req) {
+common::SP_PB_MSG MiniKV::Put(common::SP_PB_MSG rawReq) {
     LOGDTAG;
+    auto req = dynamic_cast<protocol::PutRequest*>(rawReq.get());
     auto pbResp = new protocol::PutResponse();
     auto rs = common::SP_PB_MSG(pbResp);
     if (m_bStopped) {
@@ -153,8 +164,9 @@ common::SP_PB_MSG MiniKV::Put(common::KVPutRequest req) {
     return rs;
 }
 
-common::SP_PB_MSG MiniKV::Get(common::KVGetRequest req) {
+common::SP_PB_MSG MiniKV::Get(common::SP_PB_MSG rawReq) {
     LOGDTAG;
+    auto req = dynamic_cast<protocol::GetRequest*>(rawReq.get());
     auto pbResp = new protocol::GetResponse();
     auto rs = common::SP_PB_MSG(pbResp);
     if (m_bStopped) {
@@ -195,8 +207,9 @@ common::SP_PB_MSG MiniKV::Get(common::KVGetRequest req) {
     return rs;
 }
 
-common::SP_PB_MSG MiniKV::Delete(common::KVDeleteRequest req) {
+common::SP_PB_MSG MiniKV::Delete(common::SP_PB_MSG rawReq) {
     LOGDTAG;
+    auto req = dynamic_cast<protocol::DeleteRequest*>(rawReq.get());
     auto pbResp = new protocol::DeleteResponse();
     auto rs = common::SP_PB_MSG(pbResp);
     if (m_bStopped) {
@@ -251,8 +264,9 @@ common::SP_PB_MSG MiniKV::Delete(common::KVDeleteRequest req) {
     return rs;
 }
 
-common::SP_PB_MSG MiniKV::Scan(common::KVScanRequest req) {
+common::SP_PB_MSG MiniKV::Scan(common::SP_PB_MSG rawReq) {
     LOGDTAG;
+    auto req = dynamic_cast<protocol::ScanRequest*>(rawReq.get());
     auto pbResp = new protocol::ScanResponse();
     auto rs = common::SP_PB_MSG(pbResp);
     if (m_bStopped) {
@@ -380,34 +394,38 @@ void MiniKV::register_trigger_check_wal_timer() {
 }
 
 void MiniKV::trigger_check_wal(void *) {
+    m_bCheck = true;
+    m_checkCV.notify_one();
+}
+
+void MiniKV::check_wal() {
+    m_bCheck = false;
     if (m_bStopped) {
         return;
     }
 
-    std::thread([&]() {
-        auto walRs = m_pWal->Size();
-        if (wal::Code::OK != walRs.Rc) {
-            LOGFFUN << "wal error " << walRs.Errmsg;
-        }
-        if (walRs.Size >= m_triggerCheckpointWalSizeByte) {
-            auto traveller = new MiniKVTraveller(&m_kvs, m_maxId, std::bind(&MiniKV::on_checkpoint_prepare, this),
-                        std::bind(&MiniKV::on_checkpoint_complete_prepare, this));
-            auto cpRs = m_pCheckpoint->Save(traveller);
-            delete traveller;
-            if (checkpoint::Code::OK == cpRs.Rc) {
-                std::unique_lock<std::mutex> l(m_walLock);
-                LOGIFUN << "truncate wal to idx " << cpRs.MaxId;
-                auto walTruncRs = m_pWal->Truncate(cpRs.MaxId);
-                if (walTruncRs.Rc != wal::Code::OK) {
-                    LOGFFUN << "wal do truncate error " << walTruncRs.Errmsg;
-                }
-            } else {
-                LOGEFUN << "save checkpoint error " << cpRs.Errmsg;
+    auto walRs = m_pWal->Size();
+    if (wal::Code::OK != walRs.Rc) {
+        LOGFFUN << "wal error " << walRs.Errmsg;
+    }
+    if (walRs.Size >= m_triggerCheckpointWalSizeByte) {
+        auto traveller = new MiniKVTraveller(&m_kvs, m_maxId, std::bind(&MiniKV::on_checkpoint_prepare, this),
+                                             std::bind(&MiniKV::on_checkpoint_complete_prepare, this));
+        auto cpRs = m_pCheckpoint->Save(traveller);
+        delete traveller;
+        if (checkpoint::Code::OK == cpRs.Rc) {
+            std::unique_lock<std::mutex> l(m_walLock);
+            LOGIFUN << "truncate wal to idx " << cpRs.MaxId;
+            auto walTruncRs = m_pWal->Truncate(cpRs.MaxId);
+            if (walTruncRs.Rc != wal::Code::OK) {
+                LOGFFUN << "wal do truncate error " << walTruncRs.Errmsg;
             }
+        } else {
+            LOGEFUN << "save checkpoint error " << cpRs.Errmsg;
         }
+    }
 
-        register_trigger_check_wal_timer();
-    });
+    register_trigger_check_wal_timer();
 }
 
 void MiniKV::on_checkpoint_prepare() {

@@ -32,6 +32,7 @@ EntryOrderCheckpoint::EntryOrderCheckpoint(const EntryOrderCheckpointConfig *pc)
 }
 
 CheckpointResult EntryOrderCheckpoint::Init() {
+    LOGDTAG;
     common::ObjReleaseHandler<bool> handler(&m_bInited, [](bool *inited) {
         *inited = true;
     });
@@ -47,6 +48,7 @@ CheckpointResult EntryOrderCheckpoint::Init() {
 // TODO(sunchao): 1. 把load定义一个模式抽象一下？免得和log的load逻辑重复
 //                2. 同wal, io和计算异步？
 LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
+    LOGDTAG;
     if (UNLIKELY(!m_bInited)) {
         LOGEFUN << EOCP_NAME << UninitializedError;
         return LoadCheckpointResult(Code::Uninited, UninitializedError);
@@ -206,7 +208,7 @@ LoadCheckpointResult EntryOrderCheckpoint::Load(EntryLoadedCallback callback) {
 }
 
 SaveCheckpointResult EntryOrderCheckpoint::Save(IEntriesTraveller *traveller) {
-    LOGDFUN1("save checkpoint");
+    LOGDTAG;
     if (UNLIKELY(!m_bInited)) {
         LOGEFUN << EOCP_NAME << UninitializedError;
         return SaveCheckpointResult(Code::Uninited, UninitializedError);
@@ -247,6 +249,7 @@ SaveCheckpointResult EntryOrderCheckpoint::Save(IEntriesTraveller *traveller) {
 }
 
 SaveCheckpointResult EntryOrderCheckpoint::do_save_in_parent(int childPid) {
+    LOGITAG;
     while (true) {
         auto pid = waitpid(childPid, nullptr, 0);
         if (-1 == pid) {

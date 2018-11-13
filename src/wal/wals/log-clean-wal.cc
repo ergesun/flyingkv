@@ -53,6 +53,7 @@ LogCleanWal::~LogCleanWal() {
  * 清理未完成的trunc，初始化segment相关信息
  */
 WalResult LogCleanWal::Init() {
+    LOGDTAG;
     common::ObjReleaseHandler<bool> handler(&m_bInited, [](bool *inited) {
        *inited = true;
     });
@@ -131,6 +132,7 @@ WalResult LogCleanWal::Init() {
 }
 
 LoadResult LogCleanWal::Load(const WalEntryLoadedCallback &callback) {
+    LOGDTAG;
     if (UNLIKELY(!m_bInited)) {
         LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
         return LoadResult(Code::Uninited, UninitializedError);
@@ -161,6 +163,7 @@ LoadResult LogCleanWal::Load(const WalEntryLoadedCallback &callback) {
 
 // TODO(sunchao): 抽象一个编码函数，对应不同的log version。目前这个只能编码version=1
 AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
+    LOGDTAG;
     if (UNLIKELY(!m_bInited)) {
         LCLOGEFUN << UninitializedError;
         return AppendEntryResult(Code::Uninited, UninitializedError);
@@ -233,6 +236,7 @@ AppendEntryResult LogCleanWal::AppendEntry(common::IEntry *entry) {
 }
 
 TruncateResult LogCleanWal::Truncate(uint64_t id) {
+    LOGDTAG;
     if (UNLIKELY(!m_bInited)) {
         LOGEFUN << LOGCLEAN_WAL_NAME << UninitializedError;
         return TruncateResult(Code::Uninited, UninitializedError);
@@ -320,9 +324,36 @@ TruncateResult LogCleanWal::Truncate(uint64_t id) {
     return TruncateResult(Code::OK);
 }
 
+SizeResult LogCleanWal::Size() {
+    LOGDTAG;
+    auto listRs = list_segments_asc();
+    if (listRs.Rc != Code::OK) {
+        return SizeResult(listRs.Rc, listRs.Errmsg);
+    }
+
+    if (listRs.Segments.empty()) {
+        return SizeResult(0);
+    }
+
+    uint64_t size = 0;
+    for (auto &s : listRs.Segments) {
+        auto sSize = utils::FileUtils::GetFileSize(s.Path);
+        if (-1 == sSize) {
+            auto errmsg = strerror(errno);
+            LCLOGEFUN << " access file " << s.Path << " error " << errmsg;
+            return SizeResult(Code::FileSystemError, errmsg);
+        }
+
+        size += sSize;
+    }
+
+    return SizeResult(size);
+}
+
 // TODO(sunchao): 1. 抽象一个解析函数，对应不同的log version。目前这个只能解析version=1
 //                2. 优化为io和计算分离，2线程并发做？
 LogCleanWal::LoadSegmentResult LogCleanWal::load_segment(const std::string &filePath, uint64_t segId, const WalEntryLoadedCallback &callback) {
+    LOGDTAG;
     auto fd = utils::FileUtils::Open(filePath, O_RDONLY, 0, 0);
     if (-1 == fd) {
         auto errmsg = strerror(errno);
@@ -690,31 +721,6 @@ LogCleanWal::LoadSegmentMaxEntryIdResult LogCleanWal::load_segment_max_entry_id(
 
     // entry被破坏，直接返回SMLOG_INVALID_ENTRY_ID.
     return LoadSegmentMaxEntryIdResult(Code::FileCorrupt, FileCorruptError);
-}
-
-SizeResult LogCleanWal::Size() {
-    auto listRs = list_segments_asc();
-    if (listRs.Rc != Code::OK) {
-        return SizeResult(listRs.Rc, listRs.Errmsg);
-    }
-
-    if (listRs.Segments.empty()) {
-        return SizeResult(0);
-    }
-
-    uint64_t size = 0;
-    for (auto &s : listRs.Segments) {
-        auto sSize = utils::FileUtils::GetFileSize(s.Path);
-        if (-1 == sSize) {
-            auto errmsg = strerror(errno);
-            LCLOGEFUN << " access file " << s.Path << " error " << errmsg;
-            return SizeResult(Code::FileSystemError, errmsg);
-        }
-
-        size += sSize;
-    }
-
-    return SizeResult(size);
 }
 }
 }

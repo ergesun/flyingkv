@@ -46,7 +46,11 @@ int FileUtils::CreateDir(const string &dir, __mode_t mode) {
 int FileUtils::CreateDirPath(const string &path, __mode_t access_mode) {
     char buffer[PATH_MAX + 1];
     bzero(buffer, sizeof(buffer));
-    memcpy(buffer, path.c_str(), PATH_MAX);
+    auto len = path.length();
+    if (PATH_MAX < len) {
+        len = PATH_MAX;
+    }
+    memcpy(buffer, path.c_str(), len);
     char *p = buffer;
     if ('/' == *p) {
         ++p;

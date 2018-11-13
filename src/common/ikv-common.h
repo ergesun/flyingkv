@@ -23,10 +23,6 @@ enum class ReqRespType {
 };
 
 typedef std::shared_ptr<google::protobuf::Message> SP_PB_MSG;
-typedef std::shared_ptr<protocol::PutRequest> KVPutRequest;
-typedef std::shared_ptr<protocol::GetRequest> KVGetRequest;
-typedef std::shared_ptr<protocol::DeleteRequest> KVDeleteRequest;
-typedef std::shared_ptr<protocol::ScanRequest> KVScanRequest;
 
 /**
  * rpc通信的消息接收接口。
@@ -34,12 +30,12 @@ typedef std::shared_ptr<protocol::ScanRequest> KVScanRequest;
 class IKVOperator {
 PUBLIC
     virtual ~IKVOperator() = default;
-    virtual SP_PB_MSG Put(KVPutRequest)       = 0;
-    virtual SP_PB_MSG Get(KVGetRequest)       = 0;
-    virtual SP_PB_MSG Delete(KVDeleteRequest) = 0;
-    virtual SP_PB_MSG Scan(KVScanRequest)     = 0;
+    virtual SP_PB_MSG Put(SP_PB_MSG)       = 0;
+    virtual SP_PB_MSG Get(SP_PB_MSG)       = 0;
+    virtual SP_PB_MSG Delete(SP_PB_MSG)    = 0;
+    virtual SP_PB_MSG Scan(SP_PB_MSG)      = 0;
 };
-} // namespace server
+} // namespace common
 } // namespace flyingkv
 
 namespace std {

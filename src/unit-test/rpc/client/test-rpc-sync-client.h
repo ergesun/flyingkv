@@ -20,7 +20,7 @@ class TestRpcClientSync : public rpc::ARpcSyncClient {
 PUBLIC
     TestRpcClientSync(net::ISocketService *ss, const sys::cctime &timeout,
                                 uint16_t workThreadsCnt, sys::MemPool *memPool = nullptr) :
-        rpc::ARpcSyncClient(ss, timeout, workThreadsCnt, memPool) {}
+        rpc::ARpcSyncClient(ss, timeout, memPool) {}
 
     // Define Rpc start
     DefineStandardSyncRpcWithMsgId(Get);
