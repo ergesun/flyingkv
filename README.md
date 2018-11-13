@@ -57,3 +57,5 @@ gcc|>= 4.8.2
 1. add async rpc server, so we can support more concurrency requests and add a scheduler use queue to scheduler and control requests.
 2. fix ut
 3. use yaml?
+4. fix TODO
+5. fix fork waitpid unknown child process error(目前这个错误对正确性没有影响).

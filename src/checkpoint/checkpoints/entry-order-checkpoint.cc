@@ -273,7 +273,29 @@ void EntryOrderCheckpoint::do_save_in_child(IEntriesTraveller *traveller) {
     if (-1 == lockFile.fd) {
         auto errmsg = strerror(errno);
         EOCPLOGEFUN << " lock file " << m_sLockPath << " error " << errmsg;
-        exit(1);
+        return;
+    }
+
+    auto loadMetaRs = load_meta();
+    if (Code::OK != loadMetaRs.Rc) {
+        EOCPLOGEFUN << " load meta error " << loadMetaRs.Errmsg;
+        return;
+    }
+
+    if (traveller->MaxId() <= loadMetaRs.EntryId) {
+        // close and rm lock file
+        if (-1 == utils::FileUtils::CloseFile(lockFile)) {
+            auto errmsg = strerror(errno);
+            EOCPLOGEFUN << " close lock file " << lockFile.path << " error " << errmsg;
+            return;
+        }
+
+        if (-1 == utils::FileUtils::Unlink(lockFile.path)) {
+            auto errmsg = strerror(errno);
+            EOCPLOGEFUN << " unlink lock file " << lockFile.path << " error " << errmsg;
+            return;
+        }
+        return;
     }
     auto rs = check_and_recover();
     if (Code::OK != rs.Rc) {
@@ -552,14 +574,15 @@ CheckpointResult EntryOrderCheckpoint::save_new_checkpoint(IEntriesTraveller *tr
             EOCPLOGEFUN << "write file " << m_sNewCpFilePath << " error " << errmsg;
             return CheckpointResult(Code::FileSystemError, errmsg);
         }
-        if (-1 == fdatasync(fd)) {
-            auto errmsg = strerror(errno);
-            EOCPLOGEFUN << " fdatasync file " << m_sNewCpFilePath << " error " << errmsg;
-            return CheckpointResult(Code::FileSystemError, errmsg);
-        }
+
         offset += walEntrySize;
     }
 
+    if (-1 == fdatasync(fd)) {
+        auto errmsg = strerror(errno);
+        EOCPLOGEFUN << " fdatasync file " << m_sNewCpFilePath << " error " << errmsg;
+        return CheckpointResult(Code::FileSystemError, errmsg);
+    }
     return CheckpointResult(Code::OK);
 }
 }
